@@ -218,18 +218,18 @@ module TWP3
       args.each_with_index do |value, index|
         case @parameters[index].type
           when :int
-            then msg.parameters << Types::ShortInteger.new(args[index])
+            then msg.parameters << Types::ShortInteger.new(value)
           when :string
-            then msg.parameters << Types::ShortString.new(args[index])
+            then msg.parameters << Types::ShortString.new(value)
         end
       end
 
       msg.submit
       
-      response = TWP3::Messages::Response.new(con)
+      response = Messages::Response.new(con)
       response.receive
       
-      msg = @protocol.messages.select{|m| m.id == response.message}.first
+      msg = @protocol.messages.select {|m| m.id == response.message}.first
       msg.parameters.each_index do |index|
         msg.parameters[index].value = response.parameters[index]
       end
@@ -261,7 +261,7 @@ module TWP3
       @specification = Specification.new(&block)
       @specification.protocols.each do |protocol|
         (self.class == Class ? self : self.class).
-          const_set(protocol.name, @specification.protocols.first)
+          const_set(protocol.name, protocol)
       end
     end
     
@@ -294,6 +294,7 @@ module TWP3
 end
 
 # to encapsulate, can be wrapped by any object (e.g. TWPClient::Echo.Request)
+# here on root level
 extend TWP3::DSL
 
 # sweet, he?
@@ -330,6 +331,8 @@ end
 #
 # puts spec.inspect
 
+# now go:
+
 TWP3::Connection.setup('www.dcl.hpi.uni-potsdam.de', 80)
 
 reply = Echo.Request('test')
@@ -338,40 +341,3 @@ puts "#{reply.name} = ID #{reply.id}"
 reply.parameters.each do |param|
   puts "- #{param.type} #{param.name} = #{param.value}"
 end
-
-# so the parsed result of that should be like the following?
-# class Echo
-#   def Request(text)
-#     [text, text.length]
-#   end
-# 
-#   def Reply(text, nr_of_letters)
-#     nil
-#   end
-# end
-
-# old stuff that works
-# con = TWP3::Connection.new('www.dcl.hpi.uni-potsdam.de', 80)
-# con.protocol = 2
-# con.connect
-# 
-# msg = TWP3::Messages::Request.new(con)
-# msg.message = 0
-# msg.parameters << TWP3::Types::ShortString.new('test')
-# msg.submit
-# 
-# response = TWP3::Messages::Response.new(con)
-# response.receive
-# 
-# response.print
-# 
-# con.disconnect
-
-# hint for socket closing:
-#
-# def do_at_exit(str1)
-#   at_exit { print str1 }
-# end
-# at_exit { puts "cruel world" }
-# do_at_exit("goodbye ")
-# exit
