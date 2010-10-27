@@ -1,9 +1,10 @@
 grammar TDL;
 
-ALPHA 	: 'A'..'Z'|'a'..'z';
-DIGIT 	: 0..9;
-LETTER 	: ALPHA | '_';
-WS  : (' '|'\r'|'\n')+ {$channel = HIDDEN;} ;
+WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ { $channel = HIDDEN; };
+
+LETTER : ALPHA | '_';
+DIGIT 	: '0'..'9';
+fragment ALPHA 	: 'A'..'Z'|'a'..'z';
 identifier 
 	: LETTER (LETTER | DIGIT)*;
 number 
@@ -36,4 +37,4 @@ protocol
 protocolelement 
    	: typedef | messagedef;
 specification 
-   	: (protocol | messagedef | structdef)*;
+   	: (protocol | messagedef | structdef)* EOF;
