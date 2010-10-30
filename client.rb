@@ -73,7 +73,7 @@ module TWP3
         @connected = true
       rescue Exception
         @socket.close if @socket && !@socket.closed?
-        exit(1)
+        exit 1
       end
     end
     
@@ -174,8 +174,8 @@ module TWP3
     end
 
     def method_missing(name, *args, &block)
-      method = @messages.select {|p| p.name == name.to_s}.first
-      method ? method.invoke(*args, &block) : super
+      message = @messages.select {|p| p.name == name.to_s}.first
+      message ? message.submit(*args, &block) : super
     end      
   end
   
@@ -189,7 +189,7 @@ module TWP3
       instance_exec(&block) if block_given?
     end
     
-    def invoke(*args, &block)
+    def submit(*args, &block)
       # don't open a new connection for every message
       #
       # check wether con is already connected?
@@ -205,7 +205,7 @@ module TWP3
         unless con.protocol == @protocol.id
           con.disconnect
           con.protocol = @protocol.id
-          con.connect          
+          con.connect
         end
       else
         con.protocol = @protocol.id
@@ -239,8 +239,8 @@ module TWP3
   end
   
   class Parameter
-    attr_reader :name, :type, :value
-    attr_writer :value
+    attr_reader :name, :type
+    attr_accessor :value
     
     def initialize(name, type)
       @name, @type = name, type
