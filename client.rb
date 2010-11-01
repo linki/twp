@@ -1,6 +1,12 @@
 require 'socket'
 require 'singleton'
 
+class Fixnum
+  def to_twp
+    TWP3::Types::ShortInteger.new(self).to_s
+  end
+end
+
 module TWP3
   MAGIC_BYTES    = "TWP3\n"
   END_OF_CONTENT = 0
@@ -36,6 +42,8 @@ module TWP3
   class Connection
     include Singleton
     
+    attr_writer :protocol
+    
     def initialize
       @connected = false
       at_exit { disconnect }
@@ -61,24 +69,21 @@ module TWP3
       @connected
     end
     
-    def protocol=(id)
-      @protocol = Types::ShortInteger.new(id)
-    end
-    
     def connect
       begin
         @socket = TCPSocket.new(@host, @port)
         @socket.write MAGIC_BYTES
-        @socket.write @protocol
+        @socket.write @protocol.to_twp
         @connected = true
-      rescue Exception
+      rescue SocketError
         @socket.close if @socket && !@socket.closed?
+        STDERR.puts "Connection Error"
         exit 1
       end
     end
     
     def disconnect
-      @socket.close unless @socket.closed?
+      @socket.close if @socket && !@socket.closed?
       @connected = false
     end
     
@@ -136,16 +141,6 @@ module TWP3
           end
         end
       end
-      
-      def print
-        puts "Response"
-        puts "========"
-        puts "Message: #{@message}"
-        puts "Parameters:"
-        @parameters.each do |param|
-          puts "- #{param}"
-        end
-      end
     end
   end
   
@@ -160,8 +155,8 @@ module TWP3
     end
     
     def method_missing(name, *args, &block)
-      @protocols.select {|p| p.name == name.to_s}.first || super
-    end      
+      @protocols.find {|p| p.name == name.to_s} || super
+    end
   end
   
   class Protocol
@@ -174,7 +169,7 @@ module TWP3
     end
 
     def method_missing(name, *args, &block)
-      message = @messages.select {|p| p.name == name.to_s}.first
+      message = @messages.find {|p| p.name == name.to_s}
       message ? message.submit(*args, &block) : super
     end      
   end
@@ -229,7 +224,7 @@ module TWP3
       response = Messages::Response.new(con)
       response.receive
       
-      msg = @protocol.messages.select {|m| m.id == response.message}.first
+      msg = @protocol.messages.find {|m| m.id == response.message}
       msg.parameters.each_index do |index|
         msg.parameters[index].value = response.parameters[index]
       end
@@ -341,3 +336,13 @@ puts "#{reply.name} = ID #{reply.id}"
 reply.parameters.each do |param|
   puts "- #{param.type} #{param.name} = #{param.value}"
 end
+
+# @socket = TCPSocket.new('localhost', 12345)
+# puts @socket.read(4).inspect
+# @socket.close
+
+# class Echo
+#   def Request(text)
+#     ['asd', 3]
+#   end
+# end

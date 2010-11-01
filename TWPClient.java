@@ -46,8 +46,7 @@ public class TWPClient {
 	private void writeString(String string) throws IOException {
 		int type = string.length() + 17;
 		writer.write(type);
-		writer.writeBytes(string);
-		
+		writer.writeBytes(string);	
 	}
 
 	private void writeEndOfMessage() throws IOException {
