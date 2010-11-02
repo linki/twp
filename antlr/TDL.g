@@ -2,9 +2,11 @@ grammar TDL;
 
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ { $channel = HIDDEN; };
 
+LETTER : ALPHA | '_';
 DIGIT 	: '0'..'9';
+fragment ALPHA 	: 'A'..'Z'|'a'..'z';
 identifier 
-	: 'text' | 'number_of_letters' | 'Echo' | 'Request' | 'Reply';
+	: 'Echo' | 'Request' | 'Reply' | 'text' | 'number_of_letters';
 number 
    	: DIGIT+;
    	
