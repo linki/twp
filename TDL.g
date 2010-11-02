@@ -2,13 +2,14 @@ grammar TDL;
 
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ { $channel = HIDDEN; };
 
-LETTER : ALPHA | '_';
-DIGIT 	: '0'..'9';
-fragment ALPHA 	: 'A'..'Z'|'a'..'z';
+ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+    ;
+SEVEN 	: '0'..'7';
+INT	:	'0'..'9'+;
 identifier 
-	: LETTER (LETTER | DIGIT)*;
+	: ID;
 number 
-   	: DIGIT+;
+   	: INT;
    	
 type 	
 	: primitiveType | identifier | ('any' 'defined' 'by' identifier);
@@ -31,7 +32,7 @@ forwarddef
    	: 'typedef' identifier ';';
    
 messagedef 
-   	: 'message' identifier '=' ( '0'..'7' | 'ID' number ) '{' field* '}';
+   	: 'message' identifier '=' ( SEVEN | 'ID' number ) '{' field* '}';//'0'..'7'
 protocol 
    	: 'protocol' identifier '=' 'ID' number '{' protocolelement* '}';
 protocolelement 
