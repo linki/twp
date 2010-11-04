@@ -8,6 +8,10 @@ SEVEN 	: '0'..'7';
 INT	:	'0'..'9'+;
 identifier 
 	: ID;
+	
+seven	:	
+	SEVEN;
+	
 number 
    	: INT;
    	
@@ -32,7 +36,7 @@ forwarddef
    	: 'typedef' identifier ';';
    
 messagedef 
-   	: 'message' identifier '=' ( SEVEN | 'ID' number ) '{' field* '}';//'0'..'7'
+   	: 'message' identifier '=' ( seven | 'ID' number ) '{' field* '}';//'0'..'7'
 protocol 
    	: 'protocol' identifier '=' 'ID' number '{' protocolelement* '}';
 protocolelement 
