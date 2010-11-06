@@ -1,0 +1,17 @@
+<?xml version="1.0"?> 
+<project name="twp" default="build" basedir="."> 
+  <target name="build"> 
+    <!--<javac srcdir="src" /> --> 
+  </target>
+  <target name="grammar"> 
+  	<java classname="org.antlr.Tool">
+  		<arg value="grammars/TDL.g" />
+  		<classpath>
+		  <pathelement location="lib/antlr-3.2.jar"/>
+  		</classpath>   
+  	</java>
+  	<move file="grammars/TDLLexer.java" todir="src" />
+  	<move file="grammars/TDLParser.java" todir="src" />
+  	<delete file="TDL.tokens"/>
+  </target>
+</project>
