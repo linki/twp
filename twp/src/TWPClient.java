@@ -20,71 +20,72 @@ public class TWPClient {
 		this.port = port;
 	}
 
-	private void connect() throws UnknownHostException, IOException {
+	public void connect() throws UnknownHostException, IOException {
 		socket = new Socket(host, port);
 		writer = new DataOutputStream(socket.getOutputStream());
 		reader = new DataInputStream(socket.getInputStream());
 	}
 
-	private void disconnect() throws IOException {
+	public void disconnect() throws IOException {
 		socket.close();
 	}
 
-	private void writeMagicBytes() throws IOException {
+	public void writeMagicBytes() throws IOException {
 		writer.writeBytes(MAGIC_BYTES);
 	}
 
-	private void writeProtocol(int i) throws IOException {
-		writer.write(SHORT_INTEGER);
-		writer.write(i);
+	public void writeProtocol(int protocol) throws IOException {
+		writeInteger(protocol);
 	}
 
-	private void writeMessage(int i) throws IOException {
+	// TODO: registered extensions
+	public int readMessage() throws IOException {
+		byte message = reader.readByte();
+		return message - 4;
+	}
+
+	// TODO: registered extensions
+	public void writeMessage(int i) throws IOException {
 		writer.write(i + 4);
 	}
+	
+	// TODO: length / other types
+	public int readInteger() throws IOException {
+		int type = reader.readByte();
+		int value = reader.readByte();
+		return value;
+	}
+	
+	// TODO: length / other types
+	public void writeInteger(int value) throws IOException {
+		writer.write(SHORT_INTEGER);
+		writer.write(value);
+	}
 
-	private void writeString(String string) throws IOException {
+	// TODO: longer strings than 109
+	public String readString() throws IOException {
+		int type = reader.readByte();
+		byte[] value = new byte[type - 17];
+		reader.read(value);
+		return new String(value);
+	}
+
+	// TODO: longer strings than 109
+	public void writeString(String string) throws IOException {
 		int type = string.length() + 17;
 		writer.write(type);
 		writer.writeBytes(string);
 	}
 
-	private void writeEndOfMessage() throws IOException {
+	public void readEndOfMessage() throws IOException {
+		reader.readByte();
+	}
+
+	public void writeEndOfMessage() throws IOException {
 		writer.write(0);
 	}
 
-	private void readMessage() throws IOException {
-		byte message = reader.readByte();
-		System.out.println("Message: "+ message);
-	}
-
-	private void readString() throws IOException {
-		int type = reader.readByte();
-		
-		System.out.println("Type: " + type);
-		
-		byte[] value = new byte[type - 17];
-		reader.read(value);
-		
-		System.out.println("Value: " + new String(value));
-	}
-	
-	private void readInteger() throws IOException {
-		int type = reader.readByte();
-		
-		System.out.println("Type: " + type);
-		
-		int value = reader.readByte();
-		
-		System.out.println("Value: " + value);
-	}	
-
-	private void readEndOfMessage() throws IOException {
-		int eom = reader.readByte();
-		
-		System.out.println("End: " + eom);
-	}
-
+	// example
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		
 		TWPClient twp = new TWPClient("www.dcl.hpi.uni-potsdam.de", 80);
