@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import twp.TWPClient;
+
 class Example {
 	
 	public String echo(String text) throws UnknownHostException, IOException {
