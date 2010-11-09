@@ -17,23 +17,39 @@ public class TWPClient {
 	private DataOutputStream writer;
 	private DataInputStream reader;
 	
+	public TWPClient(Socket socket) throws IOException {
+		this.socket = socket;
+		this.writer = new DataOutputStream(socket.getOutputStream());
+		this.reader = new DataInputStream(socket.getInputStream());
+	}
+
 	public TWPClient(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
 
 	public void connect() throws UnknownHostException, IOException {
-		socket = new Socket(host, port);
-		writer = new DataOutputStream(socket.getOutputStream());
-		reader = new DataInputStream(socket.getInputStream());
+		this.socket = new Socket(host, port);
+		this.writer = new DataOutputStream(socket.getOutputStream());
+		this.reader = new DataInputStream(socket.getInputStream());
 	}
 
 	public void disconnect() throws IOException {
 		socket.close();
 	}
 
+	public String readMagicBytes() throws IOException {
+		byte[] magicBytes = new byte[5];
+		reader.readFully(magicBytes);
+		return new String(magicBytes);
+	}
+
 	public void writeMagicBytes() throws IOException {
 		writer.writeBytes(MAGIC_BYTES);
+	}
+
+	public int readProtocol() throws IOException {
+		return readInteger();
 	}
 
 	public void writeProtocol(int protocol) throws IOException {
@@ -68,7 +84,7 @@ public class TWPClient {
 	public String readString() throws IOException {
 		int type = reader.readByte();
 		byte[] value = new byte[type - 17];
-		reader.read(value);
+		reader.readFully(value);
 		return new String(value);
 	}
 

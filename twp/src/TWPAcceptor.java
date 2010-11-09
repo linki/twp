@@ -5,10 +5,17 @@ import org.antlr.runtime.*;
 
 // use `ant grammar` in project root to update parser and lexer files
 
-public class TWPTest {
-	public static void main(String[] args) throws Exception {
+public class TWPAcceptor {
+	
+	public static void main(String[] args) throws IOException, RecognitionException {
+		
+		if (args.length < 1) {
+			System.err.println("Please provide a TWP3 specification file.");
+			return;
+		}
+		
 		// load a file
-		FileInputStream fis = new FileInputStream("examples/echo.twp3"); 
+		FileInputStream fis = new FileInputStream(args[0]); 
 		
 		// create a CharStream that reads from standard input
 		ANTLRInputStream input = new ANTLRInputStream(fis);
@@ -19,17 +26,19 @@ public class TWPTest {
 		// create a buffer of tokens pulled from the lexer
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
-		// print the tokens
-		@SuppressWarnings("unchecked")
-		Iterator<CommonToken> iterator = tokens.getTokens().iterator();
-		while (iterator.hasNext()) {
-			System.out.println(iterator.next().getText());
-		}
-	
 		// create a parser that feeds off the tokens buffer
 		TDLParser parser = new TDLParser(tokens);
 	
-		// begin parsing at rule r
+		// begin parsing at rule specification
 		parser.specification();
+		
+		// verify
+		int numErrors = parser.getNumberOfSyntaxErrors();
+		if (numErrors == 0) {
+			System.err.println("File is a valid TWP3 specification.");
+		} else {
+			System.err.println("File doesn't contain a valid TWP3 specification. (" + numErrors + " Errors)");
+		}
+		
 	}
 }
