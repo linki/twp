@@ -14,7 +14,7 @@ import twp3.custom.Specification;
 
 public class LocalImpl implements Specification {
 	@Override
-	public List<Object> echo(String text) throws IOException {
+	public EchoResult echo(String text) throws IOException {
 		TWPClient twp = new TWPClient("localhost", 6666);
 		twp.connect();
 		
@@ -31,19 +31,15 @@ public class LocalImpl implements Specification {
 		
 		twp.disconnect();
 		
-		//EchoResponse response = new EchoResponse();
-		//response.addParameter(returnedText);
-		//response.addParameter(length);
-		
-		List<Object> result = new ArrayList<Object>();
-		result.add(returnedText);
-		result.add(length);
+		EchoResult result = new EchoResult();
+		result.text = returnedText;
+		result.number_of_letters = length;
 		
 		return result;
 	}
 
 	@Override
-	public String simpleEcho(String text) throws IOException {
+	public SimpleEchoResult simpleEcho(String text) throws IOException {
 		TWPClient twp = new TWPClient("localhost", 6666);
 		twp.connect();
 		
@@ -59,10 +55,9 @@ public class LocalImpl implements Specification {
 		
 		twp.disconnect();
 		
-		//EchoResponse response = new EchoResponse();
-		//response.addParameter(returnedText);
-		//response.addParameter(length);
+		SimpleEchoResult result = new SimpleEchoResult();
+		result.text = returnedText;
 		
-		return returnedText;
+		return result;
 	}
 }

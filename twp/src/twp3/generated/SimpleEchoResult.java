@@ -7,8 +7,8 @@ import java.util.List;
 import twp3.core.DefaultResult;
 import twp3.core.Result;
 
-public class SimpleEchoResult extends DefaultResult implements Result {
-	public SimpleEchoResult(String result) {
+public class SimpleEchoResult {
+/*	public SimpleEchoResult(String result) {
 		super(new ArrayList<Object>());
 		response.add(result);
 	}
@@ -19,5 +19,7 @@ public class SimpleEchoResult extends DefaultResult implements Result {
 	
 	public void setText(String text) {
 		response.set(0, text);
-	}
+	} */
+	
+	public String text;
 }

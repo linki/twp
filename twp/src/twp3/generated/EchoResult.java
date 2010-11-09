@@ -7,8 +7,8 @@ import java.util.List;
 import twp3.core.DefaultResult;
 import twp3.core.Result;
 
-public class EchoResult extends DefaultResult implements Result {
-	public EchoResult(List<Object> response) {
+public class EchoResult {
+/*	public EchoResult(List<Object> response) {
 		super(response);
 	}
 
@@ -27,4 +27,8 @@ public class EchoResult extends DefaultResult implements Result {
 	public void setNumberOfLetters(int number_of_letters) {
 		response.set(1, number_of_letters);
 	}
+	 */
+	
+	public String text;
+	public int number_of_letters;
 }

@@ -15,10 +15,12 @@ public class LocalStub {
 	}
 	
 	public EchoResult echo(String text) throws IOException {
-		return new EchoResult(impl.echo(text));
+		return null;
+		//return new EchoResult(impl.echo(text));
 	}
 
 	public SimpleEchoResult simpleEcho(String text) throws IOException {
-		return new SimpleEchoResult(impl.simpleEcho(text));
+		return null;
+		//return new SimpleEchoResult(impl.simpleEcho(text));
 	}
 }

@@ -4,17 +4,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import twp3.generated.EchoResult;
+import twp3.generated.SimpleEchoResult;
+
 public class RemoteImpl implements Specification  {
 	@Override
-	public List<Object> echo(String text) {
-		List<Object> result = new ArrayList<Object>();
-		result.add(text);
-		result.add(text.length());
+	public EchoResult echo(String text) {
+		EchoResult result = new EchoResult();
+		result.text = text;
+		result.number_of_letters = text.length();
 		return result;
 	}
 
 	@Override
-	public String simpleEcho(String text) {
-		return text;
+	public SimpleEchoResult simpleEcho(String text) {
+		SimpleEchoResult result = new SimpleEchoResult();
+		result.text = text;
+		return result;
 	}
 }

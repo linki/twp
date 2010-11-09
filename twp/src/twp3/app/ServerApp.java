@@ -11,8 +11,8 @@ import twp3.custom.Specification;
 
 public class ServerApp {
 	public static void main(String[] args) throws IOException {
-		Specification remote = new RemoteImpl();
-		Server server = new Server(remote);
+		Specification spec = new RemoteImpl();
+		Server server = new Server(spec);
 		server.start();
 	}
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import twp.TWPClient;
 import twp3.custom.RemoteImpl;
 import twp3.custom.Specification;
+import twp3.generated.EchoResult;
+import twp3.generated.SimpleEchoResult;
 
 public class Server {
 	Specification spec;
@@ -41,10 +43,10 @@ public class Server {
 				int messageId = twp.readMessage();
 				String text = twp.readString();
 				
-				List<Object> result = remote.echo(text);
+				EchoResult result = remote.echo(text);
 				twp.writeMessage(2);
-				twp.writeString((String) result.get(0));
-				twp.writeInteger((Integer) result.get(1));
+				twp.writeString(result.text);
+				twp.writeInteger(result.number_of_letters);
 				twp.writeEndOfMessage();
 			}
 					
@@ -52,9 +54,9 @@ public class Server {
 				int messageId = twp.readMessage();
 				String text = twp.readString();
 				
-				String result = remote.simpleEcho(text);
+				SimpleEchoResult result = remote.simpleEcho(text);
 				twp.writeMessage(4);
-				twp.writeString((String) result);
+				twp.writeString(result.text);
 				twp.writeEndOfMessage();
 			}
 
