@@ -8,7 +8,7 @@ import twp.generated.Protocol;
 import twp.generated.RequestHandler;
 
 
-public class ClientApp implements RequestHandler {
+public class ClientApp {
 
 	/**
 	 * @param args
@@ -17,7 +17,7 @@ public class ClientApp implements RequestHandler {
 		// TODO Auto-generated method stub
 		Protocol protocol;
 		try {
-			protocol = Protocol.startClient("www.dcl.hpi.uni-potsdam.de", 80);
+			protocol = Protocol.startClient("localhost", 12347);
 			EchoResponse res;
 			res = protocol.echo("foobar");
 			System.out.println(res.getNumberOfLetters());
@@ -29,12 +29,6 @@ public class ClientApp implements RequestHandler {
 			e1.printStackTrace();
 		}
 		
-	}
-
-	@Override
-	public EchoResponse onEcho(EchoRequest request) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

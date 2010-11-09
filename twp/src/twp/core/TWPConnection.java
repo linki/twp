@@ -4,7 +4,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
+
+import twp.generated.Protocol;
 
 
 public class TWPConnection {
@@ -13,13 +16,13 @@ public class TWPConnection {
 	
 	private Socket socket;
 	private ServerSocket serverSocket;
-	private int protocol;
+	private int protocolVersion;
 	private DataOutputStream writer;
 	private DataInputStream reader;
-	
+	private Protocol protocol;
 	public TWPConnection(String host, int port, int protocol) throws UnknownHostException, IOException {
 		socket = new Socket(host, port);
-		this.protocol = protocol;
+		this.protocolVersion = protocol;
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new DataOutputStream(socket.getOutputStream());
 		startClient();
@@ -28,15 +31,26 @@ public class TWPConnection {
 	private void startClient() {
 		try {
 			writeMagicBytes();
-			writeProtocol(this.protocol);
+			writeProtocol(this.protocolVersion);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	public TWPConnection(int port) throws IOException {
+	public TWPConnection(int port, Protocol protocol) throws IOException {
 		serverSocket = new ServerSocket(port);
+		this.protocol = protocol;
+		//startServer();
+	}
+	
+	public void startServer() throws IOException {
+		socket = serverSocket.accept();
+		reader = new DataInputStream(socket.getInputStream());
+		writer = new DataOutputStream(socket.getOutputStream());
+		reader.skipBytes(7);
+		protocol.onMessage();
+		socket.close();
 	}
 	
 	public void disconnect() throws IOException {
