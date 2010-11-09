@@ -242,68 +242,196 @@ require 'singleton'
 #     end
 #   end
 #   
-#   # here's the magic
-#   
-#   module DSL
-#     def self.extended(base)
-#       # add the following DSL methods to the classes only when we include the DSL module
-#       Specification.send :include, SpecificationMethods
-#       Protocol.send      :include, ProtocolMethods
-#       Message.send       :include, MessageMethods
-#     end
-#     
-#     def specification(&block)
-#       @specification = Specification.new(&block)
-#       @specification.protocols.each do |protocol|
-#         (self.class == Class ? self : self.class).
-#           const_set(protocol.name, protocol)
-#       end
-#     end
-#     
-#     module SpecificationMethods
-#       def protocol(name, id, &block)
-#         @protocols << Protocol.new(name, id, &block)
-#       end
-#     end
-#     
-#     module ProtocolMethods
-#       def message(name, id, &block)
-#         @messages << Message.new(name, id, self, &block)
-#       end
-#     end
-#     
-#     module MessageMethods
-#       def parameter(name, type)
-#         @parameters << Parameter.new(name, type)
-#       end
-#       
-#       def string(name)
-#         parameter(name, :string)
-#       end
-# 
-#       def int(name)
-#         parameter(name, :int)
-#       end
-#     end
+# end
+
+# @socket = TCPSocket.new('localhost', 12345)
+# puts @socket.read(4).inspect
+# @socket.close
+
+# class Echo
+#   def Request(text)
+#     ['asd', 3]
 #   end
 # end
 
+module TWP3
+  REQUEST = 0
+  REPLY   = 1
+  
+  class Specification
+    attr_reader :protocols
+  
+    def initialize(&block)
+      @protocols = []
+      instance_exec(&block) if block_given?
+    end
+  
+    def receive(stream)
+      stream.read(5) # "TWP3\n"
+      stream.read(1) # "13"
+      protocol_id = stream.read(1).ord # "2"
+      protocol = @protocols.find {|p| p.id == protocol_id}
+      protocol.receive(stream)
+    end
+    
+    def method_missing(name, *args, &block)
+      protocol = @protocols.find {|p| p.name == name.to_s}
+      protocol ? protocol.invoke(REQUEST, *args, &block) : super
+    end
+  end
+
+  class Protocol
+    attr_reader :name, :id, :messages
+  
+    def initialize(name, id, &block)
+      @name, @id = name, id
+      @messages  = []
+      instance_exec(&block) if block_given?
+    end
+  
+    def receive(stream)
+      message_id = stream.read(1).ord - 4
+      message = @messages.find {|m| m.id == message_id}
+      message.receive(stream)
+    end
+    
+    def invoke(id, *args, &block)
+      message = @messages.find {|p| p.id == id}
+      message ? message.invoke(*args, &block) : super
+    end
+  end
+
+  class Message
+    attr_accessor :protocol, :id, :text, :number_of_letters, :parameters
+  
+    def initialize(name, id, protocol, &block)
+      @name, @id, @protocol = name, id, protocol
+      @parameters = []
+      instance_exec(&block) if block_given?
+    end
+  
+    def receive(stream)
+      msg = dup
+      @parameters.each_index do |i|
+        msg.parameters[i] = @parameters[i].receive(stream)
+      end
+      stream.read(1) # end
+      msg
+    end
+
+    def to_stream
+      stream = "TWP3\n"
+      stream << "#{13.chr}#{@protocol.id.chr}"
+      stream << "#{(@id + 4).chr}"
+      @parameters.each do |param|
+        stream << param.to_stream
+      end    
+      stream << "#{0.chr}"
+    end
+  
+    def invoke(*args, &block)
+      @socket = TCPSocket.new('www.dcl.hpi.uni-potsdam.de', 80)
+      request = self.dup
+      args.each_index do |i|
+        request.parameters[i].value = args[i]
+      end
+      @socket.write request.to_stream
+      reply = @protocol.receive(@socket)
+      reply.parameters.map {|p| p.value}
+    end
+  end
+
+  class Parameter
+    attr_accessor :name, :type, :value
+  
+    def initialize(name, type, value = nil)
+      @name, @type, @value = name, type, value
+    end
+  
+    def receive(stream)
+      type = stream.read(1).ord
+      case type
+        when 13
+          @value = stream.read(1).ord
+        when 17..126
+          @value = stream.read(type - 17)
+      end
+      self
+    end
+
+    def to_stream
+      case @type
+        when :int
+          "#{13.chr}#{@value.chr}"
+        when :string
+          "#{(@value.length + 17).chr}#{@value}"
+      end
+    end
+  end
+  
+  # here's the magic
+    
+  module DSL
+    def self.extended(base)
+      # add the following DSL methods to the classes only when we include the DSL module
+      Specification.send :include, SpecificationMethods
+      Protocol.send      :include, ProtocolMethods
+      Message.send       :include, MessageMethods
+    end
+    
+    def specification(&block)
+      @specification = Specification.new(&block)
+      # @specification.protocols.each do |protocol|
+      #   (self.class == Class ? self : self.class).
+      #     const_set(protocol.name, protocol)
+      # end
+    end
+    
+    module SpecificationMethods
+      def protocol(name, id, &block)
+        @protocols << Protocol.new(name, id, &block)
+      end
+    end
+    
+    module ProtocolMethods
+      def message(name, id, &block)
+        @messages << Message.new(name, id, self, &block)
+      end
+    end
+    
+    module MessageMethods
+      def parameter(name, type)
+        @parameters << Parameter.new(name, type)
+      end
+      
+      def string(name)
+        parameter(name, :string)
+      end
+
+      def int(name)
+        parameter(name, :int)
+      end
+    end
+  end
+end
+
 # to encapsulate, can be wrapped by any object (e.g. TWPClient::Echo.Request)
 # here on root level
-# extend TWP3::DSL
-# 
-# # sweet, he?
-# specification do
-#   protocol 'Echo', 2 do
-#     message 'Request', 0 do
-#       string :text
-#     end
-#     message 'Reply', 1 do
-#       string :text
-#       int :number_of_letters
-#     end
-#   end
-# end
+extend TWP3::DSL
+
+# sweet, he?
+spec =
+specification do
+  protocol 'Echo', 2 do
+    message 'Request', 0 do
+      string :text
+    end
+    message 'Reply', 1 do
+      string :text
+      int :number_of_letters
+    end
+  end
+end
 
 # same as:
 
@@ -321,148 +449,25 @@ require 'singleton'
 # protocol.messages << message2
 # 
 # spec.protocols << protocol
-# 
-# Echo = protocol
-#
-# puts spec.inspect
 
 # now go:
 
 # TWP3::Connection.setup('www.dcl.hpi.uni-potsdam.de', 80)
-# 
-# reply = Echo.Request('test')
-# 
-# puts "#{reply.name} = ID #{reply.id}"
-# reply.parameters.each do |param|
-#   puts "- #{param.type} #{param.name} = #{param.value}"
-# end
 
-# @socket = TCPSocket.new('localhost', 12345)
-# puts @socket.read(4).inspect
+result = spec.Echo('martin')
+puts result.inspect
+
+# @socket = TCPSocket.new('www.dcl.hpi.uni-potsdam.de', 80)
+# 
+# request = spec.protocols[0].messages[0].dup
+# request.parameters[0].value = 'martin'
+# 
+# @socket.write request.to_stream
+# 
+# reply = request.protocol.receive(@socket)
+# puts reply.protocol.id
+# puts reply.id
+# puts reply.parameters[0].value
+# puts reply.parameters[1].value
+# 
 # @socket.close
-
-# class Echo
-#   def Request(text)
-#     ['asd', 3]
-#   end
-# end
-
-class Specification
-  attr_reader :protocols
-  
-  def initialize
-    @protocols = []
-  end
-  
-  def receive(stream)
-    stream.read(5) # "TWP3\n"
-    stream.read(1) # "13"
-    protocol_id = stream.read(1).ord # "2"
-    protocol = @protocols.find {|p| p.id == protocol_id}
-    protocol.receive(stream)
-  end
-end
-
-class Protocol
-  attr_reader :name, :id, :messages
-  
-  def initialize(name, id)
-    @name, @id = name, id
-    @messages  = []
-  end
-  
-  def receive(stream)
-    message_id = stream.read(1).ord - 4
-    message = @messages.find {|m| m.id == message_id}
-    message.receive(stream)
-  end
-end
-
-class Message
-  attr_accessor :protocol, :id, :text, :number_of_letters, :reply_with
-  attr_accessor :parameters
-  
-  def initialize(name, id, protocol)
-    @name, @id, @protocol = name, id, protocol
-    @parameters = []
-  end
-  
-  def receive(stream)
-    msg = dup
-    @parameters.each_index do |i|
-      msg.parameters[i] = @parameters[i].receive(stream)
-    end
-    stream.read(1) # end
-    msg
-  end
-
-  def to_stream
-    stream = "TWP3\n"
-    stream << "#{13.chr}#{@protocol.id.chr}"
-    stream << "#{(@id + 4).chr}"
-    @parameters.each do |param|
-      stream << param.to_stream
-    end    
-    stream << "#{0.chr}"
-  end
-end
-
-class Parameter
-  attr_accessor :name, :type, :value
-  
-  def initialize(name, type, value = nil)
-    @name, @type, @value = name, type, value
-  end
-  
-  def receive(stream)
-    type = stream.read(1).ord
-    case type
-      when 13
-        @value = stream.read(1).ord
-      when 17..126
-        @value = stream.read(type - 17)
-    end
-    self
-  end
-
-  def to_stream
-    case @type
-      when :int
-        "#{13.chr}#{@value.chr}"
-      when :string
-        "#{(@value.length + 17).chr}#{@value}"
-    end
-  end
-end
-
-spec = Specification.new
-protocol = Protocol.new('Echo', 2)
-
-message1 = Message.new('Request', 0, protocol)
-message1.parameters << Parameter.new('text', :string)
-
-message2 = Message.new('Reply', 1, protocol)
-message2.parameters << Parameter.new('text', :string)
-message2.parameters << Parameter.new('number_of_letters', :int)
-
-message1.reply_with = message2
-
-protocol.messages << message1
-protocol.messages << message2
-
-spec.protocols << protocol
-
-@socket = TCPSocket.new('localhost', 12345)
-
-request = spec.protocols[0].messages[0].dup
-request.parameters[0].value = 'martin'
-
-@socket.write request.to_stream
-
-reply = request.protocol.receive(@socket)
-puts reply.protocol.id
-puts reply.id
-puts reply.parameters[0].value
-puts reply.parameters[1].value
-
-@socket.close
