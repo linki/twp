@@ -9,6 +9,8 @@ import java.net.UnknownHostException;
 public class TWPClient {
 	private static final String MAGIC_BYTES = "TWP3\n";
 	private static final int SHORT_INTEGER = 13;
+	private static final int LONG_INTEGER = 14;
+	private static final int LONG_STRING = 127;
 	
 	private String host;
 	private int port;
@@ -51,32 +53,41 @@ public class TWPClient {
 		writer.write(i + 4);
 	}
 	
-	// TODO: length / other types
 	public int readInteger() throws IOException {
 		int type = reader.readByte();
-		int value = reader.readByte();
+		int value = 0;
+		if (type == SHORT_INTEGER)
+			value = reader.readByte();
+		else if (type == LONG_INTEGER)
+			value = reader.readInt();
 		return value;
 	}
 	
-	// TODO: length / other types
 	public void writeInteger(int value) throws IOException {
-		writer.write(SHORT_INTEGER);
-		writer.write(value);
+		if (-128 <= value && value <= 127) {
+			writer.write(SHORT_INTEGER);
+			writer.write(value);
+		} else {
+			writer.write(LONG_INTEGER);
+			writer.writeInt(value);
+		}
 	}
 
-	// TODO: longer strings than 109
 	public String readString() throws IOException {
 		int type = reader.readByte();
-		byte[] value = new byte[type - 17];
-		reader.read(value);
-		return new String(value);
+		int length = type == LONG_STRING ? reader.readInt() : type - 17;
+		byte[] value = new byte[length];
+		reader.readFully(value);
+		return new String(value, "UTF-8");
 	}
 
-	// TODO: longer strings than 109
 	public void writeString(String string) throws IOException {
-		int type = string.length() + 17;
+		byte[] bytes = string.getBytes("UTF-8");
+		int type = bytes.length > 109 ? LONG_STRING : bytes.length + 17;
 		writer.write(type);
-		writer.writeBytes(string);
+		if (type == LONG_STRING)
+			writer.writeInt(bytes.length);
+		writer.write(bytes);
 	}
 
 	public void readEndOfMessage() throws IOException {
