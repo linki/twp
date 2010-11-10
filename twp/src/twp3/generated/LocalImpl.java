@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.List;
 
 import twp.TWPClient;
+import twp3.core.Message;
+import twp3.core.Parameter;
 import twp3.custom.Specification;
 
 public class LocalImpl implements Specification {
@@ -17,14 +19,18 @@ public class LocalImpl implements Specification {
 	public EchoResult echo(String text) throws IOException {
 		TWPClient twp = new TWPClient("localhost", 6666);
 		twp.connect();
+
+		// create echo request msg
+		Message message = new Message();
+		message.protocol = 22;
+		message.id = 0;
+		message.parameters.add(new Parameter(text, "string"));
 		
-		twp.writeMagicBytes();
-		twp.writeProtocol(22);
-		twp.writeMessage(0);
-		twp.writeString(text);
-		twp.writeEndOfMessage();
+		// write it
+		twp.writeMessage(message);
 		
-		int messageId = twp.readMessage();
+		
+		int messageId = twp.readMessageId();
 		String returnedText = twp.readString();
 		int length = twp.readInteger();
 		twp.readEndOfMessage();
@@ -45,11 +51,11 @@ public class LocalImpl implements Specification {
 		
 		twp.writeMagicBytes();
 		twp.writeProtocol(23);
-		twp.writeMessage(0);
+		twp.writeMessageId(0);
 		twp.writeString(text);
 		twp.writeEndOfMessage();
 		
-		int messageId = twp.readMessage();
+		int messageId = twp.readMessageId();
 		String returnedText = twp.readString();
 		twp.readEndOfMessage();
 		

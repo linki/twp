@@ -12,13 +12,13 @@ class Example {
 		
 		twp.writeMagicBytes();
 		twp.writeProtocol(2);
-		twp.writeMessage(0);
+		twp.writeMessageId(0);
 		twp.writeString(text);
 		twp.writeEndOfMessage();
 		
 		// if message is something like exception or close connection,
 		// we'll have to deal with that
-		int message = twp.readMessage();
+		int message = twp.readMessageId();
 		
 		String returnedText = twp.readString();
 		int length = twp.readInteger();

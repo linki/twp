@@ -40,22 +40,22 @@ public class Server {
 			Specification remote = new RemoteImpl();
 			
 			if (protocol == 22) {
-				int messageId = twp.readMessage();
+				int messageId = twp.readMessageId();
 				String text = twp.readString();
 				
 				EchoResult result = remote.echo(text);
-				twp.writeMessage(2);
+				twp.writeMessageId(2);
 				twp.writeString(result.text);
 				twp.writeInteger(result.number_of_letters);
 				twp.writeEndOfMessage();
 			}
 					
 			if (protocol == 23) {
-				int messageId = twp.readMessage();
+				int messageId = twp.readMessageId();
 				String text = twp.readString();
 				
 				SimpleEchoResult result = remote.simpleEcho(text);
-				twp.writeMessage(4);
+				twp.writeMessageId(4);
 				twp.writeString(result.text);
 				twp.writeEndOfMessage();
 			}

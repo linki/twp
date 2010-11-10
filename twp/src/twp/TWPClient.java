@@ -5,6 +5,10 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import twp3.core.Message;
+import twp3.core.Parameter;
 
 public class TWPClient {
 	private static final String MAGIC_BYTES = "TWP3\n";
@@ -17,12 +21,6 @@ public class TWPClient {
 	private DataOutputStream writer;
 	private DataInputStream reader;
 	
-	public TWPClient(Socket socket) throws IOException {
-		this.socket = socket;
-		this.writer = new DataOutputStream(socket.getOutputStream());
-		this.reader = new DataInputStream(socket.getInputStream());
-	}
-
 	public TWPClient(String host, int port) {
 		this.host = host;
 		this.port = port;
@@ -34,6 +32,12 @@ public class TWPClient {
 		this.reader = new DataInputStream(socket.getInputStream());
 	}
 
+	public TWPClient(Socket socket) throws IOException {
+		this.socket = socket;
+		this.writer = new DataOutputStream(socket.getOutputStream());
+		this.reader = new DataInputStream(socket.getInputStream());
+	}
+	
 	public void disconnect() throws IOException {
 		socket.close();
 	}
@@ -57,13 +61,13 @@ public class TWPClient {
 	}
 
 	// TODO: registered extensions
-	public int readMessage() throws IOException {
+	public int readMessageId() throws IOException {
 		byte message = reader.readByte();
 		return message - 4;
 	}
 
 	// TODO: registered extensions
-	public void writeMessage(int i) throws IOException {
+	public void writeMessageId(int i) throws IOException {
 		writer.write(i + 4);
 	}
 	
@@ -103,184 +107,65 @@ public class TWPClient {
 		writer.write(0);
 	}
 
+	public void writeMessage(Message message) throws IOException {
+		writeMagicBytes();
+		writeProtocol(message.protocol);
+		writeMessageId(message.id);
+		
+		Iterator<Parameter> iterator = message.parameters.iterator();
+		while (iterator.hasNext()) {
+			Parameter param = iterator.next();
+			if (param.type.equals("string")) {
+				writeString((String) param.value); // support other types
+			}
+			if (param.type.equals("int")) {
+				writeInteger((Integer) param.value); // support other types
+			}
+		}
+		writeEndOfMessage();
+	}
+
 	// example
 	public static void main(String[] args) throws UnknownHostException, IOException {
+		
+		if (args.length < 1) {
+			System.err.println("Please provide a text to echo.");
+			return;
+		}
 		
 		TWPClient twp = new TWPClient("www.dcl.hpi.uni-potsdam.de", 80);
 		twp.connect();
 		
-		System.out.println("Connected");
-
-		twp.writeMagicBytes();
-		twp.writeProtocol(2);
-		twp.writeMessage(0);
-		twp.writeString("martin");
-		twp.writeEndOfMessage();
+		int requestProtocol  = 2;
+		int requestMessageId = 0;
+		String requestText   = args[0];
 		
-		twp.readMessage();
-		twp.readString();
-		twp.readInteger();
+		twp.writeMagicBytes();
+		twp.writeProtocol(requestProtocol);
+		twp.writeMessageId(requestMessageId);
+		twp.writeString(requestText);
+		twp.writeEndOfMessage();
+
+		System.out.println();
+		System.out.println("Request:");
+		System.out.println("- Protocol: " + requestProtocol);
+		System.out.println("- Message ID: " + requestMessageId);
+		System.out.println("- Parameters:");
+		System.out.println("  - Text: " + requestText);
+		
+		int responseMessageId = twp.readMessageId();
+		String responseText = twp.readString();
+		int responseLength = twp.readInteger();
 		twp.readEndOfMessage();
 		
+		System.out.println();
+		System.out.println("Response:");
+		System.out.println("- Message ID: " + responseMessageId);
+		System.out.println("- Parameters:");
+		System.out.println("  - Text: " + responseText);
+		System.out.println("  - Number of Letters: " + responseLength);
+		System.out.println();
+
 		twp.disconnect();
-		
-		System.out.println("Disconnected");
 	}
 }
-
-/*
-package org.threeriversinstitute.tyrant;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Iterator;
-
-class TyrantMap implements Iterable<byte[]> {
-	private static final int RESET_ITERATOR_OPERATION = 0x50;
-	private static final int GET_NEXT_KEY_OPERATION = 0x51;
-	private static final int SIZE_OPERATION = 0x80;
-	private static final int REMOVE_OPERATION = 0x20;
-	private static final int VANISH_OPERATION = 0x72;
-	private static final int GET_OPERATION = 0x30;
-	private static final int PUT_OPERATION = 0x10;
-	private static final int OPERATION_PREFIX = 0xC8;
-	private Socket socket;
-	private DataOutputStream writer;
-	private DataInputStream reader;
-
-	void put(byte[] key, byte[] value) throws IOException {
-		writeOperation(PUT_OPERATION);
-		writer.writeInt(key.length);
-		writer.writeInt(value.length);
-		writer.write(key);
-		writer.write(value);
-		int status = reader.read();
-		if (status != 0)
-			throw new RuntimeException();
-	}
-
-	public byte[] get(byte[] key) {
-		try {
-			writeOperation(GET_OPERATION);
-			writer.writeInt(key.length);
-			writer.write(key);
-			return readBytes();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void clear() throws IOException {
-		writeOperation(VANISH_OPERATION);
-		int status = reader.read();
-		if (status != 0)
-			throw new RuntimeException();
-	}
-	
-	public void remove(byte[] key) throws IOException {
-		if (key == null)
-			throw new IllegalArgumentException();
-		writeOperation(REMOVE_OPERATION);
-		writer.writeInt(key.length);
-		writer.write(key);
-		int status = reader.read();
-		if (status == 1)
-			return;
-		if (status != 0)
-			throw new RuntimeException();
-	}
-	
-	public long size() throws IOException {
-		writeOperation(SIZE_OPERATION);
-		int status = reader.read();
-		if (status != 0)
-			throw new RuntimeException();
-		return reader.readLong();
-	}
-	
-	@Override
-	public Iterator<byte[]> iterator() {
-		try {
-			reset();
-			final byte[] firstKey = getNextKey();
-			
-			return new Iterator<byte[]>() {
-				byte[] nextKey = firstKey;
-				private byte[] previousKey;
-				
-				@Override
-				public boolean hasNext() {
-					return nextKey != null;
-				}
-				
-				@Override
-				public byte[] next() {
-					byte[] result = get(nextKey);
-					previousKey = nextKey;
-					nextKey = getNextKey();
-					return result ;
-				}
-				
-				@Override
-				public void remove() {
-					try {
-						TyrantMap.this.remove(previousKey);
-					} catch (IllegalArgumentException e) {
-						throw new IllegalStateException(e);
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			};
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	void open() throws UnknownHostException, IOException {
-		socket = new Socket("localhost", 1978);
-		writer = new DataOutputStream(socket.getOutputStream());
-		reader = new DataInputStream(socket.getInputStream());
-	}
-
-	public void close() throws IOException {
-		socket.close();
-	}
-
-	private void reset() throws IOException {
-		writeOperation(RESET_ITERATOR_OPERATION);
-		int status = reader.read();
-		if (status != 0)
-			throw new RuntimeException();
-	}
-
-	private byte[] getNextKey() {
-		try {
-			writeOperation(GET_NEXT_KEY_OPERATION);
-			return readBytes();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void writeOperation(int operation) throws IOException {
-		writer.write(OPERATION_PREFIX);
-		writer.write(operation);
-	}
-
-	private byte[] readBytes() throws IOException {
-		int status = reader.read();
-		if (status == 1)
-			return null;
-		if (status != 0)
-			throw new RuntimeException();
-		int length = reader.readInt();
-		byte[] results = new byte[length];
-		reader.read(results); // TODO read longer values
-		return results;
-	}
-
-}
-*/
