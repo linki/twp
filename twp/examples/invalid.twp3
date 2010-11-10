@@ -1,0 +1,13 @@
+protocol Echo = ID 22{
+
+
+  message {
+    string text;
+  }
+
+  message Reply=1 {
+    string text;
+    int number_of_letters;
+  }
+}
+}

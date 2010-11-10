@@ -48,13 +48,13 @@ public class Client {
 		
 		twp.writeMagicBytes();
 		twp.writeProtocol(protocolObject.id);
-		twp.writeMessage(message.id);
+		twp.writeMessageId(message.id);
 		twp.writeString(parameters[0]);
 		twp.writeEndOfMessage();
 		
 		// if message is something like exception or close connection,
 		// we'll have to deal with that
-		int message_id = twp.readMessage();
+		int message_id = twp.readMessageId();
 		
 		String returnedText = twp.readString();
 		int length = twp.readInteger();
