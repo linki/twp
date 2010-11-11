@@ -7,7 +7,8 @@ import twp.core.Parameter;
 
 public class Message {
 
-	private int id, protocol;
+	private int id; 
+	private int protocol;
 	private List<Parameter> parameters;
 	
 	public Message(int messageId, int protocolVersion) {

@@ -1,63 +1,71 @@
 package twp.generated;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 
+import twp.core.Message;
+import twp.core.Parameter;
+import twp.core.ParameterType;
 import twp.core.TWPConnection;
 
 
 public class Protocol {
 	public static final int ID = 2;
 	private TWPConnection connection;
-	private RequestHandler handler;
+	private EchoHandler handler;
 	
 	
-	private Protocol(String host, int port) throws UnknownHostException, IOException {
+	private Protocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
+		handler = rh;
 		connection = new TWPConnection(host, port, ID);
 	}
 	
-	private Protocol(int port, RequestHandler rh) throws IOException {
+	private Protocol(int port, EchoHandler rh) throws IOException {
 		handler = rh;
 		connection = new TWPConnection(port, this);
 		connection.startServer();
 	}
 	
-	public static Protocol startClient(String host, int port) throws UnknownHostException, IOException {
-		return new Protocol(host, port);
+	public void stop() throws IOException {
+		connection.disconnect();
 	}
 	
-	public static Protocol startServer(int port, RequestHandler rh) throws IOException {
+	public static Protocol startClient(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
+		return new Protocol(host, port, rh);
+	}
+	
+	public static Protocol startServer(int port, EchoHandler rh) throws IOException {
 		return new Protocol(port, rh);
 	}
 	
-	public EchoResponse echo(String text) throws IOException {
-		connection.writeMessage(0);
-		connection.writeString(text);
-		connection.writeEndOfMessage();
-		
-		connection.readMessage();
-		EchoResponse resp = new EchoResponse(connection.readString(), connection.readInteger());
-		connection.readEndOfMessage();
-	
-		return resp;
+	public void echoRequest(String text) throws IOException {
+		Message message = new Message(0, ID);
+		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
+		connection.writeMessage(message);
 	}
 	
-	public void onMessage() throws IOException {
-		int messageType = connection.readMessage();
-		System.out.println("new Message " + messageType);
-		if (messageType == 0) {
-			System.out.println("Received Message");
-			EchoRequest req = new EchoRequest(connection.readString());
-			connection.readEndOfMessage();
-			EchoResponse resp = handler.onEcho(req);
-			respondEcho(resp);
+	public void echoReply(String text, int length) throws IOException {
+		Message message = new Message(1, ID);
+		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
+		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, length));
+		connection.writeMessage(message);
+	}
+	
+	public void onMessage(Message message) throws IOException {
+		System.out.println("Received Message: " + message.getType());
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		switch (message.getType()) {
+			case 0:
+				System.out.println("It's a Request.");
+				EchoRequest req = new EchoRequest((String) iter.next().getValue());
+				handler.onEchoRequest(req);
+				break;
+			case 1:
+				System.out.println("It's a Reply.");
+				EchoReply rep = new EchoReply((String) iter.next().getValue(), (Integer) iter.next().getValue());
+				handler.onEchoReply(rep);
+				break;
 		}
-		// TODO: respond with error
 	}
 	
-	private void respondEcho(EchoResponse resp) throws IOException {
-		connection.writeMessage(1);
-		connection.writeString(resp.getText());
-		connection.writeInteger(resp.getNumberOfLetters());
-		connection.writeEndOfMessage();
-	}
 }

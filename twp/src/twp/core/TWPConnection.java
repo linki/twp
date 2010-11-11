@@ -4,7 +4,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
 import twp.generated.Protocol;
@@ -41,24 +40,93 @@ public class TWPConnection {
 	public TWPConnection(int port, Protocol protocol) throws IOException {
 		serverSocket = new ServerSocket(port);
 		this.protocol = protocol;
-		//startServer();
 	}
 	
 	public void startServer() throws IOException {
-		socket = serverSocket.accept();
-		reader = new DataInputStream(socket.getInputStream());
-		writer = new DataOutputStream(socket.getOutputStream());
-		reader.skipBytes(7);
-		protocol.onMessage();
-		socket.close();
+		Runnable listener = new Runnable() {
+			public void run() {
+				try {
+					while (true) {
+						socket = serverSocket.accept();
+						System.out.println("Connection accepted");
+						reader = new DataInputStream(socket.getInputStream());
+						writer = new DataOutputStream(socket.getOutputStream());
+						if (readMagicBytes()) {
+							protocolVersion = readProtocol();
+							System.out.println("Read Protocol");
+							int tag = readMessageId();
+							while (socket.isConnected()) {
+								protocol.onMessage(readMessage(tag));
+								tag = readMessageId();
+							}
+						}
+						if (socket != null)
+							socket.close();
+					}
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+		Thread t = new Thread(listener);
+		t.start();
+	}
+	
+	public Message readMessage() throws IOException {
+		int tag = readMessageId();
+		return readMessage(tag);
+	}
+	public Message readMessage(int messageId) throws IOException {
+		Message message = new Message(messageId, protocolVersion);
+		int tag = reader.readByte();
+		ParameterType type = getParameterType(tag);
+		while (type != ParameterType.END_OF_CONTENT) {
+			Parameter p = null;
+			if (type == ParameterType.SHORT_INTEGER || type == ParameterType.LONG_INTEGER) {
+				int value = readInteger(tag);
+				p = new Parameter(type, value);
+			} else if (type == ParameterType.SHORT_STRING || type == ParameterType.LONG_STRING) {
+				String value = readString(tag);
+				p = new Parameter(type, value);
+			}
+			if (p != null)
+				message.addParameter(p);
+			tag = reader.readByte();
+			type = getParameterType(tag);
+		}
+		return message;
+	}
+	
+	public void writeMessage(Message message) throws IOException {
+		// TODO: reconnect if protocol is different
+		writeMessageId(message.getType());
+		for (Parameter p:message.getParameters()) {
+			if (p.getType() == ParameterType.SHORT_INTEGER || p.getType() == ParameterType.LONG_INTEGER) 
+				writeInteger((Integer) p.getValue());
+			else if (p.getType() == ParameterType.SHORT_STRING || p.getType() == ParameterType.LONG_STRING)
+				writeString((String) p.getValue());
+		}
+		writeEndOfMessage();
 	}
 	
 	public void disconnect() throws IOException {
 		socket.close();
 	}
 
+	public boolean readMagicBytes() throws IOException {
+		byte[] bytes = new byte[5];
+		reader.readFully(bytes);
+		System.out.println("Magic bytes: " + new String(bytes));
+		return MAGIC_BYTES.equals(new String(bytes));
+	}
+	
 	public void writeMagicBytes() throws IOException {
 		writer.writeBytes(MAGIC_BYTES);
+	}
+	
+	public int readProtocol() throws IOException {
+		return readInteger();
 	}
 	
 	public void writeProtocol(int protocol) throws IOException {
@@ -66,46 +134,65 @@ public class TWPConnection {
 	}
 	
 	// TODO: registered extensions
-	public int readMessage() throws IOException {
+	public int readMessageId() throws IOException {
 		byte message = reader.readByte();
 		return message - 4;
 	}
 
 	// TODO: registered extensions
-	public void writeMessage(int i) throws IOException {
+	public void writeMessageId(int i) throws IOException {
 		writer.write(i + 4);
 	}
 	
-	// TODO: length / other types
 	public int readInteger() throws IOException {
 		int type = reader.readByte();
-		int value = reader.readByte();
+		return readInteger(type);
+	}
+	
+	// TODO: throw error if type != SHORT OR LONGINT
+	public int readInteger(int type) throws IOException {
+		int value = 0;
+		if (type == 13)
+			value = reader.readByte();
+		else if (type == 14)
+			value = reader.readInt();
 		return value;
 	}
 	
-	// TODO: length / other types
 	public void writeInteger(int value) throws IOException {
-		writer.write(13);
-		writer.write(value);
+		if (-128 <= value && value <= 127) {
+			writer.write(13);
+			writer.write(value);
+		} else {
+			writer.write(14);
+			writer.writeInt(value);
+		}
 	}
 
-	// TODO: longer strings than 109
 	public String readString() throws IOException {
 		int type = reader.readByte();
-		byte[] value = new byte[type - 17];
+		return readString(type);
+	}
+	
+	public String readString(int type) throws IOException {
+		int length = type == 127 ? reader.readInt() : type - 17;
+		byte[] value = new byte[length];
 		reader.read(value);
-		return new String(value);
+		return new String(value, "UTF-8");
 	}
 
-	// TODO: longer strings than 109
 	public void writeString(String string) throws IOException {
-		int type = string.length() + 17;
+		byte[] bytes = string.getBytes("UTF-8");
+		int type = bytes.length > 109 ? 127 : bytes.length + 17;
 		writer.write(type);
-		writer.writeBytes(string);
+		if (type == 127)
+			writer.writeInt(bytes.length);
+		writer.write(bytes);
 	}
 
-	public void readEndOfMessage() throws IOException {
-		reader.readByte();
+	public boolean readEndOfMessage() throws IOException {
+		int tag = reader.readByte();
+		return tag == 0;
 	}
 
 	public void writeEndOfMessage() throws IOException {
@@ -113,37 +200,37 @@ public class TWPConnection {
 	}
 
 	
-	public TWPParameter getParameterType(int id) {
-		TWPParameter type = null;
+	public static ParameterType getParameterType(int id) {
+		ParameterType type = null;
 		if (id == 0)
-			type = TWPParameter.END_OF_CONTENT;
+			type = ParameterType.END_OF_CONTENT;
 		else if (id == 1)
-			type = TWPParameter.NO_VALUE;
+			type = ParameterType.NO_VALUE;
 		else if (id == 2)
-			type = TWPParameter.STRUCT;
+			type = ParameterType.STRUCT;
 		else if (id == 3)
-			type = TWPParameter.SEQUENCE;
+			type = ParameterType.SEQUENCE;
 		else if (4 <= id && id <= 11)
 			// TODO: message alternative
-			type = TWPParameter.UNION;
+			type = ParameterType.UNION;
 		else if (id == 12)
-			type = TWPParameter.REGISTERED_EXTENSION;
+			type = ParameterType.REGISTERED_EXTENSION;
 		else if (id == 13)
-			type = TWPParameter.SHORT_INTEGER;
+			type = ParameterType.SHORT_INTEGER;
 		else if (id == 14)
-			type = TWPParameter.LONG_INTEGER;
+			type = ParameterType.LONG_INTEGER;
 		else if (id == 15)
-			type = TWPParameter.SHORT_BINARY;
+			type = ParameterType.SHORT_BINARY;
 		else if (id == 16)
-			type = TWPParameter.LONG_BINARY;
+			type = ParameterType.LONG_BINARY;
 		else if (17 <= id && id <= 126)
-			type = TWPParameter.SHORT_STRING;
+			type = ParameterType.SHORT_STRING;
 		else if (id == 127)
-			type = TWPParameter.LONG_STRING;
+			type = ParameterType.LONG_STRING;
 		else if (128 <= id && id <= 159)
-			type = TWPParameter.RESERVED;
+			type = ParameterType.RESERVED;
 		else if (160 <= id && id <= 255)
-			type = TWPParameter.APPLICATION_TYPE;
+			type = ParameterType.APPLICATION_TYPE;
 		return type;
 	}
 }

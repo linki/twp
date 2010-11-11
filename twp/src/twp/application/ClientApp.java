@@ -2,32 +2,58 @@ package twp.application;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import twp.generated.EchoHandler;
+import twp.generated.EchoReply;
 import twp.generated.EchoRequest;
-import twp.generated.EchoResponse;
 import twp.generated.Protocol;
-import twp.generated.RequestHandler;
 
 
-public class ClientApp {
+public class ClientApp implements EchoHandler {
 
+	private Protocol protocol;
+	
+	public ClientApp(String host, int port) {
+		try {
+			protocol = Protocol.startClient(host, port, this);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Protocol protocol;
+		ClientApp client = new ClientApp("localhost", 12347);
+		client.start();
+	}
+
+	public void start() {
 		try {
-			protocol = Protocol.startClient("localhost", 12347);
-			EchoResponse res;
-			res = protocol.echo("foobar");
-			System.out.println(res.getNumberOfLetters());
-		} catch (UnknownHostException e1) {
+			for (int i=0;i<10;i++) {
+				if (protocol != null)
+					protocol.echoRequest("fŸŸbar");
+			}
+		
+			//protocol.stop();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void onEchoReply(EchoReply reply) {
+		System.out.println("Response from Server:");
+		System.out.println(reply.getText() + " has a length of " + reply.getNumberOfLetters());
+	}
+
+	@Override
+	public void onEchoRequest(EchoRequest request) {
+		
 		
 	}
 
