@@ -29,7 +29,6 @@ public class LocalImpl implements Specification {
 		// write it
 		twp.writeMessage(message);
 		
-		
 		int messageId = twp.readMessageId();
 		String returnedText = twp.readString();
 		int length = twp.readInteger();

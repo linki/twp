@@ -7,6 +7,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
+import twp3.core.Message;
+import twp3.core.Parameter;
+
 public class TWPClient {
 	private static final String MAGIC_BYTES = "TWP3\n";
 	private static final int SHORT_INTEGER = 13;
@@ -115,6 +118,25 @@ public class TWPClient {
 		writer.write(0);
 	}
 
+	public void writeMessage(Message message) throws IOException {
+		writeMagicBytes();
+		writeProtocol(message.protocol);
+		writeMessageId(message.id);
+		
+		Iterator<Parameter> iterator = message.parameters.iterator();
+		while (iterator.hasNext()) {
+			Parameter param = iterator.next();
+			if (param.type.equals("string")) {
+				writeString((String) param.value); // support other types
+			}
+			if (param.type.equals("int")) {
+				writeInteger((Integer) param.value); // support other types
+			}
+		}
+		
+		writeEndOfMessage();
+	}
+	
 	// example
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		
