@@ -1,0 +1,8 @@
+class Grammar < Thor
+  # TODO
+  desc "generates grammar", "generates ruby file from grammar"
+  def generate(filename)
+    content = File.read(filename)
+    puts content
+  end
+end

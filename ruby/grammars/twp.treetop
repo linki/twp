@@ -1,0 +1,81 @@
+grammar TWP
+  rule specification
+    space* (protocol / messagedef / structdef) (space+ (protocol / messagedef / structdef))* space*
+  end
+
+  rule protocol
+    'protocol' space+ identifier space* '=' space* 'ID' space* number space* '{' space* protocolelement? (space+ protocolelement)* space* '}'
+  end
+  
+  rule messagedef
+    'message' space+ identifier space* '=' space* ([0-7] / 'ID' space* number) space* '{' space* field? (space+ field)* space* '}'
+  end
+
+  rule structdef
+    'struct' space+ identifier (space* '=' space* 'ID' space* number)? space* '{' space* field (space+ field)* space* '}'
+  end
+
+  rule field
+    ('optional' space+)? type space+ identifier space* ';'
+  end
+
+  rule protocolelement
+    typedef / messagedef
+  end
+
+  rule typedef
+    structdef / sequencedef / uniondef / forwarddef
+  end
+
+  rule sequencedef
+    'sequence' space* '<' space* type space* '>' space+ identifier space* ';'
+  end
+
+  rule uniondef
+    'union' space+ identifier space* '{' space* casedef (space+ casedef)* space* '}'
+  end
+
+  rule casedef
+    'case' space+ number space* ':' space* type space+ identifier space* ';'
+  end
+
+  rule forwarddef
+    'typedef' space+ identifier space* ';'
+  end
+  
+  rule type
+    ('any' space+ 'defined' space+ 'by' space+ identifier) / primitive_type / identifier
+  end
+  
+  rule primitive_type 
+ 	  'int' / 'string' / 'binary' / 'any'
+  end
+  
+  rule identifier
+    letter (letter / digit)*
+  end
+  
+  rule letter
+    alpha / '_'
+  end
+  
+  rule alpha
+    [a-zA-Z]
+  end
+  
+  rule digit
+    [0-9]
+  end
+  
+  rule number
+    digit+
+  end
+    
+  rule comment
+    '/*' (letter / digit / [\s]+)* '*/'
+  end
+
+  rule space
+    [\s] / comment
+  end
+end
