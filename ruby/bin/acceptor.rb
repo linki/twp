@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'treetop'
 
-Treetop.load 'grammars/twp'
+Treetop.load File.expand_path('../../grammars/twp.treetop', __FILE__)
 
 if ARGV.size < 1
   STDERR.puts 'Give me a file to parse!'
