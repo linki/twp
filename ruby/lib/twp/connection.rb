@@ -5,12 +5,11 @@ module TWP
   class Connection
     include Singleton
     attr_accessor :socket
-    
+  
     MAGIC_BYTES = "TWP3\n"
     
     def self.setup(host, port)
-      con = self.instance
-      con.setup(host, port)
+      instance.setup(host, port)
     end
     
     def setup(host, port)
@@ -32,8 +31,12 @@ module TWP
       case type
         when 13..14
           read_integer(type)
+        when 15..16
+          read_binary(type)
         when 17..127
           read_string(type)
+        else
+          raise Exception
       end
     end
     
@@ -41,8 +44,12 @@ module TWP
       case type
         when :int
           write_integer(value)
+        when :binary
+          write_binary(value)
         when :string
           write_string(value)
+        else
+          raise Exception
       end
     end
     
@@ -59,7 +66,7 @@ module TWP
     end
     
     def write_protocol(protocol)
-      write_integer(protocol)
+      write_integer protocol
     end
     
     # extension
@@ -78,6 +85,8 @@ module TWP
           read_byte
         when 14
           read_four_bytes
+        else
+          raise Exception
       end
     end
     
@@ -111,6 +120,31 @@ module TWP
       end
     end
     
+    def read_binary(type = read_byte)
+      case type
+        when 15
+          length = read_byte
+          read(length)
+        when 16
+          length = read_four_bytes
+          read(length)
+        else
+          raise Exception
+      end
+    end
+    
+    def write_binary(value)
+      if (0..255).include?(value.length)
+        write_byte 15
+        write_byte value.length
+        write value
+      else
+        write_byte 16
+        write_four_bytes value.length        
+        write value
+      end
+    end 
+    
     def read_end_of_msg
       read_byte
     end
@@ -118,24 +152,24 @@ module TWP
     def write_end_of_msg
       write_byte 0
     end
+
+    def read_byte
+      read(1).ord
+    end
+
+    def write_byte(byte)
+      write byte.chr
+    end
     
     def read_four_bytes
-      # "\x00\x00\x00\xA2".unpack('N') => [162]
       # Treat four characters as an unsigned long in network byte order
+      # "\x00\x00\x00\xA2".unpack('N') => [162]
       read(4).unpack('N').first
     end
     
     def write_four_bytes(value)
       # [162].pack('N') => "\x00\x00\x00\xA2"
       write [value].pack('N')
-    end
-
-    def read_byte
-      read(1).ord
-    end
-    
-    def write_byte(byte)
-      write byte.chr
     end
     
     def read(*args, &block)

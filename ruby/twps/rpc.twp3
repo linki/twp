@@ -2,7 +2,7 @@ protocol RPC = ID 1 {
   message Request = 0 {
           int request_id;
           int response_expected; /* 0 or 1 */
-          string operation;
+					string operation;
           any defined by operation parameters;
   }
   message Reply = 1{

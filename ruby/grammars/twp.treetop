@@ -1,22 +1,22 @@
 grammar TWP
   rule specification
-    space* (protocol / messagedef / structdef) (space+ (protocol / messagedef / structdef))* space*
+    (protocol / messagedef / structdef / space)* <SpecificationNode>
   end
 
   rule protocol
-    'protocol' space+ identifier space* '=' space* 'ID' space* number space* '{' space* protocolelement? (space+ protocolelement)* space* '}'
+    'protocol' space identifier space? '=' space? 'ID' space? number space? '{' (protocolelement / space)* '}' <ProtocolNode>
   end
   
   rule messagedef
-    'message' space+ identifier space* '=' space* ([0-7] / 'ID' space* number) space* '{' space* field? (space+ field)* space* '}'
+    'message' space identifier space? '=' space? ([0-7] / 'ID' space? number) space? '{' (field / space)* '}' <MessageNode>
   end
 
   rule structdef
-    'struct' space+ identifier (space* '=' space* 'ID' space* number)? space* '{' space* field (space+ field)* space* '}'
+    'struct' space identifier (space? '=' space? 'ID' space? number)? space? '{' space? field (space field)* space? '}' <StructdefNode>
   end
 
   rule field
-    ('optional' space+)? type space+ identifier space* ';'
+    ('optional' space)? type space identifier space? ';' <FieldNode>
   end
 
   rule protocolelement
@@ -28,54 +28,55 @@ grammar TWP
   end
 
   rule sequencedef
-    'sequence' space* '<' space* type space* '>' space+ identifier space* ';'
+    'sequence' space? '<' space? type space? '>' space identifier space? ';' <SequencedefNode>
   end
 
   rule uniondef
-    'union' space+ identifier space* '{' space* casedef (space+ casedef)* space* '}'
+    'union' space identifier space? '{' space? casedef (space casedef)* space? '}' <UniondefNode>
   end
 
   rule casedef
-    'case' space+ number space* ':' space* type space+ identifier space* ';'
+    'case' space number space? ':' space? type space identifier space? ';' <CasedefNode>
   end
 
   rule forwarddef
-    'typedef' space+ identifier space* ';'
+    'typedef' space identifier space? ';' <ForwarddefNode>
   end
   
   rule type
-    ('any' space+ 'defined' space+ 'by' space+ identifier) / primitive_type / identifier
+    #('any' space 'defined' space 'by' space identifier) / primitive_type / identifier
+    'int' / 'string' / 'binary' / 'any' <TypeNode>
   end
   
   rule primitive_type 
- 	  'int' / 'string' / 'binary' / 'any'
+ 	  'int' / 'string' / 'binary' / 'any' <PrimitiveTypeNode>
   end
   
   rule identifier
-    letter (letter / digit)*
+    letter (letter / digit)* <IdentifierNode>
   end
   
   rule letter
-    alpha / '_'
+    alpha / '_' <LetterNode>
   end
   
   rule alpha
-    [a-zA-Z]
+    [a-zA-Z] <AlphaNode>
   end
   
   rule digit
-    [0-9]
+    [0-9] <DigitNode>
   end
   
   rule number
-    digit+
+    digit+ <NumberNode>
   end
     
   rule comment
-    '/*' (letter / digit / [\s]+)* '*/'
+    '/*' (letter / digit / [\s]+)* '*/' <CommentNode>
   end
 
   rule space
-    [\s] / comment
+    [\s]+ <SpaceNode> # / (comment (space? comment)*)
   end
 end
