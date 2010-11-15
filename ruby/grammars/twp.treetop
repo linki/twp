@@ -44,8 +44,8 @@ grammar TWP
   end
   
   rule type
-    #('any' space 'defined' space 'by' space identifier) / primitive_type / identifier
-    'int' / 'string' / 'binary' / 'any' <TypeNode>
+    # 'int' / 'string' / 'binary' / 'any' <TypeNode>
+    ('any' space 'defined' space 'by' space identifier) / primitive_type / identifier
   end
   
   rule primitive_type 
