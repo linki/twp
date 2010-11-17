@@ -4,19 +4,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import twp.generated.EchoHandler;
-
 public abstract class TWPProtocol {
 	protected TWPConnection connection;
-	protected EchoHandler handler;
 	
-	public TWPProtocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
-		handler = rh;
+	public TWPProtocol(String host, int port) throws UnknownHostException, IOException {
 		connection = new TWPConnection(host, port, this);
 	}
 	
-	public TWPProtocol(Socket s, TWPHandler handler) throws IOException {
-		this.handler = (EchoHandler) handler;
+	public TWPProtocol(Socket s) throws IOException {
 		connection = new TWPConnection(s, this);
 	}
 	

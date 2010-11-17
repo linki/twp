@@ -15,9 +15,8 @@ public class EchoServer extends TWPServer {
 	public void openConnection(Socket socket) {
 		if (handler != null)
 			try {
-				new EchoProtocol(socket, handler);
+				new EchoProtocol(socket, (EchoHandler) handler);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	}

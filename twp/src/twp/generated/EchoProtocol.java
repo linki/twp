@@ -7,19 +7,22 @@ import java.util.Iterator;
 import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
-import twp.core.TWPHandler;
 import twp.core.TWPProtocol;
 
 
 public class EchoProtocol extends TWPProtocol {
 	public static final int ID = 2;
 	
+	private EchoHandler handler;
+	
 	public EchoProtocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
-		super(host, port, rh);
+		super(host, port);
+		handler = rh;
 	}
 	
-	public EchoProtocol(Socket s, TWPHandler handler) throws IOException {
-		super(s, handler);
+	public EchoProtocol(Socket s, EchoHandler rh) throws IOException {
+		super(s);
+		handler = rh;
 	}
 	
 	public int getVersion() {
