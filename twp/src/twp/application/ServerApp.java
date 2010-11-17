@@ -2,19 +2,21 @@ package twp.application;
 
 import java.io.IOException;
 
-import twp.generated.EchoRequest;
-import twp.generated.EchoReply;
-import twp.generated.Protocol;
 import twp.generated.EchoHandler;
+import twp.generated.EchoProtocol;
+import twp.generated.EchoReply;
+import twp.generated.EchoRequest;
+import twp.generated.EchoServer;
 
 public class ServerApp implements EchoHandler {
-	private Protocol protocol;
+		
+	private EchoServer server;
 	
 	public ServerApp(int port) {
 		try {
-			protocol = Protocol.startServer(port, this);
+			server = new EchoServer(port);
+			server.listen(this);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -22,7 +24,7 @@ public class ServerApp implements EchoHandler {
 	public static void main(String[] args) {
 		System.out.println("Starting Server...");
 		new ServerApp(12347);
-		
+		System.out.println("Server is running...");
 	}
 
 	
@@ -34,9 +36,9 @@ public class ServerApp implements EchoHandler {
 
 	@Override
 	public void onEchoRequest(EchoRequest request) {
-		System.out.println("Received echo request: " + request.getText() + " - " + request.getText().length());
+		EchoProtocol prot = request.getProtocol();
 		try {
-			protocol.echoReply(request.getText(), request.getText().length());
+			prot.echoReply(request.getText(), request.getText().length());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

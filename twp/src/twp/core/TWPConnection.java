@@ -1,76 +1,79 @@
 package twp.core;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
-import twp.generated.Protocol;
 
 
 public class TWPConnection {
 	
+	private class Listener extends Thread {
+
+		private boolean isActive;
+		
+		public Listener() {
+			this.isActive = true;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				while (isActive) {
+					Message message = readMessage();
+					protocol.onMessage(message);
+				}
+			} catch (EOFException e) {}
+			catch (IOException e) {}
+		}
+		
+		public void disconnect() {
+			isActive = false;
+		}	
+	}
+	
 	private static final String MAGIC_BYTES = "TWP3\n";
 	
 	private Socket socket;
-	private ServerSocket serverSocket;
 	private int protocolVersion;
 	private DataOutputStream writer;
 	private DataInputStream reader;
-	private Protocol protocol;
-	public TWPConnection(String host, int port, int protocol) throws UnknownHostException, IOException {
+	private TWPProtocol protocol;
+	private Listener listener;
+	
+	public TWPConnection(String host, int port, TWPProtocol p) throws UnknownHostException, IOException {
 		socket = new Socket(host, port);
-		this.protocolVersion = protocol;
+		protocol = p;
+		protocolVersion = p.getVersion();
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new DataOutputStream(socket.getOutputStream());
 		startClient();
+		listen();
 	}
 	
-	private void startClient() {
-		try {
-			writeMagicBytes();
-			writeProtocol(this.protocolVersion);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public TWPConnection(Socket s, TWPProtocol p) throws IOException {
+		socket = s;
+		reader = new DataInputStream(s.getInputStream());
+		writer = new DataOutputStream(s.getOutputStream());
+		protocol = p;
+		startServer();
+		listen();
 	}
 	
-	public TWPConnection(int port, Protocol protocol) throws IOException {
-		serverSocket = new ServerSocket(port);
-		this.protocol = protocol;
+	private void startClient() throws IOException {
+		writeMagicBytes();
+		writeProtocol(this.protocolVersion);
 	}
 	
-	public void startServer() throws IOException {
-		Runnable listener = new Runnable() {
-			public void run() {
-				try {
-					while (true) {
-						socket = serverSocket.accept();
-						System.out.println("Connection accepted");
-						reader = new DataInputStream(socket.getInputStream());
-						writer = new DataOutputStream(socket.getOutputStream());
-						if (readMagicBytes()) {
-							protocolVersion = readProtocol();
-							System.out.println("Read Protocol");
-							int tag = readMessageId();
-							while (socket.isConnected()) {
-								protocol.onMessage(readMessage(tag));
-								tag = readMessageId();
-							}
-						}
-						if (socket != null)
-							socket.close();
-					}
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-		Thread t = new Thread(listener);
-		t.start();
+	private void startServer() throws IOException {
+		readMagicBytes();
+		this.protocolVersion = readProtocol();
+	}
+	
+	private void listen() throws IOException {
+		listener = new Listener();
+		listener.start();
 	}
 	
 	public Message readMessage() throws IOException {
@@ -111,6 +114,8 @@ public class TWPConnection {
 	}
 	
 	public void disconnect() throws IOException {
+		if (listener != null && listener.isAlive())
+			listener.disconnect();
 		socket.close();
 	}
 

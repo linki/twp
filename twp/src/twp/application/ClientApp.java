@@ -5,16 +5,16 @@ import java.net.UnknownHostException;
 import twp.generated.EchoHandler;
 import twp.generated.EchoReply;
 import twp.generated.EchoRequest;
-import twp.generated.Protocol;
+import twp.generated.EchoProtocol;
 
 
 public class ClientApp implements EchoHandler {
 
-	private Protocol protocol;
+	private EchoProtocol protocol;
 	
 	public ClientApp(String host, int port) {
 		try {
-			protocol = Protocol.startClient(host, port, this);
+			protocol = new EchoProtocol(host, port, this);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -28,6 +28,7 @@ public class ClientApp implements EchoHandler {
 	 */
 	public static void main(String[] args) {
 		ClientApp client = new ClientApp("localhost", 12347);
+		//ClientApp client = new ClientApp("www.dcl.hpi.uni-potsdam.de", 80);
 		client.start();
 	}
 
@@ -37,10 +38,8 @@ public class ClientApp implements EchoHandler {
 				if (protocol != null)
 					protocol.echoRequest("fŸŸbar");
 			}
-		
 			//protocol.stop();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

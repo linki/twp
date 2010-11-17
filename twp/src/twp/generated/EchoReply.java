@@ -1,14 +1,20 @@
 package twp.generated;
 public class EchoReply {
 	
+	private EchoProtocol protocol;
 	private String text;
 	private int number_of_letters;
 	
-	public EchoReply(String text, int length) {
+	public EchoReply(EchoProtocol p, String text, int length) {
+		this.protocol = p;
 		this.text = text;
 		this.number_of_letters = length;
 	}
 
+	public EchoProtocol getProtocol() {
+		return protocol;
+	}
+	
 	public String getText() {
 		return text;
 	}
