@@ -1,0 +1,82 @@
+grammar TWP
+  rule specification
+    (protocol / messagedef / structdef / space)* <SpecificationNode>
+  end
+
+  rule protocol
+    'protocol' space identifier space? '=' space? 'ID' space? number space? '{' (protocolelement / space)* '}' <ProtocolNode>
+  end
+  
+  rule messagedef
+    'message' space identifier space? '=' space? ([0-7] / 'ID' space? number) space? '{' (field / space)* '}' <MessageNode>
+  end
+
+  rule structdef
+    'struct' space identifier (space? '=' space? 'ID' space? number)? space? '{' space? field (space field)* space? '}' <StructdefNode>
+  end
+
+  rule field
+    ('optional' space)? type space identifier space? ';' <FieldNode>
+  end
+
+  rule protocolelement
+    typedef / messagedef
+  end
+
+  rule typedef
+    structdef / sequencedef / uniondef / forwarddef
+  end
+
+  rule sequencedef
+    'sequence' space? '<' space? type space? '>' space identifier space? ';' <SequencedefNode>
+  end
+
+  rule uniondef
+    'union' space identifier space? '{' space? casedef (space casedef)* space? '}' <UniondefNode>
+  end
+
+  rule casedef
+    'case' space number space? ':' space? type space identifier space? ';' <CasedefNode>
+  end
+
+  rule forwarddef
+    'typedef' space identifier space? ';' <ForwarddefNode>
+  end
+  
+  rule type
+    # 'int' / 'string' / 'binary' / 'any' <TypeNode>
+    ('any' space 'defined' space 'by' space identifier) / primitive_type / identifier
+  end
+  
+  rule primitive_type 
+ 	  'int' / 'string' / 'binary' / 'any' <PrimitiveTypeNode>
+  end
+  
+  rule identifier
+    letter (letter / digit)* <IdentifierNode>
+  end
+  
+  rule letter
+    alpha / '_' <LetterNode>
+  end
+  
+  rule alpha
+    [a-zA-Z] <AlphaNode>
+  end
+  
+  rule digit
+    [0-9] <DigitNode>
+  end
+  
+  rule number
+    digit+ <NumberNode>
+  end
+    
+  rule comment
+    '/*' (letter / digit / [\s]+)* '*/' <CommentNode>
+  end
+
+  rule space
+    [\s]+ <SpaceNode> # / (comment (space? comment)*)
+  end
+end

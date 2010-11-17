@@ -1,0 +1,18 @@
+protocol Echo=ID 2{
+	message Request=0{
+		int a;
+		string   b ;
+	}
+	struct Array{
+		optional any x;
+	}
+	sequence<int> people ;
+	union money{
+		case 2: any defined by people abc;
+	}
+	typedef test;
+}
+message Wulst = ID 19 {}
+struct Hash = ID 67{
+	asd2 xyz;
+}
