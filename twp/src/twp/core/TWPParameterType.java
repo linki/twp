@@ -1,5 +1,5 @@
 package twp.core;
-public enum TWPParameter {
+public enum TWPParameterType {
 	END_OF_CONTENT,
 	NO_VALUE,
 	STRUCT,

@@ -43,7 +43,7 @@ public class Client {
 		Protocol protocolObject = specification.getProtocols().iterator().next();
 		Message message = protocolObject.getMessages().iterator().next();
 		
-		TWPClient twp = new TWPClient(host, port);
+		TWPClientOld twp = new TWPClientOld(host, port);
 		twp.connect();
 		
 		twp.writeMagicBytes();

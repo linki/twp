@@ -4,9 +4,10 @@ import java.io.IOException;
 
 import twp.generated.EchoHandler;
 import twp.generated.EchoProtocol;
-import twp.generated.EchoReply;
-import twp.generated.EchoRequest;
 import twp.generated.EchoServer;
+import twpx.core.Message;
+import twpx.protocol.echo.EchoReply;
+import twpx.protocol.echo.EchoRequest;
 
 public class ServerApp implements EchoHandler {
 		
@@ -36,12 +37,18 @@ public class ServerApp implements EchoHandler {
 
 	@Override
 	public void onEchoRequest(EchoRequest request) {
-		EchoProtocol prot = request.getProtocol();
-		try {
-			prot.echoReply(request.getText(), request.getText().length());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		EchoProtocol prot = request.getProtocol();
+//		try {
+//			prot.echoReply(request.getText(), request.getText().length());
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
+
+	@Override
+	public Message handle(Message message) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

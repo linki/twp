@@ -3,7 +3,7 @@ package twp.core;
 public class Parameter {
 
 	private ParameterType type;
-	private Object value;
+	Object value;
 	
 	public Parameter(ParameterType t, Object v) {
 		type = t;

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import twpx.core.TWPConnection;
+
 public abstract class TWPProtocol {
 	protected TWPConnection connection;
 	
@@ -19,7 +21,7 @@ public abstract class TWPProtocol {
 		connection.disconnect();
 	}
 	
-	public abstract void onMessage(Message message) throws IOException;
+	public abstract void onMessage(MessageOld message) throws IOException;
 	
 	public abstract int getVersion();
 }

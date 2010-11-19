@@ -1,13 +1,13 @@
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import twp.TWPClient;
+import twp.TWPClientOld;
 
 class Example {
 	
 	public String echo(String text) throws UnknownHostException, IOException {
 	
-		TWPClient twp = new TWPClient("www.dcl.hpi.uni-potsdam.de", 80);
+		TWPClientOld twp = new TWPClientOld("www.dcl.hpi.uni-potsdam.de", 80);
 		twp.connect();
 		
 		twp.writeMagicBytes();

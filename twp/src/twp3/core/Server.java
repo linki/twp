@@ -7,7 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
-import twp.TWPClient;
+import twp.TWPClientOld;
 import twp3.custom.RemoteImpl;
 import twp3.custom.Specification;
 import twp3.generated.EchoResult;
@@ -32,7 +32,7 @@ public class Server {
 		while (true) {
 			Socket client = socket.accept();
 			
-			TWPClient twp = new TWPClient(client);
+			TWPClientOld twp = new TWPClientOld(client);
 			
 			String magicBytes = twp.readMagicBytes();
 			int protocol = twp.readProtocol();
