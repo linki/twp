@@ -23,7 +23,7 @@ public class Client {
 		
 		// send and receive messages
 		// verbose:
-		client.send(new EchoRequest("martin"));
+		client.send(new EchoRequest("dreck"));
 		
 		// we need to cast the returned Message in order to say getText() and getNumberOfLetters() later on
 		// a non-casty-way would be nice, though, especially if we want to support some kind of error messages nicely
