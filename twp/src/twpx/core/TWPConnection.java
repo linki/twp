@@ -38,6 +38,11 @@ public class TWPConnection {
 		socket.close();
 	}
 
+	public void reconnect() throws UnknownHostException, IOException {
+		connect();
+		disconnect();		
+	}
+
 	public boolean readMagicBytes() throws IOException {
 		byte[] bytes = new byte[5];
 		reader.readFully(bytes);

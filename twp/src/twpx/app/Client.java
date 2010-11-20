@@ -3,6 +3,7 @@ package twpx.app;
 import java.io.IOException;
 
 import twpx.core.TWPClient;
+import twpx.core.TWPConnection;
 import twpx.protocol.echo.EchoProtocol;
 import twpx.protocol.echo.EchoReply;
 import twpx.protocol.echo.EchoRequest;
@@ -37,6 +38,6 @@ public class Client {
 		
 		// lets use our response as usual
 		System.out.println(reply.getText());
-		System.out.println(reply.getNumberOfLetters());
+		System.out.println(reply.getNumberOfLetters());	
 	}
 }

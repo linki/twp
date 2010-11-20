@@ -15,11 +15,12 @@ public class TWPServer {
 		while (true) {
 			Socket socket = server.accept();
 			TWPConnection con = new TWPConnection(socket);
-			Message message = MessageManager.receive(con, true, 0); // todo header
+			Message message = MessageManager.receive(con);
 			Message answer = handle(message);
 			answer.setConnection(con);
 			answer.send(false); // no header
 			socket.close();
+			// more messages...
 		}	
 	}
 

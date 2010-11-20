@@ -24,14 +24,15 @@ public class TWPClient {
 
 	// todo protocol id switch, check whether to send header or not based on current protocol
 	public TWPClient send(Message message) throws IOException {
-		createMessage(message).send(true);
+		boolean withHeader = prepareForProtocol(message.getProtocolId());
+		createMessage(message).send(withHeader);
 		currentProtocolId = message.getProtocolId();
 		return this;
 	}
 
 	// todo protocol/header
 	public Message receive() throws IOException {
-		return MessageManager.receive(con, false, currentProtocolId);
+		return MessageManager.receive(con, currentProtocolId);
 	}
 
 	public Message sendAndReceive(Message message) throws IOException {
@@ -40,5 +41,17 @@ public class TWPClient {
 
 	public void register(Protocol protocol) {
 		MessageManager.register(protocol);
+	}
+	
+	private boolean prepareForProtocol(int protocolId) throws IOException {
+		boolean withHeader = true;
+		if (currentProtocolId > 0) {
+			if (currentProtocolId == protocolId) {
+				withHeader = false;
+			} else {
+				con.reconnect();
+			}
+		}
+		return withHeader;
 	}
 }

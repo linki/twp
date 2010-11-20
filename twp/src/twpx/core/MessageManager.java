@@ -9,17 +9,16 @@ public class MessageManager {
 	
 	public static Map<Integer, Protocol> protocols = new HashMap<Integer, Protocol>();
 	
-	// todo
 	public static void send(TWPConnection con, Message message, boolean withHeader) throws IOException {
-		
+
 		if (withHeader) {
 			con.writeMagicBytes();
 			con.writeProtocolId(message.getProtocolId());
 		}
-		
+
 		con.writeMessageId(message.getId());
 		
-		// writeGeneric
+		// change to writeGeneric
 		Iterator<TWPParameter> iterator = message.getParameters().iterator();
 		while (iterator.hasNext()) {
 			TWPParameter parameter = iterator.next();
@@ -34,22 +33,21 @@ public class MessageManager {
 		con.writeEndOfMessage();
 	}
 	
-	// todo
-	public static Message receive(TWPConnection con, boolean withHeader, int protocolId) throws IOException {
-		int protocol;
+	// if protocol is not given, then read it
+	public static Message receive(TWPConnection con) throws IOException {
+		con.readMagicBytes();
+		int protocolId = con.readProtocolId();
+		return receive(con, protocolId);
+	}	
 
-		if (withHeader) {
-			con.readMagicBytes();
-			protocol = con.readProtocolId(); // todo
-		} else {
-			protocol = protocolId; // t
-		}
+	// if protocol is given, skip the header
+	public static Message receive(TWPConnection con, int protocolId) throws IOException {
 		
 		int id = con.readMessageId();
 		
-		Message message = MessageManager.protocols.get(protocol).getMessages().get(id); // clone?
+		Message message = MessageManager.protocols.get(protocolId).getMessages().get(id); // better to clone here! TODO
 		
-		// readGeneric
+		// change to writeGeneric
 		Iterator<TWPParameter> iterator = message.getParameters().iterator();
 		while (iterator.hasNext()) {
 			TWPParameter parameter = iterator.next();
@@ -65,6 +63,7 @@ public class MessageManager {
 		
 		return message;
 	}
+	
 
 	public static void register(Protocol protocol) {
 		protocols.put(new Integer(protocol.getId()), protocol);
