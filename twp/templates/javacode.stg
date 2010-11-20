@@ -1,0 +1,55 @@
+group javacode;
+
+parameterType ::= [
+	"string":"LONG_STRING",
+	"int": "LONG_INTEGER"
+]
+
+primitiveType ::= [
+	"string":"String",
+	"int":"int",
+	"any":"Object"
+	"binary":"byte"
+]
+
+protocol(protocol) ::= <<
+package twp.generated;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import twp.core.Message;
+import twp.core.Parameter;
+import twp.core.ParameterType;
+import twp.core.TWPProtocol;
+
+public class <protocol.name>Protocol extends TWPProtocol {
+	public static final int ID = <protocol.id>;
+	
+	private <protocol.name>Handler handler;
+	
+	public <protocol.name>Protocol(String host, int port, <protocol.name>Handler rh) throws UnknownHostException, IOException {
+		super(host, port);
+		handler = rh;
+	}
+	
+	public <protocol.name>Protocol(Socket s, <protocol.name>Handler rh) throws IOException {
+		super(s);
+		handler = rh;
+	}
+	
+	public int getVersion() {
+		return ID;
+	}
+	
+	<protocol.messages:{message|
+	public void <protocol.name><message.name>(<message.fields:{field|<field.type.name> <field.name>}>) throws IOException {
+		Message message = new Message(<message.id>, ID);
+		<message.fields:{field|message.addParameter(new Parameter(ParameterType.<parameterType.(field.type.name)>, <field.name>);
+		}>
+	}
+	}>
+}
+
+>>

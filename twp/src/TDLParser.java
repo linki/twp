@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 grammars/TDL.g 2010-11-19 00:35:48
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 grammars/TDL.g 2010-11-20 21:55:00
 
 import twp.generator.metamodel.*;
 
@@ -222,12 +222,13 @@ public class TDLParser extends Parser {
     // $ANTLR end "number"
 
     public static class type_return extends ParserRuleReturnScope {
+        public Type type;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "type"
-    // grammars/TDL.g:39:1: type : ( primitiveType | identifier | ( 'any' 'defined' 'by' identifier ) );
+    // grammars/TDL.g:39:1: type returns [Type type] : ( primitiveType | identifier | ( 'any' 'defined' 'by' identifier ) );
     public final TDLParser.type_return type() throws RecognitionException {
         TDLParser.type_return retval = new TDLParser.type_return();
         retval.start = input.LT(1);
@@ -248,8 +249,9 @@ public class TDLParser extends Parser {
         Object string_literal7_tree=null;
         Object string_literal8_tree=null;
 
+        retval.type = new Type();
         try {
-            // grammars/TDL.g:40:2: ( primitiveType | identifier | ( 'any' 'defined' 'by' identifier ) )
+            // grammars/TDL.g:41:2: ( primitiveType | identifier | ( 'any' 'defined' 'by' identifier ) )
             int alt1=3;
             switch ( input.LA(1) ) {
             case 10:
@@ -291,59 +293,62 @@ public class TDLParser extends Parser {
 
             switch (alt1) {
                 case 1 :
-                    // grammars/TDL.g:40:4: primitiveType
+                    // grammars/TDL.g:41:4: primitiveType
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_primitiveType_in_type217);
+                    pushFollow(FOLLOW_primitiveType_in_type222);
                     primitiveType4=primitiveType();
 
                     state._fsp--;
 
                     adaptor.addChild(root_0, primitiveType4.getTree());
+                    retval.type.primitive = true; retval.type.name = (primitiveType4!=null?input.toString(primitiveType4.start,primitiveType4.stop):null);
 
                     }
                     break;
                 case 2 :
-                    // grammars/TDL.g:40:20: identifier
+                    // grammars/TDL.g:42:2: identifier
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_identifier_in_type221);
+                    pushFollow(FOLLOW_identifier_in_type229);
                     identifier5=identifier();
 
                     state._fsp--;
 
                     adaptor.addChild(root_0, identifier5.getTree());
+                    retval.type.name = (identifier5!=null?input.toString(identifier5.start,identifier5.stop):null);
 
                     }
                     break;
                 case 3 :
-                    // grammars/TDL.g:40:33: ( 'any' 'defined' 'by' identifier )
+                    // grammars/TDL.g:43:2: ( 'any' 'defined' 'by' identifier )
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    // grammars/TDL.g:40:33: ( 'any' 'defined' 'by' identifier )
-                    // grammars/TDL.g:40:34: 'any' 'defined' 'by' identifier
+                    // grammars/TDL.g:43:2: ( 'any' 'defined' 'by' identifier )
+                    // grammars/TDL.g:43:3: 'any' 'defined' 'by' identifier
                     {
-                    string_literal6=(Token)match(input,10,FOLLOW_10_in_type226); 
+                    string_literal6=(Token)match(input,10,FOLLOW_10_in_type237); 
                     string_literal6_tree = (Object)adaptor.create(string_literal6);
                     adaptor.addChild(root_0, string_literal6_tree);
 
-                    string_literal7=(Token)match(input,11,FOLLOW_11_in_type228); 
+                    string_literal7=(Token)match(input,11,FOLLOW_11_in_type239); 
                     string_literal7_tree = (Object)adaptor.create(string_literal7);
                     adaptor.addChild(root_0, string_literal7_tree);
 
-                    string_literal8=(Token)match(input,12,FOLLOW_12_in_type230); 
+                    string_literal8=(Token)match(input,12,FOLLOW_12_in_type241); 
                     string_literal8_tree = (Object)adaptor.create(string_literal8);
                     adaptor.addChild(root_0, string_literal8_tree);
 
-                    pushFollow(FOLLOW_identifier_in_type232);
+                    pushFollow(FOLLOW_identifier_in_type243);
                     identifier9=identifier();
 
                     state._fsp--;
 
                     adaptor.addChild(root_0, identifier9.getTree());
+                    retval.type.anyDefinedBy = true; retval.type.name = (identifier9!=null?input.toString(identifier9.start,identifier9.stop):null);
 
                     }
 
@@ -376,7 +381,7 @@ public class TDLParser extends Parser {
     };
 
     // $ANTLR start "primitiveType"
-    // grammars/TDL.g:42:1: primitiveType : ( 'int' | 'string' | 'binary' | 'any' );
+    // grammars/TDL.g:45:1: primitiveType : ( 'int' | 'string' | 'binary' | 'any' );
     public final TDLParser.primitiveType_return primitiveType() throws RecognitionException {
         TDLParser.primitiveType_return retval = new TDLParser.primitiveType_return();
         retval.start = input.LT(1);
@@ -388,7 +393,7 @@ public class TDLParser extends Parser {
         Object set10_tree=null;
 
         try {
-            // grammars/TDL.g:43:5: ( 'int' | 'string' | 'binary' | 'any' )
+            // grammars/TDL.g:46:5: ( 'int' | 'string' | 'binary' | 'any' )
             // grammars/TDL.g:
             {
             root_0 = (Object)adaptor.nil();
@@ -431,25 +436,25 @@ public class TDLParser extends Parser {
     };
 
     // $ANTLR start "typedef"
-    // grammars/TDL.g:45:1: typedef : ( structdef | sequencedef | uniondef | forwarddef );
-    public final TDLParser.typedef_return typedef() throws RecognitionException {
+    // grammars/TDL.g:48:1: typedef[Protocol protocol] : (st= structdef | s= sequencedef | u= uniondef | f= forwarddef );
+    public final TDLParser.typedef_return typedef(Protocol protocol) throws RecognitionException {
         TDLParser.typedef_return retval = new TDLParser.typedef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        TDLParser.structdef_return structdef11 = null;
+        TDLParser.structdef_return st = null;
 
-        TDLParser.sequencedef_return sequencedef12 = null;
+        TDLParser.sequencedef_return s = null;
 
-        TDLParser.uniondef_return uniondef13 = null;
+        TDLParser.uniondef_return u = null;
 
-        TDLParser.forwarddef_return forwarddef14 = null;
+        TDLParser.forwarddef_return f = null;
 
 
 
         try {
-            // grammars/TDL.g:46:2: ( structdef | sequencedef | uniondef | forwarddef )
+            // grammars/TDL.g:49:2: (st= structdef | s= sequencedef | u= uniondef | f= forwarddef )
             int alt2=4;
             switch ( input.LA(1) ) {
             case 16:
@@ -481,58 +486,62 @@ public class TDLParser extends Parser {
 
             switch (alt2) {
                 case 1 :
-                    // grammars/TDL.g:46:5: structdef
+                    // grammars/TDL.g:49:4: st= structdef
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_structdef_in_typedef275);
-                    structdef11=structdef();
+                    pushFollow(FOLLOW_structdef_in_typedef290);
+                    st=structdef();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, structdef11.getTree());
+                    adaptor.addChild(root_0, st.getTree());
+                    protocol.structs.add(st.struct);
 
                     }
                     break;
                 case 2 :
-                    // grammars/TDL.g:46:17: sequencedef
+                    // grammars/TDL.g:50:2: s= sequencedef
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_sequencedef_in_typedef279);
-                    sequencedef12=sequencedef();
+                    pushFollow(FOLLOW_sequencedef_in_typedef299);
+                    s=sequencedef();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, sequencedef12.getTree());
+                    adaptor.addChild(root_0, s.getTree());
+                    protocol.sequences.add(s.sequence);
 
                     }
                     break;
                 case 3 :
-                    // grammars/TDL.g:46:31: uniondef
+                    // grammars/TDL.g:51:2: u= uniondef
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_uniondef_in_typedef283);
-                    uniondef13=uniondef();
+                    pushFollow(FOLLOW_uniondef_in_typedef308);
+                    u=uniondef();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, uniondef13.getTree());
+                    adaptor.addChild(root_0, u.getTree());
+                    protocol.unions.add(u.union);
 
                     }
                     break;
                 case 4 :
-                    // grammars/TDL.g:46:42: forwarddef
+                    // grammars/TDL.g:52:2: f= forwarddef
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_forwarddef_in_typedef287);
-                    forwarddef14=forwarddef();
+                    pushFollow(FOLLOW_forwarddef_in_typedef317);
+                    f=forwarddef();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, forwarddef14.getTree());
+                    adaptor.addChild(root_0, f.getTree());
+                    protocol.forwards.add(f.forward);
 
                     }
                     break;
@@ -557,53 +566,56 @@ public class TDLParser extends Parser {
     // $ANTLR end "typedef"
 
     public static class structdef_return extends ParserRuleReturnScope {
+        public Struct struct;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "structdef"
-    // grammars/TDL.g:48:1: structdef : 'struct' identifier ( '=' 'ID' number )? '{' ( field )+ '}' ;
+    // grammars/TDL.g:54:1: structdef returns [Struct struct] : 'struct' identifier ( '=' 'ID' number )? '{' (f= field )+ '}' ;
     public final TDLParser.structdef_return structdef() throws RecognitionException {
         TDLParser.structdef_return retval = new TDLParser.structdef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal15=null;
+        Token string_literal11=null;
+        Token char_literal13=null;
+        Token string_literal14=null;
+        Token char_literal16=null;
         Token char_literal17=null;
-        Token string_literal18=null;
-        Token char_literal20=null;
-        Token char_literal22=null;
-        TDLParser.identifier_return identifier16 = null;
+        TDLParser.field_return f = null;
 
-        TDLParser.number_return number19 = null;
+        TDLParser.identifier_return identifier12 = null;
 
-        TDLParser.field_return field21 = null;
+        TDLParser.number_return number15 = null;
 
 
-        Object string_literal15_tree=null;
+        Object string_literal11_tree=null;
+        Object char_literal13_tree=null;
+        Object string_literal14_tree=null;
+        Object char_literal16_tree=null;
         Object char_literal17_tree=null;
-        Object string_literal18_tree=null;
-        Object char_literal20_tree=null;
-        Object char_literal22_tree=null;
 
+        retval.struct = new Struct();
         try {
-            // grammars/TDL.g:49:5: ( 'struct' identifier ( '=' 'ID' number )? '{' ( field )+ '}' )
-            // grammars/TDL.g:49:7: 'struct' identifier ( '=' 'ID' number )? '{' ( field )+ '}'
+            // grammars/TDL.g:56:5: ( 'struct' identifier ( '=' 'ID' number )? '{' (f= field )+ '}' )
+            // grammars/TDL.g:56:7: 'struct' identifier ( '=' 'ID' number )? '{' (f= field )+ '}'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal15=(Token)match(input,16,FOLLOW_16_in_structdef301); 
-            string_literal15_tree = (Object)adaptor.create(string_literal15);
-            adaptor.addChild(root_0, string_literal15_tree);
+            string_literal11=(Token)match(input,16,FOLLOW_16_in_structdef339); 
+            string_literal11_tree = (Object)adaptor.create(string_literal11);
+            adaptor.addChild(root_0, string_literal11_tree);
 
-            pushFollow(FOLLOW_identifier_in_structdef303);
-            identifier16=identifier();
+            pushFollow(FOLLOW_identifier_in_structdef341);
+            identifier12=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier16.getTree());
-            // grammars/TDL.g:49:27: ( '=' 'ID' number )?
+            adaptor.addChild(root_0, identifier12.getTree());
+            retval.struct.name = (identifier12!=null?input.toString(identifier12.start,identifier12.stop):null);
+            // grammars/TDL.g:57:5: ( '=' 'ID' number )?
             int alt3=2;
             int LA3_0 = input.LA(1);
 
@@ -612,33 +624,34 @@ public class TDLParser extends Parser {
             }
             switch (alt3) {
                 case 1 :
-                    // grammars/TDL.g:49:29: '=' 'ID' number
+                    // grammars/TDL.g:57:7: '=' 'ID' number
                     {
-                    char_literal17=(Token)match(input,17,FOLLOW_17_in_structdef307); 
-                    char_literal17_tree = (Object)adaptor.create(char_literal17);
-                    adaptor.addChild(root_0, char_literal17_tree);
+                    char_literal13=(Token)match(input,17,FOLLOW_17_in_structdef352); 
+                    char_literal13_tree = (Object)adaptor.create(char_literal13);
+                    adaptor.addChild(root_0, char_literal13_tree);
 
-                    string_literal18=(Token)match(input,18,FOLLOW_18_in_structdef309); 
-                    string_literal18_tree = (Object)adaptor.create(string_literal18);
-                    adaptor.addChild(root_0, string_literal18_tree);
+                    string_literal14=(Token)match(input,18,FOLLOW_18_in_structdef354); 
+                    string_literal14_tree = (Object)adaptor.create(string_literal14);
+                    adaptor.addChild(root_0, string_literal14_tree);
 
-                    pushFollow(FOLLOW_number_in_structdef311);
-                    number19=number();
+                    pushFollow(FOLLOW_number_in_structdef356);
+                    number15=number();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, number19.getTree());
+                    adaptor.addChild(root_0, number15.getTree());
+                    retval.struct.id = Integer.parseInt((number15!=null?input.toString(number15.start,number15.stop):null));
 
                     }
                     break;
 
             }
 
-            char_literal20=(Token)match(input,19,FOLLOW_19_in_structdef316); 
-            char_literal20_tree = (Object)adaptor.create(char_literal20);
-            adaptor.addChild(root_0, char_literal20_tree);
+            char_literal16=(Token)match(input,19,FOLLOW_19_in_structdef367); 
+            char_literal16_tree = (Object)adaptor.create(char_literal16);
+            adaptor.addChild(root_0, char_literal16_tree);
 
-            // grammars/TDL.g:49:52: ( field )+
+            // grammars/TDL.g:58:9: (f= field )+
             int cnt4=0;
             loop4:
             do {
@@ -652,14 +665,15 @@ public class TDLParser extends Parser {
 
                 switch (alt4) {
             	case 1 :
-            	    // grammars/TDL.g:49:52: field
+            	    // grammars/TDL.g:58:10: f= field
             	    {
-            	    pushFollow(FOLLOW_field_in_structdef318);
-            	    field21=field();
+            	    pushFollow(FOLLOW_field_in_structdef372);
+            	    f=field();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, field21.getTree());
+            	    adaptor.addChild(root_0, f.getTree());
+            	    retval.struct.fields.add(f.field);
 
             	    }
             	    break;
@@ -673,9 +687,9 @@ public class TDLParser extends Parser {
                 cnt4++;
             } while (true);
 
-            char_literal22=(Token)match(input,20,FOLLOW_20_in_structdef321); 
-            char_literal22_tree = (Object)adaptor.create(char_literal22);
-            adaptor.addChild(root_0, char_literal22_tree);
+            char_literal17=(Token)match(input,20,FOLLOW_20_in_structdef378); 
+            char_literal17_tree = (Object)adaptor.create(char_literal17);
+            adaptor.addChild(root_0, char_literal17_tree);
 
 
             }
@@ -699,35 +713,37 @@ public class TDLParser extends Parser {
     // $ANTLR end "structdef"
 
     public static class field_return extends ParserRuleReturnScope {
+        public Field field;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "field"
-    // grammars/TDL.g:51:1: field : ( 'optional' )? type identifier ';' ;
+    // grammars/TDL.g:60:1: field returns [Field field] : ( 'optional' )? t= type identifier ';' ;
     public final TDLParser.field_return field() throws RecognitionException {
         TDLParser.field_return retval = new TDLParser.field_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal23=null;
-        Token char_literal26=null;
-        TDLParser.type_return type24 = null;
+        Token string_literal18=null;
+        Token char_literal20=null;
+        TDLParser.type_return t = null;
 
-        TDLParser.identifier_return identifier25 = null;
+        TDLParser.identifier_return identifier19 = null;
 
 
-        Object string_literal23_tree=null;
-        Object char_literal26_tree=null;
+        Object string_literal18_tree=null;
+        Object char_literal20_tree=null;
 
+        retval.field = new Field();
         try {
-            // grammars/TDL.g:52:5: ( ( 'optional' )? type identifier ';' )
-            // grammars/TDL.g:52:7: ( 'optional' )? type identifier ';'
+            // grammars/TDL.g:62:5: ( ( 'optional' )? t= type identifier ';' )
+            // grammars/TDL.g:62:7: ( 'optional' )? t= type identifier ';'
             {
             root_0 = (Object)adaptor.nil();
 
-            // grammars/TDL.g:52:7: ( 'optional' )?
+            // grammars/TDL.g:62:7: ( 'optional' )?
             int alt5=2;
             int LA5_0 = input.LA(1);
 
@@ -736,34 +752,37 @@ public class TDLParser extends Parser {
             }
             switch (alt5) {
                 case 1 :
-                    // grammars/TDL.g:52:7: 'optional'
+                    // grammars/TDL.g:62:8: 'optional'
                     {
-                    string_literal23=(Token)match(input,21,FOLLOW_21_in_field338); 
-                    string_literal23_tree = (Object)adaptor.create(string_literal23);
-                    adaptor.addChild(root_0, string_literal23_tree);
+                    string_literal18=(Token)match(input,21,FOLLOW_21_in_field402); 
+                    string_literal18_tree = (Object)adaptor.create(string_literal18);
+                    adaptor.addChild(root_0, string_literal18_tree);
 
+                    retval.field.optional = true;
 
                     }
                     break;
 
             }
 
-            pushFollow(FOLLOW_type_in_field341);
-            type24=type();
+            pushFollow(FOLLOW_type_in_field410);
+            t=type();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, type24.getTree());
-            pushFollow(FOLLOW_identifier_in_field343);
-            identifier25=identifier();
+            adaptor.addChild(root_0, t.getTree());
+            pushFollow(FOLLOW_identifier_in_field412);
+            identifier19=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier25.getTree());
-            char_literal26=(Token)match(input,22,FOLLOW_22_in_field345); 
-            char_literal26_tree = (Object)adaptor.create(char_literal26);
-            adaptor.addChild(root_0, char_literal26_tree);
+            adaptor.addChild(root_0, identifier19.getTree());
+            char_literal20=(Token)match(input,22,FOLLOW_22_in_field414); 
+            char_literal20_tree = (Object)adaptor.create(char_literal20);
+            adaptor.addChild(root_0, char_literal20_tree);
 
+            retval.field.type = t.type;
+               	retval.field.name = (identifier19!=null?input.toString(identifier19.start,identifier19.stop):null);
 
             }
 
@@ -786,66 +805,70 @@ public class TDLParser extends Parser {
     // $ANTLR end "field"
 
     public static class sequencedef_return extends ParserRuleReturnScope {
+        public Sequence sequence;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "sequencedef"
-    // grammars/TDL.g:54:1: sequencedef : 'sequence' '<' type '>' identifier ';' ;
+    // grammars/TDL.g:67:1: sequencedef returns [Sequence sequence] : 'sequence' '<' t= type '>' identifier ';' ;
     public final TDLParser.sequencedef_return sequencedef() throws RecognitionException {
         TDLParser.sequencedef_return retval = new TDLParser.sequencedef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal27=null;
-        Token char_literal28=null;
-        Token char_literal30=null;
-        Token char_literal32=null;
-        TDLParser.type_return type29 = null;
+        Token string_literal21=null;
+        Token char_literal22=null;
+        Token char_literal23=null;
+        Token char_literal25=null;
+        TDLParser.type_return t = null;
 
-        TDLParser.identifier_return identifier31 = null;
+        TDLParser.identifier_return identifier24 = null;
 
 
-        Object string_literal27_tree=null;
-        Object char_literal28_tree=null;
-        Object char_literal30_tree=null;
-        Object char_literal32_tree=null;
+        Object string_literal21_tree=null;
+        Object char_literal22_tree=null;
+        Object char_literal23_tree=null;
+        Object char_literal25_tree=null;
 
+        retval.sequence = new Sequence();
         try {
-            // grammars/TDL.g:55:5: ( 'sequence' '<' type '>' identifier ';' )
-            // grammars/TDL.g:55:7: 'sequence' '<' type '>' identifier ';'
+            // grammars/TDL.g:69:5: ( 'sequence' '<' t= type '>' identifier ';' )
+            // grammars/TDL.g:69:7: 'sequence' '<' t= type '>' identifier ';'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal27=(Token)match(input,23,FOLLOW_23_in_sequencedef362); 
-            string_literal27_tree = (Object)adaptor.create(string_literal27);
-            adaptor.addChild(root_0, string_literal27_tree);
+            string_literal21=(Token)match(input,23,FOLLOW_23_in_sequencedef448); 
+            string_literal21_tree = (Object)adaptor.create(string_literal21);
+            adaptor.addChild(root_0, string_literal21_tree);
 
-            char_literal28=(Token)match(input,24,FOLLOW_24_in_sequencedef364); 
-            char_literal28_tree = (Object)adaptor.create(char_literal28);
-            adaptor.addChild(root_0, char_literal28_tree);
+            char_literal22=(Token)match(input,24,FOLLOW_24_in_sequencedef450); 
+            char_literal22_tree = (Object)adaptor.create(char_literal22);
+            adaptor.addChild(root_0, char_literal22_tree);
 
-            pushFollow(FOLLOW_type_in_sequencedef366);
-            type29=type();
-
-            state._fsp--;
-
-            adaptor.addChild(root_0, type29.getTree());
-            char_literal30=(Token)match(input,25,FOLLOW_25_in_sequencedef368); 
-            char_literal30_tree = (Object)adaptor.create(char_literal30);
-            adaptor.addChild(root_0, char_literal30_tree);
-
-            pushFollow(FOLLOW_identifier_in_sequencedef370);
-            identifier31=identifier();
+            pushFollow(FOLLOW_type_in_sequencedef454);
+            t=type();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier31.getTree());
-            char_literal32=(Token)match(input,22,FOLLOW_22_in_sequencedef372); 
-            char_literal32_tree = (Object)adaptor.create(char_literal32);
-            adaptor.addChild(root_0, char_literal32_tree);
+            adaptor.addChild(root_0, t.getTree());
+            char_literal23=(Token)match(input,25,FOLLOW_25_in_sequencedef456); 
+            char_literal23_tree = (Object)adaptor.create(char_literal23);
+            adaptor.addChild(root_0, char_literal23_tree);
 
+            pushFollow(FOLLOW_identifier_in_sequencedef458);
+            identifier24=identifier();
+
+            state._fsp--;
+
+            adaptor.addChild(root_0, identifier24.getTree());
+            char_literal25=(Token)match(input,22,FOLLOW_22_in_sequencedef460); 
+            char_literal25_tree = (Object)adaptor.create(char_literal25);
+            adaptor.addChild(root_0, char_literal25_tree);
+
+            retval.sequence.type = t.type;
+               	retval.sequence.name = (identifier24!=null?input.toString(identifier24.start,identifier24.stop):null);
 
             }
 
@@ -868,51 +891,53 @@ public class TDLParser extends Parser {
     // $ANTLR end "sequencedef"
 
     public static class uniondef_return extends ParserRuleReturnScope {
+        public Union union;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "uniondef"
-    // grammars/TDL.g:57:1: uniondef : 'union' identifier '{' ( casedef )+ '}' ;
+    // grammars/TDL.g:73:1: uniondef returns [Union union] : 'union' identifier '{' (c= casedef )+ '}' ;
     public final TDLParser.uniondef_return uniondef() throws RecognitionException {
         TDLParser.uniondef_return retval = new TDLParser.uniondef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal33=null;
-        Token char_literal35=null;
-        Token char_literal37=null;
-        TDLParser.identifier_return identifier34 = null;
+        Token string_literal26=null;
+        Token char_literal28=null;
+        Token char_literal29=null;
+        TDLParser.casedef_return c = null;
 
-        TDLParser.casedef_return casedef36 = null;
+        TDLParser.identifier_return identifier27 = null;
 
 
-        Object string_literal33_tree=null;
-        Object char_literal35_tree=null;
-        Object char_literal37_tree=null;
+        Object string_literal26_tree=null;
+        Object char_literal28_tree=null;
+        Object char_literal29_tree=null;
 
+        retval.union = new Union();
         try {
-            // grammars/TDL.g:58:5: ( 'union' identifier '{' ( casedef )+ '}' )
-            // grammars/TDL.g:58:7: 'union' identifier '{' ( casedef )+ '}'
+            // grammars/TDL.g:75:5: ( 'union' identifier '{' (c= casedef )+ '}' )
+            // grammars/TDL.g:75:7: 'union' identifier '{' (c= casedef )+ '}'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal33=(Token)match(input,26,FOLLOW_26_in_uniondef389); 
-            string_literal33_tree = (Object)adaptor.create(string_literal33);
-            adaptor.addChild(root_0, string_literal33_tree);
+            string_literal26=(Token)match(input,26,FOLLOW_26_in_uniondef489); 
+            string_literal26_tree = (Object)adaptor.create(string_literal26);
+            adaptor.addChild(root_0, string_literal26_tree);
 
-            pushFollow(FOLLOW_identifier_in_uniondef391);
-            identifier34=identifier();
+            pushFollow(FOLLOW_identifier_in_uniondef491);
+            identifier27=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier34.getTree());
-            char_literal35=(Token)match(input,19,FOLLOW_19_in_uniondef393); 
-            char_literal35_tree = (Object)adaptor.create(char_literal35);
-            adaptor.addChild(root_0, char_literal35_tree);
+            adaptor.addChild(root_0, identifier27.getTree());
+            char_literal28=(Token)match(input,19,FOLLOW_19_in_uniondef493); 
+            char_literal28_tree = (Object)adaptor.create(char_literal28);
+            adaptor.addChild(root_0, char_literal28_tree);
 
-            // grammars/TDL.g:58:30: ( casedef )+
+            // grammars/TDL.g:75:30: (c= casedef )+
             int cnt6=0;
             loop6:
             do {
@@ -926,14 +951,15 @@ public class TDLParser extends Parser {
 
                 switch (alt6) {
             	case 1 :
-            	    // grammars/TDL.g:58:30: casedef
+            	    // grammars/TDL.g:75:31: c= casedef
             	    {
-            	    pushFollow(FOLLOW_casedef_in_uniondef395);
-            	    casedef36=casedef();
+            	    pushFollow(FOLLOW_casedef_in_uniondef498);
+            	    c=casedef();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, casedef36.getTree());
+            	    adaptor.addChild(root_0, c.getTree());
+            	    retval.union.cases.add(c.caze);
 
             	    }
             	    break;
@@ -947,10 +973,11 @@ public class TDLParser extends Parser {
                 cnt6++;
             } while (true);
 
-            char_literal37=(Token)match(input,20,FOLLOW_20_in_uniondef398); 
-            char_literal37_tree = (Object)adaptor.create(char_literal37);
-            adaptor.addChild(root_0, char_literal37_tree);
+            char_literal29=(Token)match(input,20,FOLLOW_20_in_uniondef504); 
+            char_literal29_tree = (Object)adaptor.create(char_literal29);
+            adaptor.addChild(root_0, char_literal29_tree);
 
+            retval.union.name = (identifier27!=null?input.toString(identifier27.start,identifier27.stop):null);
 
             }
 
@@ -973,68 +1000,73 @@ public class TDLParser extends Parser {
     // $ANTLR end "uniondef"
 
     public static class casedef_return extends ParserRuleReturnScope {
+        public Case caze;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "casedef"
-    // grammars/TDL.g:60:1: casedef : 'case' number ':' type identifier ';' ;
+    // grammars/TDL.g:78:1: casedef returns [Case caze] : 'case' number ':' t= type identifier ';' ;
     public final TDLParser.casedef_return casedef() throws RecognitionException {
         TDLParser.casedef_return retval = new TDLParser.casedef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal38=null;
-        Token char_literal40=null;
-        Token char_literal43=null;
-        TDLParser.number_return number39 = null;
+        Token string_literal30=null;
+        Token char_literal32=null;
+        Token char_literal34=null;
+        TDLParser.type_return t = null;
 
-        TDLParser.type_return type41 = null;
+        TDLParser.number_return number31 = null;
 
-        TDLParser.identifier_return identifier42 = null;
+        TDLParser.identifier_return identifier33 = null;
 
 
-        Object string_literal38_tree=null;
-        Object char_literal40_tree=null;
-        Object char_literal43_tree=null;
+        Object string_literal30_tree=null;
+        Object char_literal32_tree=null;
+        Object char_literal34_tree=null;
 
+        retval.caze = new Case();
         try {
-            // grammars/TDL.g:61:5: ( 'case' number ':' type identifier ';' )
-            // grammars/TDL.g:61:7: 'case' number ':' type identifier ';'
+            // grammars/TDL.g:80:5: ( 'case' number ':' t= type identifier ';' )
+            // grammars/TDL.g:80:7: 'case' number ':' t= type identifier ';'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal38=(Token)match(input,27,FOLLOW_27_in_casedef416); 
-            string_literal38_tree = (Object)adaptor.create(string_literal38);
-            adaptor.addChild(root_0, string_literal38_tree);
+            string_literal30=(Token)match(input,27,FOLLOW_27_in_casedef533); 
+            string_literal30_tree = (Object)adaptor.create(string_literal30);
+            adaptor.addChild(root_0, string_literal30_tree);
 
-            pushFollow(FOLLOW_number_in_casedef418);
-            number39=number();
-
-            state._fsp--;
-
-            adaptor.addChild(root_0, number39.getTree());
-            char_literal40=(Token)match(input,28,FOLLOW_28_in_casedef420); 
-            char_literal40_tree = (Object)adaptor.create(char_literal40);
-            adaptor.addChild(root_0, char_literal40_tree);
-
-            pushFollow(FOLLOW_type_in_casedef422);
-            type41=type();
+            pushFollow(FOLLOW_number_in_casedef535);
+            number31=number();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, type41.getTree());
-            pushFollow(FOLLOW_identifier_in_casedef424);
-            identifier42=identifier();
+            adaptor.addChild(root_0, number31.getTree());
+            char_literal32=(Token)match(input,28,FOLLOW_28_in_casedef537); 
+            char_literal32_tree = (Object)adaptor.create(char_literal32);
+            adaptor.addChild(root_0, char_literal32_tree);
+
+            pushFollow(FOLLOW_type_in_casedef541);
+            t=type();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier42.getTree());
-            char_literal43=(Token)match(input,22,FOLLOW_22_in_casedef426); 
-            char_literal43_tree = (Object)adaptor.create(char_literal43);
-            adaptor.addChild(root_0, char_literal43_tree);
+            adaptor.addChild(root_0, t.getTree());
+            pushFollow(FOLLOW_identifier_in_casedef543);
+            identifier33=identifier();
 
+            state._fsp--;
+
+            adaptor.addChild(root_0, identifier33.getTree());
+            char_literal34=(Token)match(input,22,FOLLOW_22_in_casedef545); 
+            char_literal34_tree = (Object)adaptor.create(char_literal34);
+            adaptor.addChild(root_0, char_literal34_tree);
+
+            retval.caze.id = Integer.parseInt((number31!=null?input.toString(number31.start,number31.stop):null));
+               	retval.caze.type = t.type;
+               	retval.caze.name = (identifier33!=null?input.toString(identifier33.start,identifier33.stop):null);
 
             }
 
@@ -1057,46 +1089,49 @@ public class TDLParser extends Parser {
     // $ANTLR end "casedef"
 
     public static class forwarddef_return extends ParserRuleReturnScope {
+        public Forward forward;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "forwarddef"
-    // grammars/TDL.g:63:1: forwarddef : 'typedef' identifier ';' ;
+    // grammars/TDL.g:85:1: forwarddef returns [Forward forward] : 'typedef' identifier ';' ;
     public final TDLParser.forwarddef_return forwarddef() throws RecognitionException {
         TDLParser.forwarddef_return retval = new TDLParser.forwarddef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal44=null;
-        Token char_literal46=null;
-        TDLParser.identifier_return identifier45 = null;
+        Token string_literal35=null;
+        Token char_literal37=null;
+        TDLParser.identifier_return identifier36 = null;
 
 
-        Object string_literal44_tree=null;
-        Object char_literal46_tree=null;
+        Object string_literal35_tree=null;
+        Object char_literal37_tree=null;
 
+        retval.forward = new Forward();
         try {
-            // grammars/TDL.g:64:5: ( 'typedef' identifier ';' )
-            // grammars/TDL.g:64:7: 'typedef' identifier ';'
+            // grammars/TDL.g:87:5: ( 'typedef' identifier ';' )
+            // grammars/TDL.g:87:7: 'typedef' identifier ';'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal44=(Token)match(input,29,FOLLOW_29_in_forwarddef443); 
-            string_literal44_tree = (Object)adaptor.create(string_literal44);
-            adaptor.addChild(root_0, string_literal44_tree);
+            string_literal35=(Token)match(input,29,FOLLOW_29_in_forwarddef574); 
+            string_literal35_tree = (Object)adaptor.create(string_literal35);
+            adaptor.addChild(root_0, string_literal35_tree);
 
-            pushFollow(FOLLOW_identifier_in_forwarddef445);
-            identifier45=identifier();
+            pushFollow(FOLLOW_identifier_in_forwarddef576);
+            identifier36=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier45.getTree());
-            char_literal46=(Token)match(input,22,FOLLOW_22_in_forwarddef447); 
-            char_literal46_tree = (Object)adaptor.create(char_literal46);
-            adaptor.addChild(root_0, char_literal46_tree);
+            adaptor.addChild(root_0, identifier36.getTree());
+            char_literal37=(Token)match(input,22,FOLLOW_22_in_forwarddef578); 
+            char_literal37_tree = (Object)adaptor.create(char_literal37);
+            adaptor.addChild(root_0, char_literal37_tree);
 
+            retval.forward.name = (identifier36!=null?input.toString(identifier36.start,identifier36.stop):null);
 
             }
 
@@ -1119,59 +1154,62 @@ public class TDLParser extends Parser {
     // $ANTLR end "forwarddef"
 
     public static class messagedef_return extends ParserRuleReturnScope {
+        public Message message;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "messagedef"
-    // grammars/TDL.g:66:1: messagedef : 'message' identifier '=' ( seven | 'ID' number ) '{' ( field )* '}' ;
+    // grammars/TDL.g:90:1: messagedef returns [Message message] : 'message' identifier '=' ( seven | 'ID' number ) '{' (f= field )* '}' ;
     public final TDLParser.messagedef_return messagedef() throws RecognitionException {
         TDLParser.messagedef_return retval = new TDLParser.messagedef_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal47=null;
-        Token char_literal49=null;
-        Token string_literal51=null;
-        Token char_literal53=null;
-        Token char_literal55=null;
-        TDLParser.identifier_return identifier48 = null;
+        Token string_literal38=null;
+        Token char_literal40=null;
+        Token string_literal42=null;
+        Token char_literal44=null;
+        Token char_literal45=null;
+        TDLParser.field_return f = null;
 
-        TDLParser.seven_return seven50 = null;
+        TDLParser.identifier_return identifier39 = null;
 
-        TDLParser.number_return number52 = null;
+        TDLParser.seven_return seven41 = null;
 
-        TDLParser.field_return field54 = null;
+        TDLParser.number_return number43 = null;
 
 
-        Object string_literal47_tree=null;
-        Object char_literal49_tree=null;
-        Object string_literal51_tree=null;
-        Object char_literal53_tree=null;
-        Object char_literal55_tree=null;
+        Object string_literal38_tree=null;
+        Object char_literal40_tree=null;
+        Object string_literal42_tree=null;
+        Object char_literal44_tree=null;
+        Object char_literal45_tree=null;
 
+        retval.message = new Message();
         try {
-            // grammars/TDL.g:67:5: ( 'message' identifier '=' ( seven | 'ID' number ) '{' ( field )* '}' )
-            // grammars/TDL.g:67:7: 'message' identifier '=' ( seven | 'ID' number ) '{' ( field )* '}'
+            // grammars/TDL.g:92:5: ( 'message' identifier '=' ( seven | 'ID' number ) '{' (f= field )* '}' )
+            // grammars/TDL.g:92:7: 'message' identifier '=' ( seven | 'ID' number ) '{' (f= field )* '}'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal47=(Token)match(input,30,FOLLOW_30_in_messagedef463); 
-            string_literal47_tree = (Object)adaptor.create(string_literal47);
-            adaptor.addChild(root_0, string_literal47_tree);
+            string_literal38=(Token)match(input,30,FOLLOW_30_in_messagedef606); 
+            string_literal38_tree = (Object)adaptor.create(string_literal38);
+            adaptor.addChild(root_0, string_literal38_tree);
 
-            pushFollow(FOLLOW_identifier_in_messagedef465);
-            identifier48=identifier();
+            pushFollow(FOLLOW_identifier_in_messagedef608);
+            identifier39=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, identifier48.getTree());
-            char_literal49=(Token)match(input,17,FOLLOW_17_in_messagedef467); 
-            char_literal49_tree = (Object)adaptor.create(char_literal49);
-            adaptor.addChild(root_0, char_literal49_tree);
+            adaptor.addChild(root_0, identifier39.getTree());
+            retval.message.name = (identifier39!=null?input.toString(identifier39.start,identifier39.stop):null);
+            char_literal40=(Token)match(input,17,FOLLOW_17_in_messagedef611); 
+            char_literal40_tree = (Object)adaptor.create(char_literal40);
+            adaptor.addChild(root_0, char_literal40_tree);
 
-            // grammars/TDL.g:67:32: ( seven | 'ID' number )
+            // grammars/TDL.g:93:5: ( seven | 'ID' number )
             int alt7=2;
             int LA7_0 = input.LA(1);
 
@@ -1189,41 +1227,43 @@ public class TDLParser extends Parser {
             }
             switch (alt7) {
                 case 1 :
-                    // grammars/TDL.g:67:34: seven
+                    // grammars/TDL.g:93:7: seven
                     {
-                    pushFollow(FOLLOW_seven_in_messagedef471);
-                    seven50=seven();
+                    pushFollow(FOLLOW_seven_in_messagedef620);
+                    seven41=seven();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, seven50.getTree());
+                    adaptor.addChild(root_0, seven41.getTree());
+                    retval.message.id = Integer.parseInt((seven41!=null?input.toString(seven41.start,seven41.stop):null));
 
                     }
                     break;
                 case 2 :
-                    // grammars/TDL.g:67:42: 'ID' number
+                    // grammars/TDL.g:93:61: 'ID' number
                     {
-                    string_literal51=(Token)match(input,18,FOLLOW_18_in_messagedef475); 
-                    string_literal51_tree = (Object)adaptor.create(string_literal51);
-                    adaptor.addChild(root_0, string_literal51_tree);
+                    string_literal42=(Token)match(input,18,FOLLOW_18_in_messagedef625); 
+                    string_literal42_tree = (Object)adaptor.create(string_literal42);
+                    adaptor.addChild(root_0, string_literal42_tree);
 
-                    pushFollow(FOLLOW_number_in_messagedef477);
-                    number52=number();
+                    pushFollow(FOLLOW_number_in_messagedef627);
+                    number43=number();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, number52.getTree());
+                    adaptor.addChild(root_0, number43.getTree());
+                    retval.message.id = Integer.parseInt((number43!=null?input.toString(number43.start,number43.stop):null));
 
                     }
                     break;
 
             }
 
-            char_literal53=(Token)match(input,19,FOLLOW_19_in_messagedef481); 
-            char_literal53_tree = (Object)adaptor.create(char_literal53);
-            adaptor.addChild(root_0, char_literal53_tree);
+            char_literal44=(Token)match(input,19,FOLLOW_19_in_messagedef637); 
+            char_literal44_tree = (Object)adaptor.create(char_literal44);
+            adaptor.addChild(root_0, char_literal44_tree);
 
-            // grammars/TDL.g:67:60: ( field )*
+            // grammars/TDL.g:94:9: (f= field )*
             loop8:
             do {
                 int alt8=2;
@@ -1236,14 +1276,15 @@ public class TDLParser extends Parser {
 
                 switch (alt8) {
             	case 1 :
-            	    // grammars/TDL.g:67:60: field
+            	    // grammars/TDL.g:94:10: f= field
             	    {
-            	    pushFollow(FOLLOW_field_in_messagedef483);
-            	    field54=field();
+            	    pushFollow(FOLLOW_field_in_messagedef642);
+            	    f=field();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, field54.getTree());
+            	    adaptor.addChild(root_0, f.getTree());
+            	    retval.message.fields.add(f.field);
 
             	    }
             	    break;
@@ -1253,9 +1294,9 @@ public class TDLParser extends Parser {
                 }
             } while (true);
 
-            char_literal55=(Token)match(input,20,FOLLOW_20_in_messagedef486); 
-            char_literal55_tree = (Object)adaptor.create(char_literal55);
-            adaptor.addChild(root_0, char_literal55_tree);
+            char_literal45=(Token)match(input,20,FOLLOW_20_in_messagedef648); 
+            char_literal45_tree = (Object)adaptor.create(char_literal45);
+            adaptor.addChild(root_0, char_literal45_tree);
 
 
             }
@@ -1279,73 +1320,73 @@ public class TDLParser extends Parser {
     // $ANTLR end "messagedef"
 
     public static class protocol_return extends ParserRuleReturnScope {
+        public Protocol protocol;
         Object tree;
         public Object getTree() { return tree; }
     };
 
     // $ANTLR start "protocol"
-    // grammars/TDL.g:69:1: protocol[Specification spec] : 'protocol' identifier '=' 'ID' number '{' ( protocolelement )* '}' ;
-    public final TDLParser.protocol_return protocol(Specification spec) throws RecognitionException {
+    // grammars/TDL.g:96:1: protocol returns [Protocol protocol] : 'protocol' identifier '=' 'ID' number '{' ( protocolelement[$protocol] )* '}' ;
+    public final TDLParser.protocol_return protocol() throws RecognitionException {
         TDLParser.protocol_return retval = new TDLParser.protocol_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token string_literal56=null;
-        Token char_literal58=null;
-        Token string_literal59=null;
-        Token char_literal61=null;
-        Token char_literal63=null;
-        TDLParser.identifier_return identifier57 = null;
+        Token string_literal46=null;
+        Token char_literal48=null;
+        Token string_literal49=null;
+        Token char_literal51=null;
+        Token char_literal53=null;
+        TDLParser.identifier_return identifier47 = null;
 
-        TDLParser.number_return number60 = null;
+        TDLParser.number_return number50 = null;
 
-        TDLParser.protocolelement_return protocolelement62 = null;
+        TDLParser.protocolelement_return protocolelement52 = null;
 
 
-        Object string_literal56_tree=null;
-        Object char_literal58_tree=null;
-        Object string_literal59_tree=null;
-        Object char_literal61_tree=null;
-        Object char_literal63_tree=null;
+        Object string_literal46_tree=null;
+        Object char_literal48_tree=null;
+        Object string_literal49_tree=null;
+        Object char_literal51_tree=null;
+        Object char_literal53_tree=null;
 
-        Protocol prot = new Protocol();
-        spec.protocols.add(prot);
+        retval.protocol = new Protocol();
         try {
-            // grammars/TDL.g:72:5: ( 'protocol' identifier '=' 'ID' number '{' ( protocolelement )* '}' )
-            // grammars/TDL.g:72:7: 'protocol' identifier '=' 'ID' number '{' ( protocolelement )* '}'
+            // grammars/TDL.g:98:5: ( 'protocol' identifier '=' 'ID' number '{' ( protocolelement[$protocol] )* '}' )
+            // grammars/TDL.g:98:7: 'protocol' identifier '=' 'ID' number '{' ( protocolelement[$protocol] )* '}'
             {
             root_0 = (Object)adaptor.nil();
 
-            string_literal56=(Token)match(input,31,FOLLOW_31_in_protocol508); 
-            string_literal56_tree = (Object)adaptor.create(string_literal56);
-            adaptor.addChild(root_0, string_literal56_tree);
+            string_literal46=(Token)match(input,31,FOLLOW_31_in_protocol671); 
+            string_literal46_tree = (Object)adaptor.create(string_literal46);
+            adaptor.addChild(root_0, string_literal46_tree);
 
-            pushFollow(FOLLOW_identifier_in_protocol510);
-            identifier57=identifier();
-
-            state._fsp--;
-
-            adaptor.addChild(root_0, identifier57.getTree());
-            char_literal58=(Token)match(input,17,FOLLOW_17_in_protocol512); 
-            char_literal58_tree = (Object)adaptor.create(char_literal58);
-            adaptor.addChild(root_0, char_literal58_tree);
-
-            string_literal59=(Token)match(input,18,FOLLOW_18_in_protocol514); 
-            string_literal59_tree = (Object)adaptor.create(string_literal59);
-            adaptor.addChild(root_0, string_literal59_tree);
-
-            pushFollow(FOLLOW_number_in_protocol516);
-            number60=number();
+            pushFollow(FOLLOW_identifier_in_protocol673);
+            identifier47=identifier();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, number60.getTree());
-            char_literal61=(Token)match(input,19,FOLLOW_19_in_protocol518); 
-            char_literal61_tree = (Object)adaptor.create(char_literal61);
-            adaptor.addChild(root_0, char_literal61_tree);
+            adaptor.addChild(root_0, identifier47.getTree());
+            char_literal48=(Token)match(input,17,FOLLOW_17_in_protocol675); 
+            char_literal48_tree = (Object)adaptor.create(char_literal48);
+            adaptor.addChild(root_0, char_literal48_tree);
 
-            // grammars/TDL.g:72:49: ( protocolelement )*
+            string_literal49=(Token)match(input,18,FOLLOW_18_in_protocol677); 
+            string_literal49_tree = (Object)adaptor.create(string_literal49);
+            adaptor.addChild(root_0, string_literal49_tree);
+
+            pushFollow(FOLLOW_number_in_protocol679);
+            number50=number();
+
+            state._fsp--;
+
+            adaptor.addChild(root_0, number50.getTree());
+            char_literal51=(Token)match(input,19,FOLLOW_19_in_protocol681); 
+            char_literal51_tree = (Object)adaptor.create(char_literal51);
+            adaptor.addChild(root_0, char_literal51_tree);
+
+            // grammars/TDL.g:98:49: ( protocolelement[$protocol] )*
             loop9:
             do {
                 int alt9=2;
@@ -1358,14 +1399,14 @@ public class TDLParser extends Parser {
 
                 switch (alt9) {
             	case 1 :
-            	    // grammars/TDL.g:72:49: protocolelement
+            	    // grammars/TDL.g:98:50: protocolelement[$protocol]
             	    {
-            	    pushFollow(FOLLOW_protocolelement_in_protocol520);
-            	    protocolelement62=protocolelement();
+            	    pushFollow(FOLLOW_protocolelement_in_protocol684);
+            	    protocolelement52=protocolelement(retval.protocol);
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, protocolelement62.getTree());
+            	    adaptor.addChild(root_0, protocolelement52.getTree());
 
             	    }
             	    break;
@@ -1375,12 +1416,12 @@ public class TDLParser extends Parser {
                 }
             } while (true);
 
-            char_literal63=(Token)match(input,20,FOLLOW_20_in_protocol523); 
-            char_literal63_tree = (Object)adaptor.create(char_literal63);
-            adaptor.addChild(root_0, char_literal63_tree);
+            char_literal53=(Token)match(input,20,FOLLOW_20_in_protocol689); 
+            char_literal53_tree = (Object)adaptor.create(char_literal53);
+            adaptor.addChild(root_0, char_literal53_tree);
 
-            prot.name = (identifier57!=null?input.toString(identifier57.start,identifier57.stop):null);
-               	prot.id = Integer.parseInt((number60!=null?input.toString(number60.start,number60.stop):null));
+            retval.protocol.name = (identifier47!=null?input.toString(identifier47.start,identifier47.stop):null);
+               	retval.protocol.id = Integer.parseInt((number50!=null?input.toString(number50.start,number50.stop):null));
 
             }
 
@@ -1408,21 +1449,21 @@ public class TDLParser extends Parser {
     };
 
     // $ANTLR start "protocolelement"
-    // grammars/TDL.g:76:1: protocolelement : ( typedef | messagedef );
-    public final TDLParser.protocolelement_return protocolelement() throws RecognitionException {
+    // grammars/TDL.g:102:1: protocolelement[Protocol protocol] : ( typedef[$protocol] | m= messagedef );
+    public final TDLParser.protocolelement_return protocolelement(Protocol protocol) throws RecognitionException {
         TDLParser.protocolelement_return retval = new TDLParser.protocolelement_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        TDLParser.typedef_return typedef64 = null;
+        TDLParser.messagedef_return m = null;
 
-        TDLParser.messagedef_return messagedef65 = null;
+        TDLParser.typedef_return typedef54 = null;
 
 
 
         try {
-            // grammars/TDL.g:77:5: ( typedef | messagedef )
+            // grammars/TDL.g:103:5: ( typedef[$protocol] | m= messagedef )
             int alt10=2;
             int LA10_0 = input.LA(1);
 
@@ -1440,30 +1481,31 @@ public class TDLParser extends Parser {
             }
             switch (alt10) {
                 case 1 :
-                    // grammars/TDL.g:77:7: typedef
+                    // grammars/TDL.g:103:7: typedef[$protocol]
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_typedef_in_protocolelement542);
-                    typedef64=typedef();
+                    pushFollow(FOLLOW_typedef_in_protocolelement709);
+                    typedef54=typedef(protocol);
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, typedef64.getTree());
+                    adaptor.addChild(root_0, typedef54.getTree());
 
                     }
                     break;
                 case 2 :
-                    // grammars/TDL.g:77:17: messagedef
+                    // grammars/TDL.g:104:5: m= messagedef
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_messagedef_in_protocolelement546);
-                    messagedef65=messagedef();
+                    pushFollow(FOLLOW_messagedef_in_protocolelement721);
+                    m=messagedef();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, messagedef65.getTree());
+                    adaptor.addChild(root_0, m.getTree());
+                    protocol.messages.add(m.message);
 
                     }
                     break;
@@ -1494,31 +1536,31 @@ public class TDLParser extends Parser {
     };
 
     // $ANTLR start "specification"
-    // grammars/TDL.g:79:1: specification returns [Specification spec] : ( protocol[$spec] | messagedef | structdef )* EOF ;
+    // grammars/TDL.g:106:1: specification returns [Specification spec] : (p= protocol | m= messagedef | s= structdef )* EOF ;
     public final TDLParser.specification_return specification() throws RecognitionException {
         TDLParser.specification_return retval = new TDLParser.specification_return();
         retval.start = input.LT(1);
 
         Object root_0 = null;
 
-        Token EOF69=null;
-        TDLParser.protocol_return protocol66 = null;
+        Token EOF55=null;
+        TDLParser.protocol_return p = null;
 
-        TDLParser.messagedef_return messagedef67 = null;
+        TDLParser.messagedef_return m = null;
 
-        TDLParser.structdef_return structdef68 = null;
+        TDLParser.structdef_return s = null;
 
 
-        Object EOF69_tree=null;
+        Object EOF55_tree=null;
 
         retval.spec = new Specification();
         try {
-            // grammars/TDL.g:81:5: ( ( protocol[$spec] | messagedef | structdef )* EOF )
-            // grammars/TDL.g:81:7: ( protocol[$spec] | messagedef | structdef )* EOF
+            // grammars/TDL.g:108:5: ( (p= protocol | m= messagedef | s= structdef )* EOF )
+            // grammars/TDL.g:108:7: (p= protocol | m= messagedef | s= structdef )* EOF
             {
             root_0 = (Object)adaptor.nil();
 
-            // grammars/TDL.g:81:7: ( protocol[$spec] | messagedef | structdef )*
+            // grammars/TDL.g:108:7: (p= protocol | m= messagedef | s= structdef )*
             loop11:
             do {
                 int alt11=4;
@@ -1543,38 +1585,41 @@ public class TDLParser extends Parser {
 
                 switch (alt11) {
             	case 1 :
-            	    // grammars/TDL.g:81:8: protocol[$spec]
+            	    // grammars/TDL.g:108:8: p= protocol
             	    {
-            	    pushFollow(FOLLOW_protocol_in_specification566);
-            	    protocol66=protocol(retval.spec);
+            	    pushFollow(FOLLOW_protocol_in_specification745);
+            	    p=protocol();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, protocol66.getTree());
+            	    adaptor.addChild(root_0, p.getTree());
+            	    retval.spec.protocols.add(p.protocol);
 
             	    }
             	    break;
             	case 2 :
-            	    // grammars/TDL.g:81:25: messagedef
+            	    // grammars/TDL.g:109:5: m= messagedef
             	    {
-            	    pushFollow(FOLLOW_messagedef_in_specification570);
-            	    messagedef67=messagedef();
+            	    pushFollow(FOLLOW_messagedef_in_specification757);
+            	    m=messagedef();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, messagedef67.getTree());
+            	    adaptor.addChild(root_0, m.getTree());
+            	    retval.spec.messages.add(m.message);
 
             	    }
             	    break;
             	case 3 :
-            	    // grammars/TDL.g:81:38: structdef
+            	    // grammars/TDL.g:110:5: s= structdef
             	    {
-            	    pushFollow(FOLLOW_structdef_in_specification574);
-            	    structdef68=structdef();
+            	    pushFollow(FOLLOW_structdef_in_specification769);
+            	    s=structdef();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, structdef68.getTree());
+            	    adaptor.addChild(root_0, s.getTree());
+            	    retval.spec.structs.add(s.struct);
 
             	    }
             	    break;
@@ -1584,9 +1629,9 @@ public class TDLParser extends Parser {
                 }
             } while (true);
 
-            EOF69=(Token)match(input,EOF,FOLLOW_EOF_in_specification578); 
-            EOF69_tree = (Object)adaptor.create(EOF69);
-            adaptor.addChild(root_0, EOF69_tree);
+            EOF55=(Token)match(input,EOF,FOLLOW_EOF_in_specification775); 
+            EOF55_tree = (Object)adaptor.create(EOF55);
+            adaptor.addChild(root_0, EOF55_tree);
 
 
             }
@@ -1617,71 +1662,71 @@ public class TDLParser extends Parser {
     public static final BitSet FOLLOW_ID_in_identifier173 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_SEVENUP_in_seven184 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_number0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_primitiveType_in_type217 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_identifier_in_type221 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_10_in_type226 = new BitSet(new long[]{0x0000000000000800L});
-    public static final BitSet FOLLOW_11_in_type228 = new BitSet(new long[]{0x0000000000001000L});
-    public static final BitSet FOLLOW_12_in_type230 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_type232 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_primitiveType_in_type222 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_identifier_in_type229 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_10_in_type237 = new BitSet(new long[]{0x0000000000000800L});
+    public static final BitSet FOLLOW_11_in_type239 = new BitSet(new long[]{0x0000000000001000L});
+    public static final BitSet FOLLOW_12_in_type241 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_type243 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_set_in_primitiveType0 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_structdef_in_typedef275 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_sequencedef_in_typedef279 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_uniondef_in_typedef283 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_forwarddef_in_typedef287 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_16_in_structdef301 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_structdef303 = new BitSet(new long[]{0x00000000000A0000L});
-    public static final BitSet FOLLOW_17_in_structdef307 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_18_in_structdef309 = new BitSet(new long[]{0x0000000000000300L});
-    public static final BitSet FOLLOW_number_in_structdef311 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_structdef316 = new BitSet(new long[]{0x000000000020E440L});
-    public static final BitSet FOLLOW_field_in_structdef318 = new BitSet(new long[]{0x000000000030E440L});
-    public static final BitSet FOLLOW_20_in_structdef321 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_21_in_field338 = new BitSet(new long[]{0x000000000020E440L});
-    public static final BitSet FOLLOW_type_in_field341 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_field343 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_22_in_field345 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_23_in_sequencedef362 = new BitSet(new long[]{0x0000000001000000L});
-    public static final BitSet FOLLOW_24_in_sequencedef364 = new BitSet(new long[]{0x000000000020E440L});
-    public static final BitSet FOLLOW_type_in_sequencedef366 = new BitSet(new long[]{0x0000000002000000L});
-    public static final BitSet FOLLOW_25_in_sequencedef368 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_sequencedef370 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_22_in_sequencedef372 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_26_in_uniondef389 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_uniondef391 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_uniondef393 = new BitSet(new long[]{0x0000000008000000L});
-    public static final BitSet FOLLOW_casedef_in_uniondef395 = new BitSet(new long[]{0x0000000008100000L});
-    public static final BitSet FOLLOW_20_in_uniondef398 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_27_in_casedef416 = new BitSet(new long[]{0x0000000000000300L});
-    public static final BitSet FOLLOW_number_in_casedef418 = new BitSet(new long[]{0x0000000010000000L});
-    public static final BitSet FOLLOW_28_in_casedef420 = new BitSet(new long[]{0x000000000020E440L});
-    public static final BitSet FOLLOW_type_in_casedef422 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_casedef424 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_22_in_casedef426 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_29_in_forwarddef443 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_forwarddef445 = new BitSet(new long[]{0x0000000000400000L});
-    public static final BitSet FOLLOW_22_in_forwarddef447 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_30_in_messagedef463 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_messagedef465 = new BitSet(new long[]{0x0000000000020000L});
-    public static final BitSet FOLLOW_17_in_messagedef467 = new BitSet(new long[]{0x0000000000040100L});
-    public static final BitSet FOLLOW_seven_in_messagedef471 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_18_in_messagedef475 = new BitSet(new long[]{0x0000000000000300L});
-    public static final BitSet FOLLOW_number_in_messagedef477 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_messagedef481 = new BitSet(new long[]{0x000000000030E440L});
-    public static final BitSet FOLLOW_field_in_messagedef483 = new BitSet(new long[]{0x000000000030E440L});
-    public static final BitSet FOLLOW_20_in_messagedef486 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_31_in_protocol508 = new BitSet(new long[]{0x0000000000000040L});
-    public static final BitSet FOLLOW_identifier_in_protocol510 = new BitSet(new long[]{0x0000000000020000L});
-    public static final BitSet FOLLOW_17_in_protocol512 = new BitSet(new long[]{0x0000000000040000L});
-    public static final BitSet FOLLOW_18_in_protocol514 = new BitSet(new long[]{0x0000000000000300L});
-    public static final BitSet FOLLOW_number_in_protocol516 = new BitSet(new long[]{0x0000000000080000L});
-    public static final BitSet FOLLOW_19_in_protocol518 = new BitSet(new long[]{0x0000000064910000L});
-    public static final BitSet FOLLOW_protocolelement_in_protocol520 = new BitSet(new long[]{0x0000000064910000L});
-    public static final BitSet FOLLOW_20_in_protocol523 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typedef_in_protocolelement542 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_messagedef_in_protocolelement546 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_protocol_in_specification566 = new BitSet(new long[]{0x00000000E4810000L});
-    public static final BitSet FOLLOW_messagedef_in_specification570 = new BitSet(new long[]{0x00000000E4810000L});
-    public static final BitSet FOLLOW_structdef_in_specification574 = new BitSet(new long[]{0x00000000E4810000L});
-    public static final BitSet FOLLOW_EOF_in_specification578 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_structdef_in_typedef290 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_sequencedef_in_typedef299 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_uniondef_in_typedef308 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_forwarddef_in_typedef317 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_16_in_structdef339 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_structdef341 = new BitSet(new long[]{0x00000000000A0000L});
+    public static final BitSet FOLLOW_17_in_structdef352 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_18_in_structdef354 = new BitSet(new long[]{0x0000000000000300L});
+    public static final BitSet FOLLOW_number_in_structdef356 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_19_in_structdef367 = new BitSet(new long[]{0x000000000020E440L});
+    public static final BitSet FOLLOW_field_in_structdef372 = new BitSet(new long[]{0x000000000030E440L});
+    public static final BitSet FOLLOW_20_in_structdef378 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_21_in_field402 = new BitSet(new long[]{0x000000000020E440L});
+    public static final BitSet FOLLOW_type_in_field410 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_field412 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_field414 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_23_in_sequencedef448 = new BitSet(new long[]{0x0000000001000000L});
+    public static final BitSet FOLLOW_24_in_sequencedef450 = new BitSet(new long[]{0x000000000020E440L});
+    public static final BitSet FOLLOW_type_in_sequencedef454 = new BitSet(new long[]{0x0000000002000000L});
+    public static final BitSet FOLLOW_25_in_sequencedef456 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_sequencedef458 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_sequencedef460 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_26_in_uniondef489 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_uniondef491 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_19_in_uniondef493 = new BitSet(new long[]{0x0000000008000000L});
+    public static final BitSet FOLLOW_casedef_in_uniondef498 = new BitSet(new long[]{0x0000000008100000L});
+    public static final BitSet FOLLOW_20_in_uniondef504 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_27_in_casedef533 = new BitSet(new long[]{0x0000000000000300L});
+    public static final BitSet FOLLOW_number_in_casedef535 = new BitSet(new long[]{0x0000000010000000L});
+    public static final BitSet FOLLOW_28_in_casedef537 = new BitSet(new long[]{0x000000000020E440L});
+    public static final BitSet FOLLOW_type_in_casedef541 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_casedef543 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_casedef545 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_29_in_forwarddef574 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_forwarddef576 = new BitSet(new long[]{0x0000000000400000L});
+    public static final BitSet FOLLOW_22_in_forwarddef578 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_30_in_messagedef606 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_messagedef608 = new BitSet(new long[]{0x0000000000020000L});
+    public static final BitSet FOLLOW_17_in_messagedef611 = new BitSet(new long[]{0x0000000000040100L});
+    public static final BitSet FOLLOW_seven_in_messagedef620 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_18_in_messagedef625 = new BitSet(new long[]{0x0000000000000300L});
+    public static final BitSet FOLLOW_number_in_messagedef627 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_19_in_messagedef637 = new BitSet(new long[]{0x000000000030E440L});
+    public static final BitSet FOLLOW_field_in_messagedef642 = new BitSet(new long[]{0x000000000030E440L});
+    public static final BitSet FOLLOW_20_in_messagedef648 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_31_in_protocol671 = new BitSet(new long[]{0x0000000000000040L});
+    public static final BitSet FOLLOW_identifier_in_protocol673 = new BitSet(new long[]{0x0000000000020000L});
+    public static final BitSet FOLLOW_17_in_protocol675 = new BitSet(new long[]{0x0000000000040000L});
+    public static final BitSet FOLLOW_18_in_protocol677 = new BitSet(new long[]{0x0000000000000300L});
+    public static final BitSet FOLLOW_number_in_protocol679 = new BitSet(new long[]{0x0000000000080000L});
+    public static final BitSet FOLLOW_19_in_protocol681 = new BitSet(new long[]{0x0000000064910000L});
+    public static final BitSet FOLLOW_protocolelement_in_protocol684 = new BitSet(new long[]{0x0000000064910000L});
+    public static final BitSet FOLLOW_20_in_protocol689 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typedef_in_protocolelement709 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_messagedef_in_protocolelement721 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_protocol_in_specification745 = new BitSet(new long[]{0x00000000E4810000L});
+    public static final BitSet FOLLOW_messagedef_in_specification757 = new BitSet(new long[]{0x00000000E4810000L});
+    public static final BitSet FOLLOW_structdef_in_specification769 = new BitSet(new long[]{0x00000000E4810000L});
+    public static final BitSet FOLLOW_EOF_in_specification775 = new BitSet(new long[]{0x0000000000000002L});
 
 }

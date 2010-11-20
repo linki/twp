@@ -45,7 +45,7 @@ public class TWPAcceptor {
 		
 		System.out.println(metamodel.protocols.get(0).name);
 		
-		StringTemplateGroup stg = new StringTemplateGroup("generator", "templates/");
+		StringTemplateGroup stg = new StringTemplateGroup(new FileReader("templates/javacode.stg"));//("generator", "templates/");
 		StringTemplate st = stg.getInstanceOf("protocol");
 		
 		st.setAttribute("protocol", metamodel.protocols.get(0));
