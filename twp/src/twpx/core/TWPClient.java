@@ -22,7 +22,7 @@ public class TWPClient {
 		return message;
 	}
 
-	// todo protocol id switch, check wether to send header or not based on current protocol
+	// todo protocol id switch, check whether to send header or not based on current protocol
 	public TWPClient send(Message message) throws IOException {
 		createMessage(message).send(true);
 		currentProtocolId = message.getProtocolId();

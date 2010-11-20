@@ -19,6 +19,7 @@ public class MessageManager {
 		
 		con.writeMessageId(message.getId());
 		
+		// writeGeneric
 		Iterator<TWPParameter> iterator = message.getParameters().iterator();
 		while (iterator.hasNext()) {
 			TWPParameter parameter = iterator.next();
@@ -48,6 +49,7 @@ public class MessageManager {
 		
 		Message message = MessageManager.protocols.get(protocol).getMessages().get(id); // clone?
 		
+		// readGeneric
 		Iterator<TWPParameter> iterator = message.getParameters().iterator();
 		while (iterator.hasNext()) {
 			TWPParameter parameter = iterator.next();
