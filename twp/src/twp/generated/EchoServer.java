@@ -3,7 +3,7 @@ package twp.generated;
 import java.io.IOException;
 import java.net.Socket;
 
-import twpx.core.TWPServer;
+import twp.core.TWPServer;
 
 public class EchoServer extends TWPServer {
 

@@ -1,10 +1,8 @@
 package twp.generated;
 
-import twpx.core.Handler;
-import twpx.protocol.echo.EchoReply;
-import twpx.protocol.echo.EchoRequest;
+import twp.core.TWPHandler;
 
-public interface EchoHandler extends Handler {
+public interface EchoHandler extends TWPHandler {
 	public void onEchoRequest(EchoRequest request);
 	public void onEchoReply(EchoReply reply);
 }

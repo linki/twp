@@ -4,12 +4,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
-import twp.core.MessageOld;
+import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPProtocol;
-import twpx.protocol.echo.EchoReply;
-import twpx.protocol.echo.EchoRequest;
 
 
 public class EchoProtocol extends TWPProtocol {
@@ -32,19 +30,19 @@ public class EchoProtocol extends TWPProtocol {
 	}
 	
 	public void echoRequest(String text) throws IOException {
-		MessageOld message = new MessageOld(0, ID);
+		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		connection.writeMessage(message);
 	}
 	
 	public void echoReply(String text, int length) throws IOException {
-		MessageOld message = new MessageOld(1, ID);
+		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, length));
 		connection.writeMessage(message);
 	}
 	
-	public void onMessage(MessageOld message) throws IOException {
+	public void onMessage(Message message) throws IOException {
 		System.out.println("Received Message: " + message.getType());
 		Iterator<Parameter> iter = message.getParameters().iterator();
 		switch (message.getType()) {

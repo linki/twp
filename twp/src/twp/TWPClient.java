@@ -10,7 +10,7 @@ import java.util.Iterator;
 import twp3.core.Message;
 import twp3.core.Parameter;
 
-public class TWPClientOld {
+public class TWPClient {
 	private static final String MAGIC_BYTES = "TWP3\n";
 	private static final int SHORT_INTEGER = 13;
 	private static final int LONG_INTEGER = 14;
@@ -23,7 +23,7 @@ public class TWPClientOld {
 	private DataOutputStream writer;
 	private DataInputStream reader;
 	
-	public TWPClientOld(String host, int port) {
+	public TWPClient(String host, int port) {
 		this.host = host;
 		this.port = port;
 	}
@@ -34,7 +34,7 @@ public class TWPClientOld {
 		this.reader = new DataInputStream(socket.getInputStream());
 	}
 
-	public TWPClientOld(Socket socket) throws IOException {
+	public TWPClient(Socket socket) throws IOException {
 		this.socket = socket;
 		this.writer = new DataOutputStream(socket.getOutputStream());
 		this.reader = new DataInputStream(socket.getInputStream());
@@ -145,7 +145,7 @@ public class TWPClientOld {
 			return;
 		}
 		
-		TWPClientOld twp = new TWPClientOld("www.dcl.hpi.uni-potsdam.de", 80);
+		TWPClient twp = new TWPClient("www.dcl.hpi.uni-potsdam.de", 80);
 		twp.connect();
 		
 		int requestProtocol  = 2;

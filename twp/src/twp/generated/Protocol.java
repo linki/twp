@@ -3,12 +3,10 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
-import twp.core.MessageOld;
+import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
-import twpx.core.TWPConnection;
-import twpx.protocol.echo.EchoReply;
-import twpx.protocol.echo.EchoRequest;
+import twp.core.TWPConnection;
 
 
 public class Protocol {
@@ -19,13 +17,13 @@ public class Protocol {
 	
 	private Protocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
 		handler = rh;
-	//	connection = new TWPConnection(host, port, ID);
+		connection = new TWPConnection(host, port, ID);
 	}
 	
 	private Protocol(int port, EchoHandler rh) throws IOException {
 		handler = rh;
-		//connection = new TWPConnection(port, this);
-	//	connection.startServer();
+		connection = new TWPConnection(port, this);
+		connection.startServer();
 	}
 	
 	public void stop() throws IOException {
@@ -41,19 +39,19 @@ public class Protocol {
 	}
 	
 	public void echoRequest(String text) throws IOException {
-		MessageOld message = new MessageOld(0, ID);
+		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		connection.writeMessage(message);
 	}
 	
 	public void echoReply(String text, int length) throws IOException {
-		MessageOld message = new MessageOld(1, ID);
+		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, length));
 		connection.writeMessage(message);
 	}
 	
-	public void onMessage(MessageOld message) throws IOException {
+	public void onMessage(Message message) throws IOException {
 		System.out.println("Received Message: " + message.getType());
 		Iterator<Parameter> iter = message.getParameters().iterator();
 		switch (message.getType()) {

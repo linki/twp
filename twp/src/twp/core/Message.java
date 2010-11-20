@@ -5,13 +5,13 @@ import java.util.List;
 
 import twp.core.Parameter;
 
-public class MessageOld {
+public class Message {
 
 	private int id; 
 	private int protocol;
 	private List<Parameter> parameters;
 	
-	public MessageOld(int messageId, int protocolVersion) {
+	public Message(int messageId, int protocolVersion) {
 		id = messageId;
 		protocol = protocolVersion;
 		parameters = new ArrayList<Parameter>();

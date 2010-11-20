@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import twp.TWPClientOld;
+import twp.TWPClient;
 import twp3.core.Message;
 import twp3.core.Parameter;
 import twp3.custom.Specification;
@@ -17,7 +17,7 @@ import twp3.custom.Specification;
 public class LocalImpl implements Specification {
 	@Override
 	public EchoResult echo(String text) throws IOException {
-		TWPClientOld twp = new TWPClientOld("localhost", 6666);
+		TWPClient twp = new TWPClient("localhost", 6666);
 		twp.connect();
 
 		// create echo request msg
@@ -45,7 +45,7 @@ public class LocalImpl implements Specification {
 
 	@Override
 	public SimpleEchoResult simpleEcho(String text) throws IOException {
-		TWPClientOld twp = new TWPClientOld("localhost", 6666);
+		TWPClient twp = new TWPClient("localhost", 6666);
 		twp.connect();
 		
 		twp.writeMagicBytes();

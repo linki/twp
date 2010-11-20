@@ -3,10 +3,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import twp.generated.EchoHandler;
+import twp.generated.EchoReply;
+import twp.generated.EchoRequest;
 import twp.generated.EchoProtocol;
-import twpx.core.Message;
-import twpx.protocol.echo.EchoReply;
-import twpx.protocol.echo.EchoRequest;
 
 
 public class ClientApp implements EchoHandler {
@@ -55,12 +54,6 @@ public class ClientApp implements EchoHandler {
 	public void onEchoRequest(EchoRequest request) {
 		
 		
-	}
-
-	@Override
-	public Message handle(Message message) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }
