@@ -1,4 +1,4 @@
-package twpx.core;
+package twpx.interfaces;
 
 import java.util.Map;
 

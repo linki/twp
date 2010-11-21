@@ -2,9 +2,9 @@ package twpx.app;
 
 import java.io.IOException;
 
-import twpx.core.Handler;
-import twpx.core.Message;
 import twpx.core.TWPServer;
+import twpx.interfaces.Handler;
+import twpx.interfaces.Message;
 import twpx.protocol.echo.manual.EchoProtocol;
 import twpx.protocol.echo.manual.EchoReply;
 import twpx.protocol.echo.manual.EchoRequest;

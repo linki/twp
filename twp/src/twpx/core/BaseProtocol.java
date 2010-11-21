@@ -3,6 +3,9 @@ package twpx.core;
 import java.util.HashMap;
 import java.util.Map;
 
+import twpx.interfaces.Message;
+import twpx.interfaces.Protocol;
+
 public class BaseProtocol implements Protocol {
 	
 	protected static Protocol instance;

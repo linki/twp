@@ -1,7 +1,7 @@
 package twpx.protocol.echo.manual;
 
 import twpx.core.BaseMessage;
-import twpx.core.Message;
+import twpx.interfaces.Message;
 
 public class EchoReply extends BaseMessage implements Message {
 

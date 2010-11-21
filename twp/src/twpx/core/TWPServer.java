@@ -6,6 +6,10 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import twpx.interfaces.Handler;
+import twpx.interfaces.Message;
+import twpx.interfaces.Protocol;
+
 
 public class TWPServer {
 	

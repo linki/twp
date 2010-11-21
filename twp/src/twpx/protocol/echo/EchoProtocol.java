@@ -1,7 +1,7 @@
 package twpx.protocol.echo;
 
 import twpx.core.BaseProtocol;
-import twpx.core.Protocol;
+import twpx.interfaces.Protocol;
 
 public class EchoProtocol extends BaseProtocol implements Protocol {
 

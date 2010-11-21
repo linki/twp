@@ -1,7 +1,7 @@
 package twpx.protocol.simpleEcho;
 
 import twpx.core.BaseMessage;
-import twpx.core.Message;
+import twpx.interfaces.Message;
 
 public class SimpleEchoReply extends BaseMessage implements Message {
 

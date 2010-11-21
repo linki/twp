@@ -1,7 +1,10 @@
-package twpx.core;
+package twpx.interfaces;
 
 import java.io.IOException;
 import java.util.List;
+
+import twpx.core.TWPConnection;
+import twpx.core.TWPParameter;
 
 
 

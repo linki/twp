@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import twpx.interfaces.Message;
+import twpx.interfaces.Protocol;
+
 
 public class MessageManager {
 	
