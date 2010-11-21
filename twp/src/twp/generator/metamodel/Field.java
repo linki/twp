@@ -1,8 +1,7 @@
 package twp.generator.metamodel;
 
-public class Field {
+public class Field extends Element {
 	public boolean optional;
-	public String name;
 	public Type type;
 	
 	public Field() {

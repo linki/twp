@@ -1,9 +1,8 @@
 package twp.generator.metamodel;
 
-public class Type {
+public class Type extends Element {
 	public boolean primitive;
 	public boolean anyDefinedBy;
-	public String name;
 	
 	public Type() {
 		primitive = false;

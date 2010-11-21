@@ -1,19 +1,19 @@
-package twpx.protocol.echo;
+package twpx.protocol.simpleEcho;
 
 import twpx.core.BaseMessage;
 import twpx.core.Message;
 
-public class EchoRequest extends BaseMessage implements Message {
+public class SimpleEchoRequest extends BaseMessage implements Message {
 
-	public EchoRequest() {
+	public SimpleEchoRequest() {
 		name = "Request";
-		protocolId = 22;
+		protocolId = 23;
 		id = 0;
 		addParameter("text", "string");
 
 	}
 
-	public EchoRequest(String  text ) {
+	public SimpleEchoRequest(String  text ) {
 		this();
 		set("text", text);
 

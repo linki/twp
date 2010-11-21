@@ -3,9 +3,8 @@ package twp.generator.metamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Struct {
-	public String name;
-	public int id;
+public class Struct extends Element {
+	
 	public List<Field> fields;
 	
 	public Struct() {

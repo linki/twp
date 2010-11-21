@@ -1,6 +1,5 @@
 package twp.generator.metamodel;
 
-public class Forward {
-	public String name;
+public class Forward extends Element {
 
 }

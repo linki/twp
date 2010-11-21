@@ -7,26 +7,21 @@ public class EchoRequest extends BaseMessage implements Message {
 
 	public EchoRequest() {
 		name = "Request";
-		protocolId = 22;
+		protocolId = 2;
 		id = 0;
 		addParameter("text", "string");
-
 	}
 
-	public EchoRequest(String  text ) {
+	public EchoRequest(String text) {
 		this();
 		set("text", text);
-
 	}
 
-	public String  getText() {
+	public String getText() {
 		return (String) get("text");
 	}
 	
-	public void setText(String  text) {
+	public void setText(String text) {
 		set("text", text);
 	}
-
 }
-
- 

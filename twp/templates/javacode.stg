@@ -8,9 +8,17 @@ parameterType ::= [
 primitiveType ::= [
 	"string":"String",
 	"int":"int",
-	"any":"Object"
-	"binary":"byte"
+	"any":"Object",
+	"binary":"byte[]"
 ]
+
+castType ::= [
+	"string":"String",
+	"int":"Integer",
+	"any":"Object",
+	"binary":"Byte"
+]
+
 
 protocol(protocol) ::= <<
 package twp.generated;
@@ -24,17 +32,17 @@ import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPProtocol;
 
-public class <protocol.name>Protocol extends TWPProtocol {
+public class <protocol.bigName>Protocol extends TWPProtocol {
 	public static final int ID = <protocol.id>;
 	
-	private <protocol.name>Handler handler;
+	private <protocol.bigName>Handler handler;
 	
-	public <protocol.name>Protocol(String host, int port, <protocol.name>Handler rh) throws UnknownHostException, IOException {
+	public <protocol.bigName>Protocol(String host, int port, <protocol.bigName>Handler rh) throws UnknownHostException, IOException {
 		super(host, port);
 		handler = rh;
 	}
 	
-	public <protocol.name>Protocol(Socket s, <protocol.name>Handler rh) throws IOException {
+	public <protocol.bigName>Protocol(Socket s, <protocol.bigName>Handler rh) throws IOException {
 		super(s);
 		handler = rh;
 	}
@@ -43,13 +51,142 @@ public class <protocol.name>Protocol extends TWPProtocol {
 		return ID;
 	}
 	
-	<protocol.messages:{message|
-	public void <protocol.name><message.name>(<message.fields:{field|<field.type.name> <field.name>}>) throws IOException {
-		Message message = new Message(<message.id>, ID);
-		<message.fields:{field|message.addParameter(new Parameter(ParameterType.<parameterType.(field.type.name)>, <field.name>);
-		}>
-	}
+	<protocol.messages:{message|public void <protocol.smallName><message.bigName>(<message.fields:parameterList(); separator=", ">) throws IOException {
+	Message message = new Message(<message.id>, ID);
+	<message.fields:{field|message.addParameter(new Parameter(ParameterType.<parameterType.(field.type.name)>, <field.smallName>));
+}>
+	connection.writeMessage(message);
+}
 	}>
+	
+	public void onMessage(Message message) throws IOException {
+		Iterator\<Parameter\> iter = message.getParameters().iterator();
+		switch (message.getType()) {
+		<protocol.messages:{message|case <message.id>:
+		<protocol.bigName><message.bigName> req<message.id> = new <protocol.bigName><message.bigName>(this, <message.fields:messageParameterList(); separator=", ">);
+		handler.on<protocol.bigName><message.bigName>(req<message.id>);
+		break;
+}>
+		}
+	}
 }
 
 >>
+
+parameterList() ::= << <type(it.type)> <it.smallName> >>
+messageParameterList() ::= << <cast(it)> iter.next().getValue()>>
+cast(field) ::= <<(<if(field.type.primitive)><castType.(field.type.name)><else><field.type.bigName><endif>)>>
+type(type) ::= << <if(type.primitive)><primitiveType.(type.name)><else><type.bigName><endif> >>
+
+handler(protocol) ::= <<
+package twp.generated;
+
+import twp.core.TWPHandler;
+
+public interface <protocol.name>Handler extends TWPHandler {
+	<protocol.messages:{public void on<protocol.name><it.name>(<protocol.name><it.name> message);
+}>
+}
+>>
+
+message(protocol, message) ::= <<
+package twp.generated;
+public class <protocol.name><message.name> {
+	
+	private <protocol.name>Protocol protocol;
+	<message.fields:{private <it:parameterList()>;
+}>
+	public <protocol.bigName><message.bigName>(<protocol.bigName>Protocol p, <message.fields:parameterList(); separator=", ">) {
+		this.protocol = p;
+		<message.fields:{this.<it.smallName> = <it.smallName>;
+}>
+	}
+
+	public <protocol.bigName>Protocol getProtocol() {
+		return protocol;
+	}
+	
+	<message.fields:{
+public <type(it.type)> get<it.bigName>() {
+		return <it.smallName>;
+	}}>
+	
+}
+ >>
+ 
+server(protocol) ::= <<
+package twp.generated;
+
+import java.io.IOException;
+import java.net.Socket;
+
+import twp.core.TWPServer;
+
+public class <protocol.bigName>Server extends TWPServer {
+
+	public <protocol.bigName>Server(int port) throws IOException {
+		super(port);
+	}
+
+	@Override
+	public void openConnection(Socket socket) {
+		if (handler != null)
+			try {
+				new <protocol.bigName>Protocol(socket, (<protocol.bigName>Handler) handler);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
+
+}
+ >>
+ 
+protocolX(protocol) ::= <<
+package twpx.protocol.<protocol.smallName>;
+
+import twpx.core.BaseProtocol;
+import twpx.core.Protocol;
+
+public class <protocol.bigName>Protocol extends BaseProtocol implements Protocol {
+
+	public <protocol.bigName>Protocol() {
+		id = <protocol.id>;
+		<protocol.messages:{addMessage(<it.id>, new <protocol.bigName><it.bigName>());
+}>
+	}
+}
+ >>
+ 
+messageX(protocol, message) ::= <<
+package twpx.protocol.<protocol.smallName>;
+
+import twpx.core.BaseMessage;
+import twpx.core.Message;
+
+public class <protocol.bigName><message.bigName> extends BaseMessage implements Message {
+
+	public <protocol.bigName><message.bigName>() {
+		name = "<message.bigName>";
+		protocolId = <protocol.id>;
+		id = <message.id>;
+		<message.fields:{addParameter("<it.name>", "<it.type.name>");
+}>
+	}
+
+	public <protocol.bigName><message.bigName>(<message.fields:parameterList(); separator=", ">) {
+		this();
+		<message.fields:{set("<it.name>", <it.smallName>);
+}>
+	}
+<message.fields:{
+	public <type(it.type)> get<it.bigName>() {
+		return <cast(it)> get("<it.name>");
+	}
+	
+	public void set<it.bigName>(<type(it.type)> <it.smallName>) {
+		set("<it.name>", <it.smallName>);
+	}
+}>
+}
+
+ >>

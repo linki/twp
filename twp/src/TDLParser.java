@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 grammars/TDL.g 2010-11-20 21:55:00
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 grammars/TDL.g 2010-11-21 00:26:46
 
 import twp.generator.metamodel.*;
 
@@ -303,7 +303,7 @@ public class TDLParser extends Parser {
                     state._fsp--;
 
                     adaptor.addChild(root_0, primitiveType4.getTree());
-                    retval.type.primitive = true; retval.type.name = (primitiveType4!=null?input.toString(primitiveType4.start,primitiveType4.stop):null);
+                    retval.type.primitive = true; retval.type.setName((primitiveType4!=null?input.toString(primitiveType4.start,primitiveType4.stop):null));
 
                     }
                     break;
@@ -318,7 +318,7 @@ public class TDLParser extends Parser {
                     state._fsp--;
 
                     adaptor.addChild(root_0, identifier5.getTree());
-                    retval.type.name = (identifier5!=null?input.toString(identifier5.start,identifier5.stop):null);
+                    retval.type.setName((identifier5!=null?input.toString(identifier5.start,identifier5.stop):null));
 
                     }
                     break;
@@ -348,7 +348,7 @@ public class TDLParser extends Parser {
                     state._fsp--;
 
                     adaptor.addChild(root_0, identifier9.getTree());
-                    retval.type.anyDefinedBy = true; retval.type.name = (identifier9!=null?input.toString(identifier9.start,identifier9.stop):null);
+                    retval.type.anyDefinedBy = true; retval.type.setName((identifier9!=null?input.toString(identifier9.start,identifier9.stop):null));
 
                     }
 
@@ -614,7 +614,7 @@ public class TDLParser extends Parser {
             state._fsp--;
 
             adaptor.addChild(root_0, identifier12.getTree());
-            retval.struct.name = (identifier12!=null?input.toString(identifier12.start,identifier12.stop):null);
+            retval.struct.setName((identifier12!=null?input.toString(identifier12.start,identifier12.stop):null));
             // grammars/TDL.g:57:5: ( '=' 'ID' number )?
             int alt3=2;
             int LA3_0 = input.LA(1);
@@ -782,7 +782,7 @@ public class TDLParser extends Parser {
             adaptor.addChild(root_0, char_literal20_tree);
 
             retval.field.type = t.type;
-               	retval.field.name = (identifier19!=null?input.toString(identifier19.start,identifier19.stop):null);
+               	retval.field.setName((identifier19!=null?input.toString(identifier19.start,identifier19.stop):null));
 
             }
 
@@ -868,7 +868,7 @@ public class TDLParser extends Parser {
             adaptor.addChild(root_0, char_literal25_tree);
 
             retval.sequence.type = t.type;
-               	retval.sequence.name = (identifier24!=null?input.toString(identifier24.start,identifier24.stop):null);
+               	retval.sequence.setName((identifier24!=null?input.toString(identifier24.start,identifier24.stop):null));
 
             }
 
@@ -977,7 +977,7 @@ public class TDLParser extends Parser {
             char_literal29_tree = (Object)adaptor.create(char_literal29);
             adaptor.addChild(root_0, char_literal29_tree);
 
-            retval.union.name = (identifier27!=null?input.toString(identifier27.start,identifier27.stop):null);
+            retval.union.setName((identifier27!=null?input.toString(identifier27.start,identifier27.stop):null));
 
             }
 
@@ -1066,7 +1066,7 @@ public class TDLParser extends Parser {
 
             retval.caze.id = Integer.parseInt((number31!=null?input.toString(number31.start,number31.stop):null));
                	retval.caze.type = t.type;
-               	retval.caze.name = (identifier33!=null?input.toString(identifier33.start,identifier33.stop):null);
+               	retval.caze.setName((identifier33!=null?input.toString(identifier33.start,identifier33.stop):null));
 
             }
 
@@ -1131,7 +1131,7 @@ public class TDLParser extends Parser {
             char_literal37_tree = (Object)adaptor.create(char_literal37);
             adaptor.addChild(root_0, char_literal37_tree);
 
-            retval.forward.name = (identifier36!=null?input.toString(identifier36.start,identifier36.stop):null);
+            retval.forward.setName((identifier36!=null?input.toString(identifier36.start,identifier36.stop):null));
 
             }
 
@@ -1204,7 +1204,7 @@ public class TDLParser extends Parser {
             state._fsp--;
 
             adaptor.addChild(root_0, identifier39.getTree());
-            retval.message.name = (identifier39!=null?input.toString(identifier39.start,identifier39.stop):null);
+            retval.message.setName((identifier39!=null?input.toString(identifier39.start,identifier39.stop):null));
             char_literal40=(Token)match(input,17,FOLLOW_17_in_messagedef611); 
             char_literal40_tree = (Object)adaptor.create(char_literal40);
             adaptor.addChild(root_0, char_literal40_tree);
@@ -1420,7 +1420,7 @@ public class TDLParser extends Parser {
             char_literal53_tree = (Object)adaptor.create(char_literal53);
             adaptor.addChild(root_0, char_literal53_tree);
 
-            retval.protocol.name = (identifier47!=null?input.toString(identifier47.start,identifier47.stop):null);
+            retval.protocol.setName((identifier47!=null?input.toString(identifier47.start,identifier47.stop):null));
                	retval.protocol.id = Integer.parseInt((number50!=null?input.toString(number50.start,number50.stop):null));
 
             }

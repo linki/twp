@@ -1,6 +1,6 @@
 package twp.generator.metamodel;
 
-public class Sequence {
+public class Sequence extends Element {
+	
 	public Type type;
-	public String name;
 }

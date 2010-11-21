@@ -5,9 +5,9 @@ import java.net.Socket;
 
 import twp.core.TWPServer;
 
-public class EchoServer extends TWPServer {
+public class SimpleEchoServer extends TWPServer {
 
-	public EchoServer(int port) throws IOException {
+	public SimpleEchoServer(int port) throws IOException {
 		super(port);
 	}
 
@@ -15,7 +15,7 @@ public class EchoServer extends TWPServer {
 	public void openConnection(Socket socket) {
 		if (handler != null)
 			try {
-				new EchoProtocol(socket, (EchoHandler) handler);
+				new SimpleEchoProtocol(socket, (SimpleEchoHandler) handler);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

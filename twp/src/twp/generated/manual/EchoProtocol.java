@@ -9,8 +9,9 @@ import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPProtocol;
 
+
 public class EchoProtocol extends TWPProtocol {
-	public static final int ID = 22;
+	public static final int ID = 2;
 	
 	private EchoHandler handler;
 	
@@ -28,33 +29,34 @@ public class EchoProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	public void echoRequest(String  text ) throws IOException {
+	public void echoRequest(String text) throws IOException {
 		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
-
 		connection.writeMessage(message);
 	}
-		public void echoReply(String  text , int  numberOfLetters ) throws IOException {
+	
+	public void echoReply(String text, int length) throws IOException {
 		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, numberOfLetters));
-
+		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, length));
 		connection.writeMessage(message);
 	}
-		
 	
 	public void onMessage(Message message) throws IOException {
+		System.out.println("Received Message: " + message.getType());
 		Iterator<Parameter> iter = message.getParameters().iterator();
 		switch (message.getType()) {
-		case 0:
-				EchoRequest req0 = new EchoRequest(this, (String) iter.next().getValue());
-				handler.onEchoRequest(req0);
+			case 0:
+				System.out.println("It's a Request.");
+				EchoRequest req = new EchoRequest(this, (String) iter.next().getValue());
+				handler.onEchoRequest(req);
 				break;
-		case 1:
-				EchoReply req1 = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
-				handler.onEchoReply(req1);
+			case 1:
+				System.out.println("It's a Reply.");
+				EchoReply rep = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
+				handler.onEchoReply(rep);
 				break;
-
 		}
 	}
+	
 }

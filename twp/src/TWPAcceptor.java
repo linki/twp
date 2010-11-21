@@ -1,6 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -10,6 +14,8 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import twp.generator.metamodel.Message;
+import twp.generator.metamodel.Protocol;
 import twp.generator.metamodel.Specification;
 
 // use `ant grammar` in project root to update parser and lexer files
@@ -43,13 +49,7 @@ public class TWPAcceptor {
 		
 		Specification metamodel = r.spec;
 		
-		System.out.println(metamodel.protocols.get(0).name);
-		
-		StringTemplateGroup stg = new StringTemplateGroup(new FileReader("templates/javacode.stg"));//("generator", "templates/");
-		StringTemplate st = stg.getInstanceOf("protocol");
-		
-		st.setAttribute("protocol", metamodel.protocols.get(0));
-		System.out.println(st.toString());
+		generateCode(metamodel);
 		
 		// verify
 		int numErrors = parser.getNumberOfSyntaxErrors();
@@ -59,5 +59,57 @@ public class TWPAcceptor {
 			System.err.println("File doesn't contain a valid TWP3 specification. (" + numErrors + " Errors)");
 		}
 		
+	}
+	
+	private static void generateCode(Specification spec) {
+		StringTemplateGroup stg;
+		String dir = "src/twp/generated/";
+		String dirX = "src/twpx/protocol/";
+		try {
+			stg = new StringTemplateGroup(new FileReader("templates/javacode.stg"));
+			for (Protocol protocol:spec.protocols) {
+				StringTemplate st = stg.getInstanceOf("protocol");
+				st.setAttribute("protocol", protocol);
+				writeToFile(dir + protocol.bigName + "Protocol.java", st.toString());
+				st = stg.getInstanceOf("server");
+				st.setAttribute("protocol", protocol);
+				writeToFile(dir + protocol.bigName + "Server.java", st.toString());
+				st = stg.getInstanceOf("handler");
+				st.setAttribute("protocol", protocol);
+				writeToFile(dir + protocol.bigName + "Handler.java", st.toString());
+				st = stg.getInstanceOf("protocolX");
+				st.setAttribute("protocol", protocol);
+				checkDir(dirX + protocol.smallName + "/");
+				writeToFile(dirX + protocol.smallName + "/" + protocol.bigName + "Protocol.java", st.toString());
+				for (Message message:protocol.messages) {
+					st = stg.getInstanceOf("message");
+					st.setAttribute("protocol", protocol);
+					st.setAttribute("message", message);
+					writeToFile(dir + protocol.bigName + message.bigName + ".java", st.toString());
+					st = stg.getInstanceOf("messageX");
+					st.setAttribute("protocol", protocol);
+					st.setAttribute("message", message);
+					writeToFile(dirX + protocol.smallName + "/" + protocol.bigName + message.bigName + ".java", st.toString());
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void checkDir(String dir) {
+		File file = new File(dir);
+		if (!file.exists())
+			file.mkdirs();
+	}
+	
+	private static void writeToFile(String filename, String content) {
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+			out.write(content);
+			out.close();
+		} catch (IOException e) { 
+			System.out.println("Couldn't write " + filename);
+		}	
 	}
 }

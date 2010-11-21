@@ -9,17 +9,17 @@ import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPProtocol;
 
-public class EchoProtocol extends TWPProtocol {
-	public static final int ID = 22;
+public class SimpleEchoProtocol extends TWPProtocol {
+	public static final int ID = 23;
 	
-	private EchoHandler handler;
+	private SimpleEchoHandler handler;
 	
-	public EchoProtocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
+	public SimpleEchoProtocol(String host, int port, SimpleEchoHandler rh) throws UnknownHostException, IOException {
 		super(host, port);
 		handler = rh;
 	}
 	
-	public EchoProtocol(Socket s, EchoHandler rh) throws IOException {
+	public SimpleEchoProtocol(Socket s, SimpleEchoHandler rh) throws IOException {
 		super(s);
 		handler = rh;
 	}
@@ -28,16 +28,15 @@ public class EchoProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	public void echoRequest(String  text ) throws IOException {
+	public void simpleEchoRequest(String  text ) throws IOException {
 		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 
 		connection.writeMessage(message);
 	}
-		public void echoReply(String  text , int  numberOfLetters ) throws IOException {
+		public void simpleEchoReply(String  text ) throws IOException {
 		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, numberOfLetters));
 
 		connection.writeMessage(message);
 	}
@@ -47,12 +46,12 @@ public class EchoProtocol extends TWPProtocol {
 		Iterator<Parameter> iter = message.getParameters().iterator();
 		switch (message.getType()) {
 		case 0:
-				EchoRequest req0 = new EchoRequest(this, (String) iter.next().getValue());
-				handler.onEchoRequest(req0);
+				SimpleEchoRequest req0 = new SimpleEchoRequest(this, (String) iter.next().getValue());
+				handler.onSimpleEchoRequest(req0);
 				break;
 		case 1:
-				EchoReply req1 = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
-				handler.onEchoReply(req1);
+				SimpleEchoReply req1 = new SimpleEchoReply(this, (String) iter.next().getValue());
+				handler.onSimpleEchoReply(req1);
 				break;
 
 		}

@@ -6,10 +6,8 @@ import twpx.core.Protocol;
 public class EchoProtocol extends BaseProtocol implements Protocol {
 
 	public EchoProtocol() {
-		id = 22;
+		id = 2;
 		addMessage(0, new EchoRequest());
 		addMessage(1, new EchoReply());
-
 	}
 }
- 

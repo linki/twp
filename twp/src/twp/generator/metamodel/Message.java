@@ -3,10 +3,8 @@ package twp.generator.metamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Message {
+public class Message extends Element {
 	
-	public int id;
-	public String name;
 	public List<Field> fields;
 	
 	public Message() {
