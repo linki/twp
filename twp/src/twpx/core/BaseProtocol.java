@@ -3,8 +3,9 @@ package twpx.core;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class BaseProtocol implements Protocol {
+	
+	protected static Protocol instance;
 	
 	public int id;
 	
@@ -24,4 +25,7 @@ public class BaseProtocol implements Protocol {
 	public int getId() {
 		return id;
 	}
+
+	@Override
+	public void configure() {}
 }

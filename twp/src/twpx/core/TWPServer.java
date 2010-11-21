@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class TWPServer {
 	
 	private Map<Integer, Handler> handlers = new HashMap<Integer, Handler>();
@@ -34,6 +35,6 @@ public class TWPServer {
 	}
 
 	private Message handle(Message message) {
-		return handlers.get(message.getProtocolId()).handle(message);
+		return handlers.get(message.getProtocol().getId()).handle(message);
 	}
 }

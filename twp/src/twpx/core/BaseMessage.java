@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 
+
 public class BaseMessage implements Message {
 
 	public TWPConnection con;
 	
 	public String name;
-	public int protocolId;
+	public Protocol protocol;
 	public int id;
 	
 	public List<TWPParameter> parameters = new ArrayList<TWPParameter>();
@@ -29,8 +30,8 @@ public class BaseMessage implements Message {
 	}
 
 	@Override
-	public int getProtocolId() {
-		return protocolId;
+	public Protocol getProtocol() {
+		return protocol;
 	}
 	
 	@Override

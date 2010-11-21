@@ -3,10 +3,8 @@ package twpx.app;
 import java.io.IOException;
 
 import twpx.core.TWPClient;
-import twpx.core.TWPConnection;
-import twpx.protocol.echo.EchoProtocol;
-import twpx.protocol.echo.EchoReply;
-import twpx.protocol.echo.EchoRequest;
+import twpx.protocol.echo.manual.EchoReply;
+import twpx.protocol.echo.manual.EchoRequest;
 
 public class Client {
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException {
@@ -18,9 +16,6 @@ public class Client {
 		// verbose, that's happening:
 		// TWPClient client = new TWPClient(new TWPConnection("www.dcl.hpi.uni-potsdam.de", 80));
 		// TWPClient client = new TWPClient(new TWPConnection("localhost", 1234));
-		
-		// register the protocol with the client (that only does some init stuff, would be nice to remove that - TODO)
-		client.register(new EchoProtocol());
 		
 		// send and receive messages
 		// verbose:

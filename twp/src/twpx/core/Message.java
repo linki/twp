@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 
+
 public interface Message {
 
 	void setConnection(TWPConnection con);
@@ -14,7 +15,7 @@ public interface Message {
 	
 	String getName();
 	
-	int getProtocolId();
+	Protocol getProtocol();
 
 	void addParameter(String name, String type);
 	

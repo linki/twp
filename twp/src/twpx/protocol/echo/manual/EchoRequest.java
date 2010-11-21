@@ -7,7 +7,7 @@ public class EchoRequest extends BaseMessage implements Message {
 
 	public EchoRequest() {
 		name = "Request";
-		protocolId = 2;
+		protocol = EchoProtocol.instance();
 		id = 0;
 		addParameter("text", "string");
 	}

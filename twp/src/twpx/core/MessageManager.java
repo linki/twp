@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+
 public class MessageManager {
 	
 	public static Map<Integer, Protocol> protocols = new HashMap<Integer, Protocol>();
@@ -13,7 +14,7 @@ public class MessageManager {
 
 		if (withHeader) {
 			con.writeMagicBytes();
-			con.writeProtocolId(message.getProtocolId());
+			con.writeProtocolId(message.getProtocol().getId());
 		}
 
 		con.writeMessageId(message.getId());
