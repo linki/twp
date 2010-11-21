@@ -1,11 +1,9 @@
-package twp3.custom;
+package twp3.old;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
-import twp3.generated.EchoResult;
-import twp3.generated.SimpleEchoResult;
 
 public interface Specification {
 	EchoResult echo(String text) throws IOException;

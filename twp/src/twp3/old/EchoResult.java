@@ -1,4 +1,4 @@
-package twp3.generated;
+package twp3.old;
 
 public class EchoResult {
 	public String text;

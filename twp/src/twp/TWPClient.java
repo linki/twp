@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
-import twp3.core.Message;
-import twp3.core.Parameter;
+import twp3.old.Message;
+import twp3.old.Parameter;
 
 public class TWPClient {
 	private static final String MAGIC_BYTES = "TWP3\n";
