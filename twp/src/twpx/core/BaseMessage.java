@@ -10,13 +10,12 @@ import twpx.interfaces.Message;
 import twpx.interfaces.Protocol;
 
 
-
 public class BaseMessage implements Message {
 
 	public TWPConnection con;
 	
 	public String name;
-	public Protocol protocol;
+	public int protocolId;
 	public int id;
 	
 	public List<TWPParameter> parameters = new ArrayList<TWPParameter>();
@@ -33,8 +32,8 @@ public class BaseMessage implements Message {
 	}
 
 	@Override
-	public Protocol getProtocol() {
-		return protocol;
+	public int getProtocolId() {
+		return protocolId;
 	}
 	
 	@Override

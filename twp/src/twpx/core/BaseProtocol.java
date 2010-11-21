@@ -8,8 +8,6 @@ import twpx.interfaces.Protocol;
 
 public class BaseProtocol implements Protocol {
 	
-	protected static Protocol instance;
-	
 	public int id;
 	
 	public Map<Integer, Message> messages = new HashMap<Integer, Message>();
@@ -28,7 +26,4 @@ public class BaseProtocol implements Protocol {
 	public int getId() {
 		return id;
 	}
-
-	@Override
-	public void configure() {}
 }

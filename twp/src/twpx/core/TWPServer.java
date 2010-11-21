@@ -10,7 +10,6 @@ import twpx.interfaces.Handler;
 import twpx.interfaces.Message;
 import twpx.interfaces.Protocol;
 
-
 public class TWPServer {
 	
 	private Map<Integer, Handler> handlers = new HashMap<Integer, Handler>();
@@ -39,6 +38,6 @@ public class TWPServer {
 	}
 
 	private Message handle(Message message) {
-		return handlers.get(message.getProtocol().getId()).handle(message);
+		return handlers.get(message.getProtocolId()).handle(message);
 	}
 }

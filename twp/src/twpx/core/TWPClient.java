@@ -27,10 +27,9 @@ public class TWPClient {
 
 	// todo protocol id switch, check whether to send header or not based on current protocol
 	public TWPClient send(Message message) throws IOException {
-		boolean withHeader = prepareForProtocol(message.getProtocol().getId());
+		boolean withHeader = prepareForProtocol(message.getProtocolId());
 		createMessage(message).send(withHeader);
-		MessageManager.register(message.getProtocol());		
-		currentProtocolId = message.getProtocol().getId();
+		currentProtocolId = message.getProtocolId();
 		return this;
 	}
 

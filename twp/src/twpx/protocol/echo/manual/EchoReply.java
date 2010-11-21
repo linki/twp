@@ -7,7 +7,7 @@ public class EchoReply extends BaseMessage implements Message {
 
 	public EchoReply() {
 		name = "Reply";
-		protocol = EchoProtocol.instance();
+		protocolId = 2;
 		id = 1;
 		addParameter("text", "string");
 		addParameter("number_of_letters", "int");

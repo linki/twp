@@ -8,7 +8,6 @@ import java.util.Map;
 import twpx.interfaces.Message;
 import twpx.interfaces.Protocol;
 
-
 public class MessageManager {
 	
 	public static Map<Integer, Protocol> protocols = new HashMap<Integer, Protocol>();
@@ -17,7 +16,7 @@ public class MessageManager {
 
 		if (withHeader) {
 			con.writeMagicBytes();
-			con.writeProtocolId(message.getProtocol().getId());
+			con.writeProtocolId(message.getProtocolId());
 		}
 
 		con.writeMessageId(message.getId());

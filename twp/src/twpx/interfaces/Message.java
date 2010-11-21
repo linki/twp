@@ -7,7 +7,6 @@ import twpx.core.TWPConnection;
 import twpx.core.TWPParameter;
 
 
-
 public interface Message {
 
 	void setConnection(TWPConnection con);
@@ -18,7 +17,7 @@ public interface Message {
 	
 	String getName();
 	
-	Protocol getProtocol();
+	int getProtocolId();
 
 	void addParameter(String name, String type);
 	

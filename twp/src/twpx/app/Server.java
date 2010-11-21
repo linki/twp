@@ -5,9 +5,9 @@ import java.io.IOException;
 import twpx.core.TWPServer;
 import twpx.interfaces.Handler;
 import twpx.interfaces.Message;
-import twpx.protocol.echo.manual.EchoProtocol;
-import twpx.protocol.echo.manual.EchoReply;
-import twpx.protocol.echo.manual.EchoRequest;
+import twpx.protocol.echo.EchoProtocol;
+import twpx.protocol.echo.EchoReply;
+import twpx.protocol.echo.EchoRequest;
 
 // the custom handler class for the server
 class MyEchoHandler implements Handler {
@@ -35,7 +35,7 @@ public class Server {
 		TWPServer server = new TWPServer();
 		
 		// register a protocol and assign it its own handler
-		server.register(EchoProtocol.instance(), new MyEchoHandler());
+		server.register(new EchoProtocol(), new MyEchoHandler());
 		
 		// start the server on the specified port
 		server.listen(1234);
