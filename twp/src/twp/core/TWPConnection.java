@@ -81,20 +81,45 @@ public class TWPConnection {
 	}
 	public Message readMessage(int messageId) throws IOException {
 		Message message = new Message(messageId, protocolVersion);
-		int tag = reader.readByte();
+		int tag = reader.readUnsignedByte();
 		ParameterType type = getParameterType(tag);
 		while (type != ParameterType.END_OF_CONTENT) {
 			Parameter p = null;
-			if (type == ParameterType.SHORT_INTEGER || type == ParameterType.LONG_INTEGER) {
-				int value = readInteger(tag);
-				p = new Parameter(type, value);
-			} else if (type == ParameterType.SHORT_STRING || type == ParameterType.LONG_STRING) {
-				String value = readString(tag);
-				p = new Parameter(type, value);
+			switch(type) { 
+				case SHORT_INTEGER: 
+				case LONG_INTEGER:
+					int value0 = readInteger(tag);
+					p = new Parameter(type, value0);
+					break;
+				case SHORT_STRING: 
+				case LONG_STRING:
+					String value1 = readString(tag);
+					p = new Parameter(type, value1);
+					break;
+				case SHORT_BINARY:
+				case LONG_BINARY:
+					byte[] value2 = readByte(tag);
+					p = new Parameter(type, value2);
+					break;
+				case STRUCT:
+					break;
+				case SEQUENCE:
+					break;
+				case UNION:
+					break;
+				case NO_VALUE:
+					p = new Parameter(type, null);
+					break;
+				case REGISTERED_EXTENSION:
+					break;
+				case RESERVED:
+					break;
+				case APPLICATION_TYPE:
+					break;
 			}
 			if (p != null)
 				message.addParameter(p);
-			tag = reader.readByte();
+			tag = reader.readUnsignedByte();
 			type = getParameterType(tag);
 		}
 		return message;
@@ -139,7 +164,7 @@ public class TWPConnection {
 	
 	// TODO: registered extensions
 	public int readMessageId() throws IOException {
-		byte message = reader.readByte();
+		int message = reader.readUnsignedByte();
 		return message - 4;
 	}
 
@@ -148,8 +173,35 @@ public class TWPConnection {
 		writer.write(i + 4);
 	}
 	
+	public byte[] readByte() throws IOException {
+		int tag = reader.readUnsignedByte();
+		return readByte(tag);
+	}
+	
+	public byte[] readByte(int tag) throws IOException {
+		int length = 0;
+		if (tag == 15)
+			length = reader.readUnsignedByte();
+		else if (tag == 16)
+			length = reader.readInt();
+		byte[] value = new byte[length];
+		reader.readFully(value);
+		return value;
+	}
+	
+	public void writeByte(byte[] value) throws IOException {
+		if (value.length > 255) {
+			writer.write(15);
+			writer.writeByte(value.length);
+		} else {
+			writer.write(16);
+			writer.writeInt(value.length);
+		}
+		writer.write(value);
+	}
+	
 	public int readInteger() throws IOException {
-		int type = reader.readByte();
+		int type = reader.readUnsignedByte();
 		return readInteger(type);
 	}
 	
@@ -174,7 +226,7 @@ public class TWPConnection {
 	}
 
 	public String readString() throws IOException {
-		int type = reader.readByte();
+		int type = reader.readUnsignedByte();
 		return readString(type);
 	}
 	
@@ -195,7 +247,7 @@ public class TWPConnection {
 	}
 
 	public boolean readEndOfMessage() throws IOException {
-		int tag = reader.readByte();
+		int tag = reader.readUnsignedByte();
 		return tag == 0;
 	}
 
