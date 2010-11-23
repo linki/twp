@@ -185,7 +185,7 @@ public class TWPConnection {
 			}			
 		}
 		writer.write(0);
-	}
+	}	
 	
 	public int readInteger() throws IOException {
 		int type = reader.readByte();
