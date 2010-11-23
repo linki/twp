@@ -1,4 +1,4 @@
-package twp3.generated;
+package twp3.old;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,9 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 import twp.TWPClient;
-import twp3.core.Message;
-import twp3.core.Parameter;
-import twp3.custom.Specification;
 
 public class LocalImpl implements Specification {
 	@Override

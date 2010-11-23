@@ -3,6 +3,9 @@ package twpx.core;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
+import twpx.interfaces.Message;
+import twpx.interfaces.Protocol;
+
 public class TWPClient {
 	
 	TWPConnection con;

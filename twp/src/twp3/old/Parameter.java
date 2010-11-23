@@ -1,4 +1,4 @@
-package twp3.core;
+package twp3.old;
 
 public class Parameter {
 	public String type;

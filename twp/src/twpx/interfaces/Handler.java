@@ -1,4 +1,4 @@
-package twpx.core;
+package twpx.interfaces;
 
 public interface Handler {
 

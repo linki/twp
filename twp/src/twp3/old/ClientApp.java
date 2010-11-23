@@ -1,11 +1,7 @@
-package twp3.app;
+package twp3.old;
 
 import java.io.IOException;
 
-import twp3.custom.Specification;
-import twp3.generated.LocalImpl;
-import twp3.generated.EchoResult;
-import twp3.generated.SimpleEchoResult;
 
 public class ClientApp {
 	public static void main(String[] args) throws IOException {

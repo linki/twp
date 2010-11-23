@@ -1,4 +1,4 @@
-package twp3.core;
+package twp3.old;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,10 +8,6 @@ import java.net.Socket;
 import java.util.List;
 
 import twp.TWPClient;
-import twp3.custom.RemoteImpl;
-import twp3.custom.Specification;
-import twp3.generated.EchoResult;
-import twp3.generated.SimpleEchoResult;
 
 public class Server {
 	Specification spec;
