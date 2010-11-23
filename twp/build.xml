@@ -12,6 +12,6 @@
   	</java>
   	<move file="grammars/TDLLexer.java" todir="src" />
   	<move file="grammars/TDLParser.java" todir="src" />
-  	<delete file="TDL.tokens"/>
+  	<!--delete file="TDL.tokens"/-->
   </target>
 </project>
