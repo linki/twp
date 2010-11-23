@@ -1,4 +1,4 @@
-package twp.generated;
+package twp.generated.manual;
 
 import twp.core.TWPHandler;
 

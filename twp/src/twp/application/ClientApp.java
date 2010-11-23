@@ -11,10 +11,15 @@ import twp.generated.EchoProtocol;
 public class ClientApp implements EchoHandler {
 
 	private EchoProtocol protocol;
+	private boolean autoHandler;
 	
-	public ClientApp(String host, int port) {
+	public ClientApp(String host, int port, boolean flag) {
+		autoHandler = flag;
 		try {
-			protocol = new EchoProtocol(host, port, this);
+			if (flag)
+				protocol = new EchoProtocol(host, port, this);
+			else
+				protocol = new EchoProtocol(host, port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -27,7 +32,7 @@ public class ClientApp implements EchoHandler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ClientApp client = new ClientApp("localhost", 12347);
+		ClientApp client = new ClientApp("localhost", 12347, false);
 		//ClientApp client = new ClientApp("www.dcl.hpi.uni-potsdam.de", 80);
 		client.start();
 	}
@@ -35,8 +40,13 @@ public class ClientApp implements EchoHandler {
 	public void start() {
 		try {
 			for (int i=0;i<10;i++) {
-				if (protocol != null)
-					protocol.echoRequest("fŸŸbar");
+				if (protocol != null) {
+					protocol.sendRequest("fŸŸbar");
+					if (!autoHandler) {
+						EchoReply rep = protocol.receiveReply();
+						System.out.println(rep.getText() + " has a length of " + rep.getNumberOfLetters());	
+					}
+				}
 			}
 			//protocol.stop();
 		} catch (IOException e) {

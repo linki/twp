@@ -1,4 +1,4 @@
-package twpx.protocol.echo;
+package twpx.protocol.echo.manual;
 
 import twpx.core.BaseMessage;
 import twpx.core.Message;

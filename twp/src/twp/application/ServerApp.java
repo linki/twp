@@ -38,7 +38,7 @@ public class ServerApp implements EchoHandler {
 	public void onEchoRequest(EchoRequest request) {
 		EchoProtocol prot = request.getProtocol();
 		try {
-			prot.echoReply(request.getText(), request.getText().length());
+			prot.sendReply(request.getText(), request.getText().length());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

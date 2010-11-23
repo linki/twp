@@ -40,8 +40,13 @@ public class <protocol.bigName>Protocol extends TWPProtocol {
 	public <protocol.bigName>Protocol(String host, int port, <protocol.bigName>Handler rh) throws UnknownHostException, IOException {
 		super(host, port);
 		handler = rh;
+		connection.listen();
 	}
 	
+	public <protocol.bigName>Protocol(String host, int port) throws UnknownHostException, IOException {
+		super(host, port);
+	}
+		
 	public <protocol.bigName>Protocol(Socket s, <protocol.bigName>Handler rh) throws IOException {
 		super(s);
 		handler = rh;
@@ -51,11 +56,21 @@ public class <protocol.bigName>Protocol extends TWPProtocol {
 		return ID;
 	}
 	
-	<protocol.messages:{message|public void <protocol.smallName><message.bigName>(<message.fields:parameterList(); separator=", ">) throws IOException {
+	<protocol.messages:{message|public void send<message.bigName>(<message.fields:parameterList(); separator=", ">) throws IOException {
 	Message message = new Message(<message.id>, ID);
 	<message.fields:{field|message.addParameter(new Parameter(ParameterType.<parameterType.(field.type.name)>, <field.smallName>));
 }>
 	connection.writeMessage(message);
+}
+
+public <protocol.bigName><message.bigName> receive<message.bigName>() throws IOException {
+	Message message = connection.readMessage();
+	if (message == null || message.getType() != <message.id>) {
+		// throw exception
+	}
+	Iterator\<Parameter\> iter = message.getParameters().iterator();
+	<protocol.bigName><message.bigName> req = new <protocol.bigName><message.bigName>(this, <message.fields:messageParameterList(); separator=", ">);
+	return req;
 }
 	}>
 	

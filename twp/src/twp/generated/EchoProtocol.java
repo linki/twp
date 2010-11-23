@@ -17,8 +17,13 @@ public class EchoProtocol extends TWPProtocol {
 	public EchoProtocol(String host, int port, EchoHandler rh) throws UnknownHostException, IOException {
 		super(host, port);
 		handler = rh;
+		connection.listen();
 	}
 	
+	public EchoProtocol(String host, int port) throws UnknownHostException, IOException {
+		super(host, port);
+	}
+		
 	public EchoProtocol(Socket s, EchoHandler rh) throws IOException {
 		super(s);
 		handler = rh;
@@ -28,18 +33,38 @@ public class EchoProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	public void echoRequest(String  text ) throws IOException {
+	public void sendRequest(String  text ) throws IOException {
 		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 
 		connection.writeMessage(message);
 	}
-		public void echoReply(String  text , int  numberOfLetters ) throws IOException {
+
+	public EchoRequest receiveRequest() throws IOException {
+		Message message = connection.readMessage();
+		if (message == null || message.getType() != 0) {
+			// throw exception
+		}
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		EchoRequest req = new EchoRequest(this, (String) iter.next().getValue());
+		return req;
+	}
+		public void sendReply(String  text , int  numberOfLetters ) throws IOException {
 		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, numberOfLetters));
 
 		connection.writeMessage(message);
+	}
+
+	public EchoReply receiveReply() throws IOException {
+		Message message = connection.readMessage();
+		if (message == null || message.getType() != 1) {
+			// throw exception
+		}
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		EchoReply req = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
+		return req;
 	}
 		
 	

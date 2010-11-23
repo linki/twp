@@ -49,7 +49,6 @@ public class TWPConnection {
 		reader = new DataInputStream(socket.getInputStream());
 		writer = new DataOutputStream(socket.getOutputStream());
 		startClient();
-		listen();
 	}
 	
 	public TWPConnection(Socket s, TWPProtocol p) throws IOException {
@@ -71,7 +70,7 @@ public class TWPConnection {
 		this.protocolVersion = readProtocol();
 	}
 	
-	private void listen() throws IOException {
+	public void listen() throws IOException {
 		listener = new Listener();
 		listener.start();
 	}

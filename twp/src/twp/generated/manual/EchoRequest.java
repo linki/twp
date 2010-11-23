@@ -1,4 +1,4 @@
-package twp.generated;
+package twp.generated.manual;
 public class EchoRequest {
 	
 	private EchoProtocol protocol;
