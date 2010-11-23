@@ -5,6 +5,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Iterator;
 
 
 public class TWPConnection {
@@ -147,6 +148,39 @@ public class TWPConnection {
 	public void writeMessageId(int i) throws IOException {
 		writer.write(i + 4);
 	}
+	
+	public TWPStruct readStruct() throws IOException {
+		// int type = reader.readByte();
+		TWPStruct struct = new TWPStruct();
+		int type = reader.readByte(); // registered extension
+		type = reader.readInt();
+		while (true) {
+			type = reader.readByte();
+			if (type == 0)
+				break;
+			if (13 >= type && type <= 14)
+				struct.add(new Parameter(ParameterType.LONG_INTEGER, readInteger(type)));
+			if (17 >= type && type <= 127)
+				struct.add(new Parameter(ParameterType.LONG_STRING, readString(type)));
+		}
+		return struct;
+	}	
+	
+	public void writeStruct(TWPStruct struct) throws IOException {
+		writer.write(12);
+		writer.writeInt(struct.getId());
+		Iterator<Parameter> iterator = struct.getFields().iterator();
+		while (iterator.hasNext()) {
+			Parameter param = iterator.next();
+			if (param.getType() == ParameterType.SHORT_INTEGER || param.getType() == ParameterType.LONG_INTEGER) {
+				writeInteger((Integer) param.getValue());				
+			}
+			if (param.getType() == ParameterType.SHORT_STRING || param.getType() == ParameterType.LONG_STRING) {
+				writeString((String) param.getValue());				
+			}			
+		}
+		writer.write(0);
+	}	
 	
 	public int readInteger() throws IOException {
 		int type = reader.readByte();
