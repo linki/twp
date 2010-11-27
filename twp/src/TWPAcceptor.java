@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -15,6 +16,7 @@ import org.antlr.stringtemplate.StringTemplateGroup;
 import twp.generator.metamodel.Message;
 import twp.generator.metamodel.Protocol;
 import twp.generator.metamodel.Specification;
+import twp.generator.metamodel.Struct;
 
 // use `ant grammar` in project root to update parser and lexer files
 
@@ -47,6 +49,7 @@ public class TWPAcceptor {
 		
 		Specification metamodel = r.spec;
 		
+		enrichModel(metamodel);
 		generateCode(metamodel);
 		
 		// verify
@@ -57,6 +60,17 @@ public class TWPAcceptor {
 			System.err.println("File doesn't contain a valid TWP3 specification. (" + numErrors + " Errors)");
 		}
 		
+	}
+	
+	private static void enrichModel(Specification spec) {
+		HashMap<String, String> global = new HashMap<String, String>();
+		for (Struct struct:spec.structs) {
+			global.put(struct.name, struct.bigName);
+		}
+		for (Protocol p:spec.protocols) {
+			HashMap<String, String> local = new HashMap<String, String>();
+			
+		}
 	}
 	
 	private static void generateCode(Specification spec) {

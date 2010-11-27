@@ -80,60 +80,139 @@ public class TWPConnection {
 		int tag = readMessageId();
 		return readMessage(tag);
 	}
+	
+	private Parameter createParameter(int tag) throws IOException {
+		ParameterType type = getParameterType(tag);
+		Parameter p = null;
+		switch(type) { 
+			case SHORT_INTEGER: 
+			case LONG_INTEGER:
+				int value0 = readInteger(tag);
+				p = new Parameter(type, value0);
+				break;
+			case SHORT_STRING: 
+			case LONG_STRING:
+				String value1 = readString(tag);
+				p = new Parameter(type, value1);
+				break;
+			case SHORT_BINARY:
+			case LONG_BINARY:
+				byte[] value2 = readByte(tag);
+				p = new Parameter(type, value2);
+				break;
+			case STRUCT:
+			case SEQUENCE:
+			case UNION:
+			case REGISTERED_EXTENSION:
+				TWPContainer value3 = readContainer(tag);
+				p = new Parameter(type, value3);
+				break;
+			case NO_VALUE:
+				p = new Parameter(type, null);
+				break;
+			case RESERVED:
+				break;
+			case APPLICATION_TYPE:
+				break;
+		}
+		return p;
+	}
+	
+	public TWPContainer readContainer(int tag) throws IOException {
+		ParameterType type = getParameterType(tag);
+		TWPContainer container = new TWPContainer(type);
+		if (type == ParameterType.REGISTERED_EXTENSION) {
+			container.setId(reader.readInt());
+		} else if (type == ParameterType.UNION) {
+			container.setId(tag - 4);
+		}
+		tag = reader.readUnsignedByte();
+		type = getParameterType(tag);
+		while (type != ParameterType.END_OF_CONTENT) {
+			Parameter p = createParameter(tag);
+			if (p != null) {
+				container.add(p);
+			}
+			tag = reader.readUnsignedByte();
+			type = getParameterType(tag);
+		}
+		return container;
+	}
+	
+	public void writeContainer(TWPContainer container) throws IOException {
+		switch (container.getType()) {
+		case STRUCT:
+			writer.write(2);
+			break;
+		case SEQUENCE:
+			writer.write(3);
+			break;
+		case UNION:
+			writer.write(container.getId() + 4);
+			break;
+		case REGISTERED_EXTENSION:
+			writer.write(12);
+			writer.writeInt(container.getId());
+			break;
+		}
+		Iterator<Parameter> iterator = container.getParameters().iterator();
+		while (iterator.hasNext()) {
+			Parameter param = iterator.next();
+			writeParameter(param);	
+		}
+		writer.write(0);
+	}
+	
 	public Message readMessage(int messageId) throws IOException {
 		Message message = new Message(messageId, protocolVersion);
 		int tag = reader.readUnsignedByte();
 		ParameterType type = getParameterType(tag);
 		while (type != ParameterType.END_OF_CONTENT) {
-			Parameter p = null;
-			switch(type) { 
-				case SHORT_INTEGER: 
-				case LONG_INTEGER:
-					int value0 = readInteger(tag);
-					p = new Parameter(type, value0);
-					break;
-				case SHORT_STRING: 
-				case LONG_STRING:
-					String value1 = readString(tag);
-					p = new Parameter(type, value1);
-					break;
-				case SHORT_BINARY:
-				case LONG_BINARY:
-					byte[] value2 = readByte(tag);
-					p = new Parameter(type, value2);
-					break;
-				case STRUCT:
-					break;
-				case SEQUENCE:
-					break;
-				case UNION:
-					break;
-				case NO_VALUE:
-					p = new Parameter(type, null);
-					break;
-				case REGISTERED_EXTENSION:
-					break;
-				case RESERVED:
-					break;
-				case APPLICATION_TYPE:
-					break;
-			}
-			if (p != null)
+			Parameter p = createParameter(tag);
+			if (p != null) {
 				message.addParameter(p);
+			}
 			tag = reader.readUnsignedByte();
 			type = getParameterType(tag);
 		}
 		return message;
 	}
 	
+	private void writeParameter(Parameter p) throws IOException {
+		switch(p.getType()) {
+		case SHORT_INTEGER:
+		case LONG_INTEGER: 
+			writeInteger((Integer) p.getValue());
+			break;
+		case SHORT_STRING:
+		case LONG_STRING:
+			writeString((String) p.getValue());
+			break;
+		case SHORT_BINARY:
+		case LONG_BINARY:
+			writeByte((byte[]) p.getValue());
+			break;
+		case STRUCT:
+		case SEQUENCE:
+		case UNION:
+		case REGISTERED_EXTENSION:
+			writeContainer((TWPContainer) p.getValue());
+			break;
+		case NO_VALUE:
+			writer.writeByte(1);
+			break;
+		case RESERVED:
+			break;
+		case APPLICATION_TYPE:
+			break;
+		}
+	}
+	
 	public void writeMessage(Message message) throws IOException {
 		// TODO: reconnect if protocol is different
 		writeMessageId(message.getType());
 		for (Parameter p:message.getParameters()) {
-			if (p.getType() == ParameterType.SHORT_INTEGER || p.getType() == ParameterType.LONG_INTEGER) 
-				writeInteger((Integer) p.getValue());
-			else if (p.getType() == ParameterType.SHORT_STRING || p.getType() == ParameterType.LONG_STRING)
-				writeString((String) p.getValue());
+			writeParameter(p);
 		}
 		writeEndOfMessage();
 	}
@@ -201,25 +280,33 @@ public class TWPConnection {
 		}
 		writer.write(value);
 	}
-
+	
+	@Deprecated
 	public TWPStruct readStruct() throws IOException {
+		int type = reader.readUnsignedByte();
+		return readStruct(type);
+	}
+
+	@Deprecated
+	public TWPStruct readStruct(int tag) throws IOException {
 		TWPStruct struct = new TWPStruct();
-		int type = reader.readByte();
-		if (type == 12) {
+		ParameterType type = getParameterType(tag);
+		if (type == ParameterType.REGISTERED_EXTENSION) {
 			struct.setId(reader.readInt());
 		}
-		while (true) {
-			type = reader.readByte();
-			if (type == 0)
-				break;
-			if (13 >= type && type <= 14)
-				struct.add(new Parameter(getParameterType(type), readInteger(type)));
-			if (17 >= type && type <= 127)
-				struct.add(new Parameter(getParameterType(type), readString(type)));
+		tag = reader.readUnsignedByte();
+		type = getParameterType(tag);
+		while (type != ParameterType.END_OF_CONTENT) {
+			Parameter p = createParameter(tag);
+			if (p != null)
+				struct.add(p);
+			tag = reader.readUnsignedByte();
+			type = getParameterType(tag);
 		}
 		return struct;
 	}	
 	
+	@Deprecated
 	public void writeStruct(TWPStruct struct) throws IOException {
 		if (struct.getId() == (Integer) null) {
 			writer.write(2);
@@ -230,12 +317,7 @@ public class TWPConnection {
 		Iterator<Parameter> iterator = struct.getFields().iterator();
 		while (iterator.hasNext()) {
 			Parameter param = iterator.next();
-			if (param.getType() == ParameterType.SHORT_INTEGER || param.getType() == ParameterType.LONG_INTEGER) {
-				writeInteger((Integer) param.getValue());				
-			}
-			if (param.getType() == ParameterType.SHORT_STRING || param.getType() == ParameterType.LONG_STRING) {
-				writeString((String) param.getValue());				
-			}			
+			writeParameter(param);	
 		}
 		writer.write(0);
 	}	

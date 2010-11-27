@@ -2,7 +2,8 @@ group javacode;
 
 parameterType ::= [
 	"string":"LONG_STRING",
-	"int": "LONG_INTEGER"
+	"int":"LONG_INTEGER",
+	"binary":"LONG_BINARY"
 ]
 
 primitiveType ::= [
@@ -16,7 +17,7 @@ castType ::= [
 	"string":"String",
 	"int":"Integer",
 	"any":"Object",
-	"binary":"Byte"
+	"binary":"byte[]"
 ]
 
 
@@ -69,7 +70,7 @@ public <protocol.bigName><message.bigName> receive<message.bigName>() throws IOE
 		// throw exception
 	}
 	Iterator\<Parameter\> iter = message.getParameters().iterator();
-	<protocol.bigName><message.bigName> req = new <protocol.bigName><message.bigName>(this, <message.fields:messageParameterList(); separator=", ">);
+	<protocol.bigName><message.bigName> req = new <protocol.bigName><message.bigName>(this<if(message.fields)>, <endif><message.fields:messageParameterList(); separator=", ">);
 	return req;
 }
 	}>
@@ -78,7 +79,7 @@ public <protocol.bigName><message.bigName> receive<message.bigName>() throws IOE
 		Iterator\<Parameter\> iter = message.getParameters().iterator();
 		switch (message.getType()) {
 		<protocol.messages:{message|case <message.id>:
-		<protocol.bigName><message.bigName> req<message.id> = new <protocol.bigName><message.bigName>(this, <message.fields:messageParameterList(); separator=", ">);
+		<protocol.bigName><message.bigName> req<message.id> = new <protocol.bigName><message.bigName>(this<if(message.fields)>, <endif><message.fields:messageParameterList(); separator=", ">);
 		handler.on<protocol.bigName><message.bigName>(req<message.id>);
 		break;
 }>
@@ -111,7 +112,7 @@ public class <protocol.name><message.name> {
 	private <protocol.name>Protocol protocol;
 	<message.fields:{private <it:parameterList()>;
 }>
-	public <protocol.bigName><message.bigName>(<protocol.bigName>Protocol p, <message.fields:parameterList(); separator=", ">) {
+	public <protocol.bigName><message.bigName>(<protocol.bigName>Protocol p<if(message.fields)>, <endif><message.fields:parameterList(); separator=", ">) {
 		this.protocol = p;
 		<message.fields:{this.<it.smallName> = <it.smallName>;
 }>
