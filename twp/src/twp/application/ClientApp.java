@@ -3,9 +3,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import twp.generated.EchoHandler;
+import twp.generated.EchoProtocol;
 import twp.generated.EchoReply;
 import twp.generated.EchoRequest;
-import twp.generated.EchoProtocol;
 
 
 public class ClientApp implements EchoHandler {
@@ -35,6 +35,20 @@ public class ClientApp implements EchoHandler {
 		ClientApp client = new ClientApp("localhost", 12347, false);
 		//ClientApp client = new ClientApp("www.dcl.hpi.uni-potsdam.de", 80);
 		client.start();
+		
+		/*Path path = new Path();
+		List<Object> list = new ArrayList<Object>();
+		path.add("foo");
+		path.add("bar");
+		list.add((Object) path);
+		list.add(1);
+		for (Object o:list) {
+			System.out.println(o.getClass().getName());
+			if (o instanceof Sequence) 
+				System.out.println("is path!");
+			if (o instanceof Object)
+				System.out.println("is object!");
+		}*/
 	}
 
 	public void start() {

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TWPStruct {
 	int id;
-	List<Parameter> fields = new ArrayList<Parameter>();
+	List<Object> elements = new ArrayList<Object>();
 	
 	public int getId() {
 		return id;
@@ -15,11 +15,11 @@ public class TWPStruct {
 		this.id = id;
 	}
 	
-	public void add(Parameter parameter) {
-		fields.add(parameter);
+	public void add(Object elem) {
+		elements.add(elem);
 	}
 	
-	public List<Parameter> getFields() {
-		return fields;
+	public List<Object> getElements() {
+		return elements;
 	}
 }

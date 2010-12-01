@@ -2,14 +2,12 @@ package twp.generated;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
-import twp.core.TWPContainer;
 import twp.core.TWPProtocol;
 
 public class RPCProtocol extends TWPProtocol {
@@ -36,23 +34,7 @@ public class RPCProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	public List<Object> getAnyDefinedBy(Parameter param) {
-		List<Object> list = new ArrayList<Object>();
-		if (param.getType() == ParameterType.STRUCT) {
-			for (Parameter p:((TWPContainer) param.getValue()).getParameters()) {
-				list.add(p.getValue());
-			}
-		} else if (param.getType() != ParameterType.NO_VALUE) {
-			list.add(param.getValue());
-		}
-		return list;
-	}
 	
-	public Parameter setAnyDefinedBy(List<Object> list) {
-		Parameter param = null;
-		
-		return param;
-	}
 	
 	public void sendRequest(int  requestId, int  responseExpected, String  operation, List<Object>  parameters) throws IOException {
 		Message message = new Message(0, ID);

@@ -280,49 +280,7 @@ public class TWPConnection {
 		}
 		writer.write(value);
 	}
-	
-	@Deprecated
-	public TWPStruct readStruct() throws IOException {
-		int type = reader.readUnsignedByte();
-		return readStruct(type);
-	}
-
-	@Deprecated
-	public TWPStruct readStruct(int tag) throws IOException {
-		TWPStruct struct = new TWPStruct();
-		ParameterType type = getParameterType(tag);
-		if (type == ParameterType.REGISTERED_EXTENSION) {
-			struct.setId(reader.readInt());
-		}
-		tag = reader.readUnsignedByte();
-		type = getParameterType(tag);
-		while (type != ParameterType.END_OF_CONTENT) {
-			Parameter p = createParameter(tag);
-			if (p != null)
-				struct.add(p);
-			tag = reader.readUnsignedByte();
-			type = getParameterType(tag);
-		}
-		return struct;
-	}	
-	
-	@Deprecated
-	public void writeStruct(TWPStruct struct) throws IOException {
-		if (struct.getId() == (Integer) null) {
-			writer.write(2);
-		} else {
-			writer.write(12);
-			writer.writeInt(struct.getId());
-		}
-		Iterator<Parameter> iterator = struct.getFields().iterator();
-		while (iterator.hasNext()) {
-			Parameter param = iterator.next();
-			writeParameter(param);	
-		}
-		writer.write(0);
-	}	
-
-	
+		
 	public int readInteger() throws IOException {
 		int type = reader.readUnsignedByte();
 		return readInteger(type);
