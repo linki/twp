@@ -26,6 +26,10 @@ public class Path implements Sequence {
 		elements.add(part);
 	}
 	
+	public List<String> getParts() {
+		return elements;
+	}
+	
 	public List<Object> getElements() {
 		List<Object> result = new ArrayList<Object>();
 		for (String elem:elements)

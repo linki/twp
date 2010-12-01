@@ -123,6 +123,7 @@ public class TFSClient {
 		params.add(port);
 		protocol.sendRequest(id++, 1, "monitor", params);
 		RPCReply rep = protocol.receiveReply();
+		System.out.println(rep.getResult());
 		int result = (Integer) rep.getResult().get(0);
     	return result;
     }
@@ -141,6 +142,12 @@ public class TFSClient {
 			//p.add("admin");
 			p.add("test");
 			client.mkdir(p);
+			/*byte[] host = new byte[4];
+			host[0] = ((Integer) 92).byteValue();
+			host[1] = ((Integer) 225).byteValue();
+			host[2] = ((Integer) 57).byteValue();
+			host[3] = ((Integer) 130).byteValue();
+			int monitor = client.monitor(p, 1, host, 12347);*/
 			int file = client.open(p, "test.txt", 1);
 			System.out.println("Opened File: " + file);
 			byte[] data = "Hallo Welt!".getBytes("UTF-8");
@@ -159,6 +166,7 @@ public class TFSClient {
 			byte[] content = client.read(file, data.length);
 			System.out.println("Read File: " + new String(content, "UTF-8"));
 			client.close(file);
+			//client.stop_monitoring(monitor);
 			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
