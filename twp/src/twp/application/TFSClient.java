@@ -123,7 +123,6 @@ public class TFSClient {
 		params.add(port);
 		protocol.sendRequest(id++, 1, "monitor", params);
 		RPCReply rep = protocol.receiveReply();
-		System.out.println(rep.getResult());
 		int result = (Integer) rep.getResult().get(0);
     	return result;
     }
@@ -139,33 +138,38 @@ public class TFSClient {
 		try {
 			TFSClient client = new TFSClient("www.dcl.hpi.uni-potsdam.de", 80);
 			Path p = new Path();
-			//p.add("admin");
 			p.add("test");
-			client.mkdir(p);
-			/*byte[] host = new byte[4];
-			host[0] = ((Integer) 92).byteValue();
-			host[1] = ((Integer) 225).byteValue();
-			host[2] = ((Integer) 57).byteValue();
-			host[3] = ((Integer) 130).byteValue();
-			int monitor = client.monitor(p, 1, host, 12347);*/
+			
+			//client.mkdir(p);
+			//InetAddress addr = InetAddress.getLocalHost();
+			//int monitor = client.monitor(p, 1, addr.getAddress(), 12347);
+			
 			int file = client.open(p, "test.txt", 1);
 			System.out.println("Opened File: " + file);
+			
 			byte[] data = "Hallo Welt!".getBytes("UTF-8");
 			client.write(file, data);
 			System.out.println("Wrote to File");
+			
 			client.close(file);
 			System.out.println("Closed File");
+			
 			ListResult result = client.listdir(p);
 			System.out.println("=== Directories ===");
-			for (String dir:result.getDirectories())
+			for (String dir:result.getDirectories().getElements())
 				System.out.println(dir);
 			System.out.println("=== Files ===");
-			for (String dir:result.getFiles())
+			for (String dir:result.getFiles().getElements())
 				System.out.println(dir);
+			
+			StatResult stat = client.stat(p, "test.txt"); 
+			System.out.println("Stats: size: " + stat.getSize() + " Byte");
+			
 			file = client.open(p, "test.txt", 0);
 			byte[] content = client.read(file, data.length);
 			System.out.println("Read File: " + new String(content, "UTF-8"));
 			client.close(file);
+			
 			//client.stop_monitoring(monitor);
 			
 		} catch (UnknownHostException e) {

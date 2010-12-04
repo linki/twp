@@ -1,9 +1,7 @@
 package twp.core;
 
-import java.util.List;
 
-public interface Sequence {
+public interface Sequence extends Container {
 	
-	public List<Object> getElements();
 	public ParameterType getType();
 }

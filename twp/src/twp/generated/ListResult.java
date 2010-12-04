@@ -1,32 +1,48 @@
 package twp.generated;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ListResult {
-	List<String> dirs = new ArrayList<String>();
-	List<String> files = new ArrayList<String>();
+import twp.core.Container;
+import twp.core.GenericSequence;
+import twp.core.GenericStruct;
+import twp.core.Parameter;
+import twp.core.ParameterType;
+import twp.core.TWPContainer;
+
+public class ListResult implements Container {
+	FileList dirs;
+	FileList files;
 	
 	public ListResult(List<Object> params) {
 		if (params.size() == 2) {
-			if (params.get(0) != null) {
-				for (Object elem:(List<Object>) params.get(0)) {
-					dirs.add((String) elem);
-				}
-			}
-			if (params.get(1) != null) {
-				for (Object elem:(List<Object>) params.get(1)) {
-					files.add((String) elem);
-				}
-			}
+			dirs = new FileList((GenericSequence) params.get(0));
+			files = new FileList((GenericSequence) params.get(1));
 		}
 	}
 	
-	public List<String> getDirectories() {
+	public ListResult(GenericStruct struct) {
+		dirs = new FileList((GenericSequence) struct.getElements().get(0));
+		files = new FileList((GenericSequence) struct.getElements().get(1));
+	}
+	
+	public FileList getDirectories() {
 		return dirs;
 	}
 	
-	public List<String> getFiles() {
+	public FileList getFiles() {
 		return files;
+	}
+	
+	@Override
+	public TWPContainer toContainer() {
+		TWPContainer container = new TWPContainer(ParameterType.STRUCT);
+		container.add(new Parameter(dirs.getParameterType(), dirs.toContainer()));
+		container.add(new Parameter(files.getParameterType(), files.toContainer()));
+		return container;
+	}
+
+	@Override
+	public ParameterType getParameterType() {
+		return ParameterType.STRUCT;
 	}
 }

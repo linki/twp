@@ -226,7 +226,6 @@ public class TWPConnection {
 	public boolean readMagicBytes() throws IOException {
 		byte[] bytes = new byte[5];
 		reader.readFully(bytes);
-		System.out.println("Magic bytes: " + new String(bytes));
 		return MAGIC_BYTES.equals(new String(bytes));
 	}
 	

@@ -11,7 +11,7 @@ import twp.generated.Path;
 public class FAMServerHandler implements FAMHandler {
 
 	private void printFileName(Path directory, String filename) {
-		for (String part:directory.getParts()) 
+		for (String part:directory.getElements()) 
 			System.out.print(part + "/");
 		System.out.println(filename);
 	}

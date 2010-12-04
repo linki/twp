@@ -11,92 +11,74 @@ public abstract class TWPProtocol {
 	
 	protected List<Object> getAnyDefinedBy(Parameter param) {
 		List<Object> list = new ArrayList<Object>();
-		if (param.getType() == ParameterType.STRUCT || 
-			param.getType() == ParameterType.SEQUENCE) {
-			for (Parameter p:((TWPContainer) param.getValue()).getParameters()) {
-				switch (p.getType()) {
-				case STRUCT:
-				case SEQUENCE:
-				case REGISTERED_EXTENSION:
-				case UNION:
-					list.add(getAnyDefinedBy(p));
-					break;
-				default:
-					list.add(p.getValue());	
-				}
-			}
+		if (param.getType() == ParameterType.STRUCT) {
+			for (Parameter p:((TWPContainer) param.getValue()).getParameters())
+				list.add(compose(p));
 		} else if (param.getType() != ParameterType.NO_VALUE) {
-			list.add(param.getValue());
+			list.add(compose(param));
 		}
 		return list;
 	}
 	
-	protected TWPContainer decompose(Sequence s) {
-		ParameterType type = s.getType();
-		TWPContainer container = new TWPContainer(ParameterType.SEQUENCE);
-		for (Object elem:s.getElements()) {	
-			if (type == ParameterType.SEQUENCE) {
-				container.add(new Parameter(type, decompose((Sequence) elem)));
-			} else {
-				container.add(new Parameter(type, elem));						
-			}
+	protected Object compose(Parameter param) {
+		Object result = null;
+		switch (param.getType()) {	
+			case STRUCT:
+				GenericStruct struct = new GenericStruct();
+				for (Parameter p:((TWPContainer) param.getValue()).getParameters())
+					struct.addElement(compose(p));
+				result = struct;
+				break;
+			case SEQUENCE:
+				GenericSequence seq = new GenericSequence();
+				for (Parameter p:((TWPContainer) param.getValue()).getParameters())
+					seq.addElement(compose(p));
+				result = seq;
+				break;
+			case REGISTERED_EXTENSION:
+				GenericRegisteredExtension gre = new GenericRegisteredExtension(((TWPContainer)param.getValue()).getId());
+				for (Parameter p:((TWPContainer) param.getValue()).getParameters())
+					gre.addElement(compose(p));
+				result = gre;
+				break;
+			case UNION:
+				GenericUnion un = new GenericUnion(((TWPContainer)param.getValue()).getId(), compose(param));
+				result = un;
+				break;
+			case NO_VALUE:
+				result = null;
+				break;
+			default:
+				result = param.getValue();
+				break;
 		}
-		return container;
+		return result;
+	}
+	
+	protected Parameter decompose(Object o) {
+		Parameter param = null;
+		if (o instanceof String) 
+			param = new Parameter(ParameterType.LONG_STRING, o);
+		else if (o instanceof Integer)
+			param = new Parameter(ParameterType.LONG_INTEGER, o);
+		else if (o instanceof byte[])
+			param = new Parameter(ParameterType.LONG_BINARY, o);
+		else if (o instanceof Container) 
+			param = new Parameter(((Container) o).getParameterType(), ((Container) o).toContainer());	
+		
+		return param;
 	}
 	
 	protected Parameter setAnyDefinedBy(List<Object> list) {
 		Parameter param = null;
 		if (list.size() == 0) 
 			param = new Parameter(ParameterType.NO_VALUE, null);
-		else if (list.size() == 1) {
-			Object o = list.get(0);
-			if (o instanceof String) 
-				param = new Parameter(ParameterType.LONG_STRING, o);
-			else if (o instanceof Integer)
-				param = new Parameter(ParameterType.LONG_INTEGER, o);
-			else if (o instanceof byte[])
-				param = new Parameter(ParameterType.LONG_BINARY, o);
-			if (o instanceof Sequence) {
-				ParameterType type = ((Sequence) o).getType();
-				TWPContainer container = new TWPContainer(ParameterType.SEQUENCE);
-				for (Object elem:((Sequence) o).getElements()) {	
-					if (type == ParameterType.STRUCT ||
-						type == ParameterType.SEQUENCE ||
-						type == ParameterType.REGISTERED_EXTENSION ||
-						type == ParameterType.UNION) {
-						container.add(new Parameter(type, decompose((Sequence) elem))); 
-					} else {
-						container.add(new Parameter(type, elem));						
-					}
-				}
-				param = new Parameter(ParameterType.SEQUENCE, container);	
-			}
-			
-		} else {
+		else if (list.size() == 1)
+			param = decompose(list.get(0));
+		else {
 			TWPContainer container = new TWPContainer(ParameterType.STRUCT);
-			for (Object o:list) {
-				if (o instanceof String) 
-					container.add(new Parameter(ParameterType.LONG_STRING, o));
-				else if (o instanceof Integer)
-					container.add(new Parameter(ParameterType.LONG_INTEGER, o));
-				else if (o instanceof byte[])
-					container.add(new Parameter(ParameterType.LONG_BINARY, o));
-				if (o instanceof Sequence) {
-					ParameterType type = ((Sequence) o).getType();
-					TWPContainer container2 = new TWPContainer(ParameterType.SEQUENCE);
-					for (Object elem:((Sequence) o).getElements()) {	
-						if (type == ParameterType.STRUCT ||
-							type == ParameterType.SEQUENCE ||
-							type == ParameterType.REGISTERED_EXTENSION ||
-							type == ParameterType.UNION) {
-							container2.add(new Parameter(type, decompose((Sequence) elem))); 
-						} else {
-							container2.add(new Parameter(type, elem));						
-						}
-					}
-					container.add(new Parameter(ParameterType.SEQUENCE, container2));	
-				}
-			}
+			for (Object o:list)
+				container.add(decompose(o));
 			param = new Parameter(ParameterType.STRUCT, container);
 		}
 		return param;
