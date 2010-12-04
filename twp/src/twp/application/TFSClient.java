@@ -170,6 +170,9 @@ public class TFSClient {
 			System.out.println("Read File: " + new String(content, "UTF-8"));
 			client.close(file);
 			
+			System.out.println("Disk Usage");
+			DiskUsage du = new DiskUsage(client);
+			du.diskUsage(p, true);
 			//client.stop_monitoring(monitor);
 			
 		} catch (UnknownHostException e) {

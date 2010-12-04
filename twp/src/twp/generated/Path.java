@@ -46,4 +46,20 @@ public class Path implements Container {
 		}
 		return container;
 	}
+	
+	public String toString() {
+		if (elements.isEmpty())
+			return "/";
+		StringBuilder sb = new StringBuilder();
+		for (String elem:elements) 
+			sb.append("/").append(elem);
+		return sb.toString();	
+	}
+	
+	public Path clone() {
+		Path clone = new Path();
+		for (String elem:elements)
+			clone.add(elem);
+		return clone;
+	}
 }
