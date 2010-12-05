@@ -1,29 +1,43 @@
-# generated file
-
 require 'twp/protocol'
 require 'twp/message'
 
 module Echo
-  extend TWP::Protocol
-  
-  id 2
-
-  class Request
-    include TWP::Message
+  module Messages
+    class Request
+      include TWP::Message
+      
+      @id = 0
+      
+      @parameters = {
+        'text' => :string
+      }
+      
+      attr_accessor :text
+    end
     
-    id 0
-    protocol Echo
-    attribute :text, :string
-  end
-  
-  class Reply
-    include TWP::Message
-    
-    id 1
-    protocol Echo
-    attribute :text, :string
-    attribute :number_of_letters, :int
+    class Reply
+      include TWP::Message
+      
+      @id = 1
+      
+      @parameters = {
+        'text' => :string,
+        'number_of_letters' => :int
+      }
+      
+      attr_accessor :text
+      attr_accessor :number_of_letters   
+    end
   end
 
-  self._messages = { 0 => Request, 1 => Reply }
+  class Protocol
+    include TWP::Protocol
+    
+    @id = 2
+    
+    @messages = {
+      0 => Messages::Request,
+      1 => Messages::Reply
+    }
+  end
 end

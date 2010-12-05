@@ -1,30 +1,30 @@
-require 'twp/connection'
-
 module TWP
   module Protocol
-    def self.extended(base)
-      base.class_eval do
-        class << self
-          attr_accessor :_id
-          attr_accessor :_messages
-        end
+    def self.included(base)
+      base.send :include, InstanceMethods
+      base.singleton_class.class_eval do
+        attr_accessor :id
+        attr_accessor :messages
       end
     end
-  
-    def id(value)
-      self._id = value
-    end
-
-    def receive(header = true)
-      con = TWP::Connection.instance
-      if header
-        con.read_magic_bytes
-        con.read_protocol
+    
+    module InstanceMethods
+      def initialize(connection = nil)
+        @connection = connection
       end
-      message_id = con.read_message_id
-      msg = self._messages[message_id].receive
-      con.read_end_of_msg
-      msg
+    
+      def send(message, connection = @connection)
+        connection.write_magic_bytes
+        connection.write_protocol self.class.id
+        message.send(connection)
+        yield receive(connection) if block_given?
+      end
+    
+      def receive(connection = @connection)
+        message_id = connection.read_message_id
+        message_klass = self.class.messages[message_id]
+        message_klass.receive(connection)
+      end
     end
   end
 end

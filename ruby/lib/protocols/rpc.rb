@@ -1,47 +1,71 @@
-# generated file
-
 require 'twp/protocol'
 require 'twp/message'
 
 module RPC
-  extend TWP::Protocol
-  
-  id 1
+  module Messages
+    class Request
+      include TWP::Message
+      
+      @id = 0
+      
+      @parameters = {
+        'request_id' => :int,
+        'response_expected' => :int,
+        'operation' => :string,
+        'parameters' => :any
+      }
+      
+      attr_accessor :request_id
+      attr_accessor :response_expected
+      attr_accessor :operation
+      attr_accessor :parameters
+    end
+    
+    class Reply
+      include TWP::Message
+      
+      @id = 1
+      
+      @parameters = {
+        'request_id' => :int,
+        'result' => :any
+      }
+      
+      attr_accessor :request_id
+      attr_accessor :result    
+    end
+    
+    class CancelRequest
+      include TWP::Message
+      
+      @id = 2
+      
+      @parameters = {
+        'request_id' => :int
+      }
+      
+      attr_accessor :request_id 
+    end
+    
+    class CloseConnection
+      include TWP::Message
+      
+      @id = 1
+      
+      @parameters = {}
+    end
+  end
 
-  class Request
-    include TWP::Message
-    
-    id 0
-    protocol RPC
-    attribute :request_id, :int
-    attribute :response_expected, :int
-    attribute :operation, :string
-    attribute :parameters, :string
-  end
-  
-  class Reply
-    include TWP::Message
-    
-    id 1
-    protocol RPC
-    attribute :request_id, :int
-    attribute :result, :int
-  end
-  
-  class CancelRequest
-    include TWP::Message
-    
-    id 2
-    protocol RPC
-    attribute :request_id, :int
-  end
-  
-  class CloseConnection
-    include TWP::Message
-    
-    id 4
-    protocol RPC
-  end  
+  class Protocol
+    include TWP::Protocol
 
-  self._messages = { 0 => Request, 1 => Reply, 2 => CancelRequest, 4 => CloseConnection, }
+    @id = 1
+
+    @messages = {
+      0 => Messages::Request,
+      1 => Messages::Reply,
+      2 => Messages::CancelRequest,
+      4 => Messages::CloseConnection
+    }
+  end
 end

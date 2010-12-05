@@ -28,6 +28,10 @@ module TWP
     
     def read_generic(type = read_byte)
       case type
+        when 2
+          read_struct(type)
+        when 3
+          read_sequence(type)
         when 13..14
           read_integer(type)
         when 15..16
@@ -35,11 +39,24 @@ module TWP
         when 17..127
           read_string(type)
         else
+          puts type
+          raise Exception
+      end
+    end
+
+    def read_with_type(type)
+      case type
+        #when :any remove me
+        #  read_any
+        when :any, :int, :binary, :string
+          read_generic
+        else
+          puts type
           raise Exception
       end
     end
     
-    def write_generic(value, type)
+    def write_with_type(value, type)
       case type
         when :int
           write_integer(value)
@@ -47,7 +64,10 @@ module TWP
           write_binary(value)
         when :string
           write_string(value)
+        when :any
+          write_any(value)
         else
+          puts type
           raise Exception
       end
     end
@@ -140,7 +160,64 @@ module TWP
         write_four_bytes value.length        
         write value
       end
-    end 
+    end
+    
+    def write_no_value
+      write_byte 1
+    end
+
+    def read_struct(type = read_byte)
+      struct = []
+      while (type = read_byte) != 0
+        struct << read_generic(type)
+      end
+      struct
+    end
+    
+    def read_sequence(type = read_byte)
+      sequence = []
+      while (type = read_byte) != 0
+        sequence << read_generic(type)
+      end
+      sequence
+    end    
+    
+    def read_any
+      type = read_byte
+      if type == 0
+        return nil
+      end
+      if type == 2
+        return read_generic
+      end
+      read_generic(read_byte)
+    end
+
+    def write_any(value)
+      case value.class.name
+        when 'NilClass'
+          write_no_value
+        when 'Fixnum'
+          write_integer value
+        when 'String'
+          write_string value
+        when 'Array'
+          write_byte 3
+          value.each do |val|
+            write_any val
+          end
+          write_byte 0
+        when 'OrderedHash' # order needed
+          write_byte 2
+          value.each_value do |val|
+            write_any val
+          end
+          write_byte 0
+        else
+          puts value.class.name
+          raise Exception
+      end
+    end
     
     def read_end_of_msg
       read_byte
