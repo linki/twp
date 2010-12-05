@@ -3,8 +3,6 @@ package twp.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import twp.core.Parameter;
-
 public class Message {
 
 	private int id; 

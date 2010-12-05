@@ -1,4 +1,6 @@
 package twp.generated;
+
+
 public class RPCCancelRequest {
 	
 	private RPCProtocol protocol;

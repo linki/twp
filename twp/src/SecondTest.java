@@ -1,8 +1,5 @@
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.Iterator;
-
-import org.antlr.runtime.CommonToken;
 
 import twp.Client;
 import twp.Message;

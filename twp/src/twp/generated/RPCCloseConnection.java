@@ -1,4 +1,6 @@
 package twp.generated;
+
+
 public class RPCCloseConnection {
 	
 	private RPCProtocol protocol;

@@ -5,39 +5,52 @@ import java.util.List;
 import twp.core.Container;
 import twp.core.GenericSequence;
 import twp.core.GenericStruct;
-import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPContainer;
 
 public class ListResult implements Container {
-	FileList dirs;
-	FileList files;
+	private Filelist  directories ;
+	private Filelist  files ;
+
 	
 	public ListResult(List<Object> params) {
 		if (params.size() == 2) {
-			dirs = new FileList((GenericSequence) params.get(0));
-			files = new FileList((GenericSequence) params.get(1));
+			directories = new Filelist((GenericSequence ) params.get(0));
+			files = new Filelist((GenericSequence ) params.get(1));
+
 		}
 	}
 	
 	public ListResult(GenericStruct struct) {
-		dirs = new FileList((GenericSequence) struct.getElements().get(0));
-		files = new FileList((GenericSequence) struct.getElements().get(1));
+		directories = new Filelist((GenericSequence ) struct.getElements().get(0));
+		files = new Filelist((GenericSequence ) struct.getElements().get(1));
+	
 	}
 	
-	public FileList getDirectories() {
-		return dirs;
-	}
-	
-	public FileList getFiles() {
-		return files;
-	}
+
+	public Filelist  getDirectories() {
+			return directories;
+		}
+		
+		public void setDirectories(Filelist  directories) {
+			this.directories = directories;
+		}
+
+	public Filelist  getFiles() {
+			return files;
+		}
+		
+		public void setFiles(Filelist  files) {
+			this.files = files;
+		}
+
 	
 	@Override
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.STRUCT);
-		container.add(new Parameter(dirs.getParameterType(), dirs.toContainer()));
-		container.add(new Parameter(files.getParameterType(), files.toContainer()));
+		container.add(FAMProtocol.decompose(directories));
+		container.add(FAMProtocol.decompose(files));
+
 		return container;
 	}
 

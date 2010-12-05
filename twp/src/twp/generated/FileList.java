@@ -9,21 +9,23 @@ import twp.core.Parameter;
 import twp.core.ParameterType;
 import twp.core.TWPContainer;
 
-public class FileList implements Container {
+public class Filelist implements Container {
 	
-	private List<String> elements = new ArrayList<String>();
+	private List<String > elements = new ArrayList<String>();
 	
-	public FileList() {}
+	public Filelist() {}
 	
-	public FileList(List<Object> content) {
+	public Filelist(List<Object> content) {
 		for (Object elem:content) {
-			elements.add((String) elem);
+			elements.add((String) elem
+);
 		}
 	}
 	
-	public FileList(GenericSequence seq) {
-		for (Object o:seq.getElements()) {
-			elements.add((String) o);
+	public Filelist(GenericSequence seq) {
+		for (Object elem:seq.getElements()) {
+			elements.add((String) elem
+);
 		}
 	}
 	
@@ -31,19 +33,20 @@ public class FileList implements Container {
 		return ParameterType.SEQUENCE;
 	}
 	
-	public void add(String part) {
+	public void add(String  part) {
 		elements.add(part);
 	}
 	
-	public List<String> getElements() {
+	public List<String > getElements() {
 		return elements;
 	}
 	
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.SEQUENCE);
-		for (String s:elements) {
-			container.add(new Parameter(ParameterType.LONG_STRING, s));
+		for (String  elem:elements) {
+container.add(new Parameter(ParameterType.LONG_STRING, elem));
+
 		}
 		return container;
-	}
-}
+	} 
+ }

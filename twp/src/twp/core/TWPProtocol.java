@@ -55,7 +55,7 @@ public abstract class TWPProtocol {
 		return result;
 	}
 	
-	protected static Parameter decompose(Object o) {
+	public static Parameter decompose(Object o) {
 		Parameter param = null;
 		if (o instanceof String) 
 			param = new Parameter(ParameterType.LONG_STRING, o);

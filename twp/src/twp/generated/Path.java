@@ -11,19 +11,21 @@ import twp.core.TWPContainer;
 
 public class Path implements Container {
 	
-	private List<String> elements = new ArrayList<String>();
+	private List<String > elements = new ArrayList<String>();
 	
 	public Path() {}
 	
 	public Path(List<Object> content) {
 		for (Object elem:content) {
-			elements.add((String) elem);
+			elements.add((String) elem
+);
 		}
 	}
 	
 	public Path(GenericSequence seq) {
-		for (Object o:seq.getElements()) {
-			elements.add((String) o);
+		for (Object elem:seq.getElements()) {
+			elements.add((String) elem
+);
 		}
 	}
 	
@@ -31,21 +33,22 @@ public class Path implements Container {
 		return ParameterType.SEQUENCE;
 	}
 	
-	public void add(String part) {
+	public void add(String  part) {
 		elements.add(part);
 	}
 	
-	public List<String> getElements() {
+	public List<String > getElements() {
 		return elements;
 	}
 	
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.SEQUENCE);
-		for (String s:elements) {
-			container.add(new Parameter(ParameterType.LONG_STRING, s));
+		for (String  elem:elements) {
+container.add(new Parameter(ParameterType.LONG_STRING, elem));
+
 		}
 		return container;
-	}
+	} 
 	
 	public String toString() {
 		if (elements.isEmpty())
@@ -62,4 +65,4 @@ public class Path implements Container {
 			clone.add(elem);
 		return clone;
 	}
-}
+ }
