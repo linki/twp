@@ -2,10 +2,7 @@ package twp.generated;
 
 import java.util.List;
 
-import twp.core.Container;
-import twp.core.GenericStruct;
-import twp.core.ParameterType;
-import twp.core.TWPContainer;
+import twp.core.*;
 
 public class RPCException implements Container {
 	private String  text ;

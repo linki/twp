@@ -1,5 +1,6 @@
 package twp.generated;
 
+import java.util.List;
 
 public class RPCCloseConnection {
 	

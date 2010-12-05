@@ -1,3 +1,5 @@
+package twp.generator;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,7 +26,7 @@ import twp.generator.metamodel.Union;
 
 // use `ant grammar` in project root to update parser and lexer files
 
-public class TWPAcceptor {
+public class TWPGenerator {
 	
 	public static void main(String[] args) throws IOException, RecognitionException {
 		
