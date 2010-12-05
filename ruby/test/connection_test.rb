@@ -7,10 +7,10 @@ require 'mocha'
 
 class ConnectionTest < MiniTest::Unit::TestCase
   def setup
-    @con = TWP::Connection.instance
+    @con = TWP::Connection.new('localhost', 1234)
     @socket = @con.socket = mock
   end
-  
+
   def test_write_magic_bytes_sends_twps_magic_bytes
     @socket.expects(:write).with("TWP3\n")
     @con.write_magic_bytes

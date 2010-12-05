@@ -1,30 +1,29 @@
-require 'singleton'
 require 'socket'
 
 module TWP
   class Connection
-    include Singleton
-    attr_accessor :socket
-  
     MAGIC_BYTES = "TWP3\n"
+
+    attr_accessor :socket
     
-    def self.setup(host, port)
-      instance.setup(host, port)
+    def self.connect(host, port)
+      new(host, port).tap { |c| c.connect }
     end
     
-    def setup(host, port)
+    def initialize(host, port)
       @host, @port = host, port
-      connect
-      at_exit { disconnect }
-      self
     end
     
     def connect
       @socket = TCPSocket.new(@host, @port)
     end
     
+    def connected?
+      @socket && !@socket.closed?
+    end
+    
     def disconnect
-      @socket.close if @socket && !@socket.closed?
+      @socket.close
     end
     
     def read_generic(type = read_byte)
@@ -69,12 +68,10 @@ module TWP
       write_integer protocol
     end
     
-    # extension
     def read_message_id
       read_byte - 4
     end
     
-    # extension    
     def write_message_id(message_id)
       write_byte message_id + 4
     end
