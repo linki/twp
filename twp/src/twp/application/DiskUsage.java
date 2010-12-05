@@ -42,18 +42,4 @@ public class DiskUsage {
 		return stat.getSize();
 	}
 	
-	public static void main(String args[]) {
-		try {
-			DiskUsage du = new DiskUsage("www.dcl.hpi.uni-potsdam.de", 80);
-			Path p = new Path();
-			du.diskUsage(p, true);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
 }

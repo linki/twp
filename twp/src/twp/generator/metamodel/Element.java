@@ -2,7 +2,7 @@ package twp.generator.metamodel;
 
 public class Element {
 
-	public int id;
+	public int id = -1;
 	public String name;
 	public String smallName;
 	public String bigName;

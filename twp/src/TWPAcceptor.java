@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -13,10 +14,14 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import twp.generator.metamodel.Field;
+import twp.generator.metamodel.Forward;
 import twp.generator.metamodel.Message;
 import twp.generator.metamodel.Protocol;
+import twp.generator.metamodel.Sequence;
 import twp.generator.metamodel.Specification;
 import twp.generator.metamodel.Struct;
+import twp.generator.metamodel.Union;
 
 // use `ant grammar` in project root to update parser and lexer files
 
@@ -63,13 +68,60 @@ public class TWPAcceptor {
 	}
 	
 	private static void enrichModel(Specification spec) {
-		HashMap<String, String> global = new HashMap<String, String>();
-		for (Struct struct:spec.structs) {
-			global.put(struct.name, struct.bigName);
-		}
+		HashMap<String, Integer> global = new HashMap<String, Integer>();
+		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
+		for (Struct struct:spec.structs) 
+			if (struct.id != -1)
+				global.put(struct.name, 1);
+			else
+				global.put(struct.name, 0);
 		for (Protocol p:spec.protocols) {
-			HashMap<String, String> local = new HashMap<String, String>();
-			
+			HashMap<String, Integer> local = new HashMap<String, Integer>();
+			for (Struct struct:p.structs) 
+				if (struct.id != -1)
+					local.put(struct.name, 1);
+				else
+					local.put(struct.name, 0);
+			for (Sequence seq:p.sequences) 
+				local.put(seq.name, 2);
+			for (Union un:p.unions) 
+				local.put(un.name, 3);
+			// add additional information to the fields of the message
+			for (Message m:p.messages)
+				for (Field f:m.fields)
+					setField(f, global, local);
+			for (Struct struct:p.structs)
+				for (Field f:struct.fields)
+					setField(f, global, local);
+		}
+	}
+	
+	private static void setField(Field f, HashMap<String, Integer> global, HashMap<String, Integer> local) {
+		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
+		if (!f.type.anyDefinedBy && !f.type.primitive) {
+			if (global.containsKey(f.type.name)) {
+				if (global.get(f.type.name) == 0)
+					f.type.struct = true;
+				else
+					f.type.registered = true;
+			} else if (local.containsKey(f.type.name)) {
+				switch (local.get(f.type.name)) {
+					case 0:
+						f.type.struct = true;
+						break;
+					case 1:
+						f.type.registered = true;
+						break;
+					case 2:
+						f.type.sequence = true;
+						break;
+					case 3:
+						f.type.union = true;
+						break;
+				}
+			} else {
+				// throw error - type unknown
+			}
 		}
 	}
 	

@@ -1,6 +1,7 @@
 package twp.application;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +167,7 @@ public class TFSClient {
 			System.out.println("Stats: size: " + stat.getSize() + " Byte");
 			
 			file = client.open(p, "test.txt", 0);
-			byte[] content = client.read(file, data.length);
+			byte[] content = client.read(file, stat.getSize());
 			System.out.println("Read File: " + new String(content, "UTF-8"));
 			client.close(file);
 			

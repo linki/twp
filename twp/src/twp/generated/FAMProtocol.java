@@ -4,10 +4,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 
+import twp.core.Container;
 import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
-import twp.core.Sequence;
 import twp.core.TWPProtocol;
 
 public class FAMProtocol extends TWPProtocol {
@@ -36,7 +36,7 @@ public class FAMProtocol extends TWPProtocol {
 	
 	public void sendChanged(Path  directory , String  filename ) throws IOException {
 		Message message = new Message(0, ID);
-		message.addParameter(new Parameter(ParameterType.SEQUENCE, decompose((Sequence) directory)));
+		message.addParameter(new Parameter(ParameterType.SEQUENCE, ((Container) directory).toContainer()));
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, filename));
 
 		connection.writeMessage(message);
@@ -53,7 +53,7 @@ public class FAMProtocol extends TWPProtocol {
 	}
 		public void sendDeleted(Path  directory , String  filename ) throws IOException {
 		Message message = new Message(1, ID);
-		message.addParameter(new Parameter(ParameterType.SEQUENCE, decompose((Sequence) directory)));
+		message.addParameter(new Parameter(ParameterType.SEQUENCE, ((Container) directory).toContainer()));
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, filename));
 
 		connection.writeMessage(message);
@@ -70,7 +70,7 @@ public class FAMProtocol extends TWPProtocol {
 	}
 		public void sendCreated(Path  directory , String  filename ) throws IOException {
 		Message message = new Message(2, ID);
-		message.addParameter(new Parameter(ParameterType.SEQUENCE, decompose((Sequence) directory)));
+		message.addParameter(new Parameter(ParameterType.SEQUENCE, ((Container) directory).toContainer()));
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, filename));
 
 		connection.writeMessage(message);
@@ -87,7 +87,7 @@ public class FAMProtocol extends TWPProtocol {
 	}
 		public void sendStartExecuting(Path  directory , String  filename ) throws IOException {
 		Message message = new Message(3, ID);
-		message.addParameter(new Parameter(ParameterType.SEQUENCE, decompose((Sequence) directory)));
+		message.addParameter(new Parameter(ParameterType.SEQUENCE, ((Container) directory).toContainer()));
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, filename));
 
 		connection.writeMessage(message);
@@ -104,7 +104,7 @@ public class FAMProtocol extends TWPProtocol {
 	}
 		public void sendStopExecuting(Path  directory , String  filename ) throws IOException {
 		Message message = new Message(4, ID);
-		message.addParameter(new Parameter(ParameterType.SEQUENCE, decompose((Sequence) directory)));
+		message.addParameter(new Parameter(ParameterType.SEQUENCE, ((Container) directory).toContainer()));
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, filename));
 
 		connection.writeMessage(message);

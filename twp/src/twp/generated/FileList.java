@@ -38,14 +38,7 @@ public class FileList implements Container {
 	public List<String> getElements() {
 		return elements;
 	}
-	/*
-	public List<Object> getElements() {
-		List<Object> result = new ArrayList<Object>();
-		for (String elem:elements)
-			result.add(elem);
-		return result;
-	}
-	*/
+	
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.SEQUENCE);
 		for (String s:elements) {

@@ -10,7 +10,7 @@ import twp.core.ParameterType;
 import twp.core.TWPProtocol;
 
 public class EchoProtocol extends TWPProtocol {
-	public static final int ID = 22;
+	public static final int ID = 2;
 	
 	private EchoHandler handler;
 	
