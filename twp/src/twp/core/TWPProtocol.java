@@ -55,7 +55,7 @@ public abstract class TWPProtocol {
 		return result;
 	}
 	
-	protected Parameter decompose(Object o) {
+	public static Parameter decompose(Object o) {
 		Parameter param = null;
 		if (o instanceof String) 
 			param = new Parameter(ParameterType.LONG_STRING, o);
@@ -69,7 +69,7 @@ public abstract class TWPProtocol {
 		return param;
 	}
 	
-	protected Parameter setAnyDefinedBy(List<Object> list) {
+	public static Parameter setAnyDefinedBy(List<Object> list) {
 		Parameter param = null;
 		if (list.size() == 0) 
 			param = new Parameter(ParameterType.NO_VALUE, null);

@@ -1,3 +1,5 @@
+package twp.generator;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,14 +15,18 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.stringtemplate.StringTemplate;
 import org.antlr.stringtemplate.StringTemplateGroup;
 
+import twp.generator.metamodel.Field;
 import twp.generator.metamodel.Message;
 import twp.generator.metamodel.Protocol;
+import twp.generator.metamodel.Sequence;
 import twp.generator.metamodel.Specification;
 import twp.generator.metamodel.Struct;
+import twp.generator.metamodel.Type;
+import twp.generator.metamodel.Union;
 
 // use `ant grammar` in project root to update parser and lexer files
 
-public class TWPAcceptor {
+public class TWPGenerator {
 	
 	public static void main(String[] args) throws IOException, RecognitionException {
 		
@@ -49,34 +55,89 @@ public class TWPAcceptor {
 		
 		Specification metamodel = r.spec;
 		
-		enrichModel(metamodel);
-		generateCode(metamodel);
-		
 		// verify
 		int numErrors = parser.getNumberOfSyntaxErrors();
 		if (numErrors == 0) {
-			System.err.println("File is a valid TWP3 specification.");
+			System.out.println("File is a valid TWP3 specification.");
+			// generate code
+			if (enrichModel(metamodel)) {
+				generateCode(metamodel);
+				System.out.println("Finished code generation.");
+			}
+			else
+				System.err.println("Aborted code generation.");
 		} else {
 			System.err.println("File doesn't contain a valid TWP3 specification. (" + numErrors + " Errors)");
 		}
-		
+}
+	
+	private static boolean enrichModel(Specification spec) {
+		HashMap<String, Integer> global = new HashMap<String, Integer>();
+		boolean successful = true;
+		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
+		for (Struct struct:spec.structs) 
+			if (struct.id != -1)
+				global.put(struct.name, 1);
+			else
+				global.put(struct.name, 0);
+		for (Protocol p:spec.protocols) {
+			HashMap<String, Integer> local = new HashMap<String, Integer>();
+			for (Struct struct:p.structs) 
+				if (struct.id != -1)
+					local.put(struct.name, 1);
+				else
+					local.put(struct.name, 0);
+			for (Sequence seq:p.sequences) 
+				local.put(seq.name, 2);
+			for (Union un:p.unions) 
+				local.put(un.name, 3);
+			// add additional information to the fields of the message
+			for (Message m:p.messages)
+				for (Field f:m.fields)
+					successful &= setField(f.type, global, local);
+			for (Struct struct:p.structs)
+				for (Field f:struct.fields)
+					successful &= setField(f.type, global, local);
+			for (Sequence seq:p.sequences)
+				successful &= setField(seq.type, global, local);
+		}
+		return successful;
 	}
 	
-	private static void enrichModel(Specification spec) {
-		HashMap<String, String> global = new HashMap<String, String>();
-		for (Struct struct:spec.structs) {
-			global.put(struct.name, struct.bigName);
+	private static boolean setField(Type type, HashMap<String, Integer> global, HashMap<String, Integer> local) {
+		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
+		if (!type.anyDefinedBy && !type.primitive) {
+			if (global.containsKey(type.name)) {
+				if (global.get(type.name) == 0)
+					type.struct = true;
+				else
+					type.registered = true;
+			} else if (local.containsKey(type.name)) {
+				switch (local.get(type.name)) {
+					case 0:
+						type.struct = true;
+						break;
+					case 1:
+						type.registered = true;
+						break;
+					case 2:
+						type.sequence = true;
+						break;
+					case 3:
+						type.union = true;
+						break;
+				}
+			} else {
+				System.err.println(type.name + " is not defined!");
+				return false;
+			}
 		}
-		for (Protocol p:spec.protocols) {
-			HashMap<String, String> local = new HashMap<String, String>();
-			
-		}
+		return true;
 	}
 	
 	private static void generateCode(Specification spec) {
 		StringTemplateGroup stg;
 		String dir = "src/twp/generated/";
-		String dirX = "src/twpx/protocol/";
 		try {
 			stg = new StringTemplateGroup(new FileReader("templates/javacode.stg"));
 			for (Protocol protocol:spec.protocols) {
@@ -89,19 +150,25 @@ public class TWPAcceptor {
 				st = stg.getInstanceOf("handler");
 				st.setAttribute("protocol", protocol);
 				writeToFile(dir + protocol.bigName + "Handler.java", st.toString());
-				st = stg.getInstanceOf("protocolX");
-				st.setAttribute("protocol", protocol);
-				checkDir(dirX + protocol.smallName + "/");
-				writeToFile(dirX + protocol.smallName + "/" + protocol.bigName + "Protocol.java", st.toString());
 				for (Message message:protocol.messages) {
 					st = stg.getInstanceOf("message");
 					st.setAttribute("protocol", protocol);
 					st.setAttribute("message", message);
 					writeToFile(dir + protocol.bigName + message.bigName + ".java", st.toString());
-					st = stg.getInstanceOf("messageX");
+				}
+				for (Struct struct:protocol.structs) {
+					if (struct.id == -1) {
+						st = stg.getInstanceOf("struct");
+						st.setAttribute("protocol", protocol);
+						st.setAttribute("struct", struct);
+						writeToFile(dir + struct.bigName + ".java", st.toString());
+					}
+				}
+				for (Sequence seq:protocol.sequences) {
+					st = stg.getInstanceOf("sequence");
 					st.setAttribute("protocol", protocol);
-					st.setAttribute("message", message);
-					writeToFile(dirX + protocol.smallName + "/" + protocol.bigName + message.bigName + ".java", st.toString());
+					st.setAttribute("seq", seq);
+					writeToFile(dir + seq.bigName + ".java", st.toString());
 				}
 			}
 		} catch (FileNotFoundException e) {

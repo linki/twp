@@ -8,16 +8,13 @@ public class RPCReply {
 	private int  requestId ;
 	private List<Object>  result ;
 
-	public RPCReply(RPCProtocol p, int  requestId, List<Object> result) {
+	public RPCReply(RPCProtocol p, int  requestId , List<Object>  result ) {
 		this.protocol = p;
 		this.requestId = requestId;
 		this.result = result;
+
 	}
 
-	public RPCReply(RPCProtocol p) {
-		this.protocol = p;
-	}
-	
 	public RPCProtocol getProtocol() {
 		return protocol;
 	}
@@ -26,17 +23,9 @@ public class RPCReply {
 	public int  getRequestId() {
 			return requestId;
 		}
-	public void setRequestId(int id) {
-		requestId = id;
-	}
-	
 	public List<Object>  getResult() {
 			return result;
 		}
-	
-	public void setResult(List<Object> res) {
-		result = res;
-	}
 	
 }
  

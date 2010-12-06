@@ -1,4 +1,7 @@
 package twp.generated;
+
+import java.util.List;
+
 public class RPCCancelRequest {
 	
 	private RPCProtocol protocol;

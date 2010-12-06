@@ -5,10 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.List;
 
-import twp.core.Message;
-import twp.core.Parameter;
-import twp.core.ParameterType;
-import twp.core.TWPProtocol;
+import twp.core.*;
 
 public class RPCProtocol extends TWPProtocol {
 	public static final int ID = 1;
@@ -34,35 +31,30 @@ public class RPCProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	
-	
-	public void sendRequest(int  requestId, int  responseExpected, String  operation, List<Object>  parameters) throws IOException {
+	public void sendRequest(int  requestId , int  responseExpected , String  operation , List<Object>  parameters ) throws IOException {
 		Message message = new Message(0, ID);
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, requestId));
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, responseExpected));
-		message.addParameter(new Parameter(ParameterType.LONG_STRING, operation));
+		message.addParameter(decompose(requestId));
+		message.addParameter(decompose(responseExpected));
+		message.addParameter(decompose(operation));
 		message.addParameter(setAnyDefinedBy(parameters));
-		
+
 		connection.writeMessage(message);
-	}	
+	}
+
 	public RPCRequest receiveRequest() throws IOException {
 		Message message = connection.readMessage();
 		if (message == null || message.getType() != 0) {
 			// throw exception
 		}
 		Iterator<Parameter> iter = message.getParameters().iterator();
-		RPCRequest req = new RPCRequest(this);
-		req.setRequestId((Integer) iter.next().getValue()); 
-		req.setResponseExpected((Integer) iter.next().getValue());
-		req.setOperation((String) iter.next().getValue());
-		req.setParameters(getAnyDefinedBy(iter.next()));
+		RPCRequest req = new RPCRequest(this, (Integer) iter.next().getValue() , (Integer) iter.next().getValue() , (String) iter.next().getValue() , getAnyDefinedBy(iter.next()) );
 		return req;
 	}
-	
-	public void sendReply(int  requestId, List<Object> result) throws IOException {
+		public void sendReply(int  requestId , List<Object>  result ) throws IOException {
 		Message message = new Message(1, ID);
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, requestId));
+		message.addParameter(decompose(requestId));
 		message.addParameter(setAnyDefinedBy(result));
+
 		connection.writeMessage(message);
 	}
 
@@ -72,14 +64,12 @@ public class RPCProtocol extends TWPProtocol {
 			// throw exception
 		}
 		Iterator<Parameter> iter = message.getParameters().iterator();
-		RPCReply req = new RPCReply(this);
-		req.setRequestId((Integer) iter.next().getValue());
-		req.setResult(getAnyDefinedBy(iter.next()));
+		RPCReply req = new RPCReply(this, (Integer) iter.next().getValue() , getAnyDefinedBy(iter.next()) );
 		return req;
 	}
 		public void sendCancelRequest(int  requestId ) throws IOException {
 		Message message = new Message(2, ID);
-		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, requestId));
+		message.addParameter(decompose(requestId));
 
 		connection.writeMessage(message);
 	}
@@ -90,7 +80,7 @@ public class RPCProtocol extends TWPProtocol {
 			// throw exception
 		}
 		Iterator<Parameter> iter = message.getParameters().iterator();
-		RPCCancelRequest req = new RPCCancelRequest(this, (Integer) iter.next().getValue());
+		RPCCancelRequest req = new RPCCancelRequest(this, (Integer) iter.next().getValue() );
 		return req;
 	}
 		public void sendCloseConnection() throws IOException {
@@ -113,15 +103,15 @@ public class RPCProtocol extends TWPProtocol {
 		Iterator<Parameter> iter = message.getParameters().iterator();
 		switch (message.getType()) {
 		case 0:
-				RPCRequest req0 = new RPCRequest(this, (Integer) iter.next().getValue(), (Integer) iter.next().getValue(), (String) iter.next().getValue(), getAnyDefinedBy(iter.next()));
+				RPCRequest req0 = new RPCRequest(this, (Integer) iter.next().getValue() , (Integer) iter.next().getValue() , (String) iter.next().getValue() , getAnyDefinedBy(iter.next()) );
 				handler.onRPCRequest(req0);
 				break;
 		case 1:
-				RPCReply req1 = new RPCReply(this, (Integer) iter.next().getValue(), getAnyDefinedBy(iter.next()));
+				RPCReply req1 = new RPCReply(this, (Integer) iter.next().getValue() , getAnyDefinedBy(iter.next()) );
 				handler.onRPCReply(req1);
 				break;
 		case 2:
-				RPCCancelRequest req2 = new RPCCancelRequest(this, (Integer) iter.next().getValue());
+				RPCCancelRequest req2 = new RPCCancelRequest(this, (Integer) iter.next().getValue() );
 				handler.onRPCCancelRequest(req2);
 				break;
 		case 4:
