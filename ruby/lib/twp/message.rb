@@ -19,14 +19,14 @@ module TWP
       def send(con)
         con.write_message_id self.class.id
         self.class.parameters.each_pair do |name, type|
-          con.write_with_type(instance_variable_get("@#{name}"), type)
+          con.write_generic(instance_variable_get("@#{name}"), type)
         end
         con.write_end_of_msg
       end
 
       def receive(con)
         self.class.parameters.each_pair do |name, type|
-          instance_variable_set("@#{name}", con.read_with_type(type))
+          instance_variable_set("@#{name}", con.read_generic)
         end
         con.read_end_of_msg
       end

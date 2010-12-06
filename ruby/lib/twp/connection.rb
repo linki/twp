@@ -43,20 +43,8 @@ module TWP
           raise Exception
       end
     end
-
-    def read_with_type(type)
-      case type
-        #when :any remove me
-        #  read_any
-        when :any, :int, :binary, :string
-          read_generic
-        else
-          puts type
-          raise Exception
-      end
-    end
     
-    def write_with_type(value, type)
+    def write_generic(value, type)
       case type
         when :int
           write_integer(value)
@@ -174,23 +162,28 @@ module TWP
       struct
     end
     
+    def write_struct(values)
+      write_byte 2
+      values.each_value do |value|
+        write_any value
+      end
+      write_byte 0      
+    end
+    
     def read_sequence(type = read_byte)
       sequence = []
       while (type = read_byte) != 0
         sequence << read_generic(type)
       end
       sequence
-    end    
+    end
     
-    def read_any
-      type = read_byte
-      if type == 0
-        return nil
+    def write_sequence(values)
+      write_byte 3
+      values.each do |value|
+        write_any value
       end
-      if type == 2
-        return read_generic
-      end
-      read_generic(read_byte)
+      write_byte 0
     end
 
     def write_any(value)
@@ -202,17 +195,9 @@ module TWP
         when 'String'
           write_string value
         when 'Array'
-          write_byte 3
-          value.each do |val|
-            write_any val
-          end
-          write_byte 0
-        when 'OrderedHash' # order needed
-          write_byte 2
-          value.each_value do |val|
-            write_any val
-          end
-          write_byte 0
+          write_sequence(value)
+        when 'OrderedHash' # order is needed
+          write_struct(value)
         else
           puts value.class.name
           raise Exception
