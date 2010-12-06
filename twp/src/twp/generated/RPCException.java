@@ -5,24 +5,30 @@ import java.util.List;
 import twp.core.*;
 
 public class RPCException implements Container {
+	private int id = 0;
 	private String  text ;
 
 	
 	public RPCException(List<Object> params) {
 		if (params.size() == 1) {
 			text = (String) params.get(0);
-
-
 		}
 	}
 	
-	public RPCException(GenericStruct struct) {
-		text = (String) struct.getElements().get(0);
-
-	
+	public RPCException(GenericRegisteredExtension regex) {
+		id = regex.getId();
+		text = (String) regex.getElements().get(0);
 	}
 	
 
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public String  getText() {
 			return text;
 		}
@@ -34,7 +40,7 @@ public class RPCException implements Container {
 	
 	@Override
 	public TWPContainer toContainer() {
-		TWPContainer container = new TWPContainer(ParameterType.STRUCT);
+		TWPContainer container = new TWPContainer(ParameterType.REGISTERED_EXTENSION);
 		container.add(RPCProtocol.decompose(text));
 
 		return container;
@@ -42,6 +48,6 @@ public class RPCException implements Container {
 
 	@Override
 	public ParameterType getParameterType() {
-		return ParameterType.STRUCT;
+		return ParameterType.REGISTERED_EXTENSION;
 	}
 }

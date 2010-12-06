@@ -55,21 +55,25 @@ public class TWPGenerator {
 		
 		Specification metamodel = r.spec;
 		
-		enrichModel(metamodel);
-		generateCode(metamodel);
-		
 		// verify
 		int numErrors = parser.getNumberOfSyntaxErrors();
 		if (numErrors == 0) {
-			System.err.println("File is a valid TWP3 specification.");
+			System.out.println("File is a valid TWP3 specification.");
+			// generate code
+			if (enrichModel(metamodel)) {
+				generateCode(metamodel);
+				System.out.println("Finished code generation.");
+			}
+			else
+				System.err.println("Aborted code generation.");
 		} else {
 			System.err.println("File doesn't contain a valid TWP3 specification. (" + numErrors + " Errors)");
 		}
-		
-	}
+}
 	
-	private static void enrichModel(Specification spec) {
+	private static boolean enrichModel(Specification spec) {
 		HashMap<String, Integer> global = new HashMap<String, Integer>();
+		boolean successful = true;
 		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
 		for (Struct struct:spec.structs) 
 			if (struct.id != -1)
@@ -90,16 +94,17 @@ public class TWPGenerator {
 			// add additional information to the fields of the message
 			for (Message m:p.messages)
 				for (Field f:m.fields)
-					setField(f.type, global, local);
+					successful &= setField(f.type, global, local);
 			for (Struct struct:p.structs)
 				for (Field f:struct.fields)
-					setField(f.type, global, local);
+					successful &= setField(f.type, global, local);
 			for (Sequence seq:p.sequences)
-				setField(seq.type, global, local);
+				successful &= setField(seq.type, global, local);
 		}
+		return successful;
 	}
 	
-	private static void setField(Type type, HashMap<String, Integer> global, HashMap<String, Integer> local) {
+	private static boolean setField(Type type, HashMap<String, Integer> global, HashMap<String, Integer> local) {
 		// 0 - struct, 1 - regex, 2 - sequence, 3 - union
 		if (!type.anyDefinedBy && !type.primitive) {
 			if (global.containsKey(type.name)) {
@@ -123,9 +128,11 @@ public class TWPGenerator {
 						break;
 				}
 			} else {
-				// throw error - type unknown
+				System.err.println(type.name + " is not defined!");
+				return false;
 			}
 		}
+		return true;
 	}
 	
 	private static void generateCode(Specification spec) {
@@ -150,10 +157,12 @@ public class TWPGenerator {
 					writeToFile(dir + protocol.bigName + message.bigName + ".java", st.toString());
 				}
 				for (Struct struct:protocol.structs) {
-					st = stg.getInstanceOf("struct");
-					st.setAttribute("protocol", protocol);
-					st.setAttribute("struct", struct);
-					writeToFile(dir + struct.bigName + ".java", st.toString());
+					if (struct.id == -1) {
+						st = stg.getInstanceOf("struct");
+						st.setAttribute("protocol", protocol);
+						st.setAttribute("struct", struct);
+						writeToFile(dir + struct.bigName + ".java", st.toString());
+					}
 				}
 				for (Sequence seq:protocol.sequences) {
 					st = stg.getInstanceOf("sequence");

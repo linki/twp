@@ -5,8 +5,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import twp.core.GenericRegisteredExtension;
 import twp.generated.ListResult;
 import twp.generated.Path;
+import twp.generated.RPCException;
 import twp.generated.RPCProtocol;
 import twp.generated.RPCReply;
 import twp.generated.StatResult;
@@ -29,6 +31,7 @@ public class TFSClient {
     	params.add(mode);
     	protocol.sendRequest(id++, 1, "open", params);
     	RPCReply rep = protocol.receiveReply();
+    	checkForError(rep);
     	int result = (Integer) rep.getResult().get(0);
     	return result;
 	}
@@ -39,9 +42,9 @@ public class TFSClient {
 		params.add(count);
 		protocol.sendRequest(id++, 1, "read", params);
 		RPCReply rep = protocol.receiveReply(); 
-		if (rep.getResult().size() == 1)
-			return (byte[]) rep.getResult().get(0);
-		return new byte[0];
+		checkForError(rep);
+		return (byte[]) rep.getResult().get(0);
+		
 	}
     
 	public void write(int fh, byte[] data) throws IOException {
@@ -50,7 +53,7 @@ public class TFSClient {
 		params.add(data);
 		protocol.sendRequest(id++, 1, "write", params);
 		RPCReply rep = protocol.receiveReply();
-		// TODO: check for errors
+		checkForError(rep);
     }
     
 	public void seek(int fh, int offset) throws IOException {
@@ -59,7 +62,7 @@ public class TFSClient {
 		params.add(offset);
 		protocol.sendRequest(id++, 1, "seek", params);
 		RPCReply rep = protocol.receiveReply();
-		// TODO: check for errors
+		checkForError(rep);
 	}
 	
 	// oneway
@@ -67,7 +70,8 @@ public class TFSClient {
     	List<Object> params = new ArrayList<Object>();
 		params.add(fh);
 		protocol.sendRequest(id++, 1, "close", params);
-		protocol.receiveReply();
+		RPCReply reply = protocol.receiveReply();
+		checkForError(reply);
     }
 
     // File and directory information 
@@ -76,6 +80,7 @@ public class TFSClient {
     	params.add(directory);
     	protocol.sendRequest(id++, 1, "listdir", params);
     	RPCReply rep = protocol.receiveReply();
+    	checkForError(rep);
     	ListResult result = new ListResult(rep.getResult());
     	return result;
     }
@@ -86,6 +91,7 @@ public class TFSClient {
     	params.add(file);
     	protocol.sendRequest(id++, 1, "stat", params);
     	RPCReply rep = protocol.receiveReply();
+    	checkForError(rep);
     	StatResult result = new StatResult(rep.getResult());
     	return result;
     }
@@ -95,14 +101,16 @@ public class TFSClient {
     	List<Object> params = new ArrayList<Object>();
 		params.add(directory);
 		protocol.sendRequest(id++, 1, "mkdir", params);
-		protocol.receiveReply();
+		RPCReply reply = protocol.receiveReply();
+		checkForError(reply);
     }
     
     public void rmdir(Path directory) throws IOException {
     	List<Object> params = new ArrayList<Object>();
 		params.add(directory);
 		protocol.sendRequest(id++, 1, "rmdir", params);
-		protocol.receiveReply();
+		RPCReply reply = protocol.receiveReply();
+		checkForError(reply);
     }
     
     public void remove(Path directory, String file) throws IOException {
@@ -110,7 +118,8 @@ public class TFSClient {
 		params.add(directory);
 		params.add(file);
 		protocol.sendRequest(id++, 1, "remove", params);
-		protocol.receiveReply();
+		RPCReply reply = protocol.receiveReply();
+		checkForError(reply);
     }
 
     // FAM 
@@ -123,6 +132,7 @@ public class TFSClient {
 		params.add(port);
 		protocol.sendRequest(id++, 1, "monitor", params);
 		RPCReply rep = protocol.receiveReply();
+		checkForError(rep);
 		int result = (Integer) rep.getResult().get(0);
     	return result;
     }
@@ -131,56 +141,15 @@ public class TFSClient {
     	List<Object> params = new ArrayList<Object>();
 		params.add(handle);
 		protocol.sendRequest(id++, 1, "stop_monitoring", params);
-		protocol.receiveReply();
+		RPCReply reply = protocol.receiveReply();
+		checkForError(reply);
+    }
+    
+    private void checkForError(RPCReply reply) throws IOException {
+    	if (reply.getResult().size() > 0 && reply.getResult().get(0) instanceof GenericRegisteredExtension) {
+			RPCException ex = new RPCException((GenericRegisteredExtension) reply.getResult().get(0));
+			throw new IOException(ex.getText());
+		}
     }
 	
-	public static void main(String[] args) {
-		try {
-			TFSClient client = new TFSClient("www.dcl.hpi.uni-potsdam.de", 80);
-			Path p = new Path();
-			p.add("test");
-			
-			//client.mkdir(p);
-			//InetAddress addr = InetAddress.getLocalHost();
-			//int monitor = client.monitor(p, 1, addr.getAddress(), 12347);
-			
-			int file = client.open(p, "test.txt", 1);
-			System.out.println("Opened File: " + file);
-			
-			byte[] data = "Hallo Welt!".getBytes("UTF-8");
-			client.write(file, data);
-			System.out.println("Wrote to File");
-			
-			client.close(file);
-			System.out.println("Closed File");
-			
-			ListResult result = client.listdir(p);
-			System.out.println("=== Directories ===");
-			for (String dir:result.getDirectories().getElements())
-				System.out.println(dir);
-			System.out.println("=== Files ===");
-			for (String dir:result.getFiles().getElements())
-				System.out.println(dir);
-			
-			StatResult stat = client.stat(p, "test.txt"); 
-			System.out.println("Stats: size: " + stat.getSize() + " Byte");
-			
-			file = client.open(p, "test.txt", 0);
-			byte[] content = client.read(file, stat.getSize());
-			System.out.println("Read File: " + new String(content, "UTF-8"));
-			client.close(file);
-			
-			System.out.println("Disk Usage");
-			DiskUsage du = new DiskUsage(client);
-			du.diskUsage(p, true);
-			//client.stop_monitoring(monitor);
-			
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
