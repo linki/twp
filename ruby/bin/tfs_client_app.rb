@@ -5,9 +5,9 @@ require 'net/dns/resolver'
 require 'net/dns/rr/srv' #fail
 
 packet = Net::DNS::Resolver.start('tfs.dcl.hpi.uni-potsdam.de', Net::DNS::SRV)
-packet.answer.any? do |res|
-  @host = res.host
-  @port = res.port
+packet.answer.any? do |record|
+  @host = record.host
+  @port = record.port
 end
 
 tfs = TFS::Client.new(@host, @port)
