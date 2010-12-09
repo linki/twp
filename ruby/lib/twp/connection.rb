@@ -196,8 +196,8 @@ module TWP
           write_string value
         when 'Array'
           write_sequence(value)
-        when 'OrderedHash' # order is needed
-          write_struct(value)
+        #when 'OrderedHash' # order is needed
+        #  write_struct(value)
         else
           puts value.class.name
           raise Exception
