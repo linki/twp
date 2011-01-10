@@ -1,6 +1,7 @@
 package twp.application;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import twp.generated.ListResult;
@@ -14,7 +15,8 @@ public class TFSDemo {
 	 */
 	public static void main(String[] args) {
 		try {
-			TFSClient client = new TFSClient("www.dcl.hpi.uni-potsdam.de", 80);
+			//TFSClient client = new TFSClient("www.dcl.hpi.uni-potsdam.de", 80);
+			TFSClient client = new TFSClient("tfs.dcl.hpi.uni-potsdam.de");
 			Path p = new Path();
 			
 			ListResult result = client.listdir(p);
@@ -28,10 +30,12 @@ public class TFSDemo {
 			
 			p.add("demodir");
 			
-			if (!result.getDirectories().getElements().contains("demodir"))
-				client.mkdir(p);
 			//InetAddress addr = InetAddress.getLocalHost();
 			//int monitor = client.monitor(p, 1, addr.getAddress(), 12347);
+			
+			if (!result.getDirectories().getElements().contains("demodir"))
+				client.mkdir(p);
+			
 			
 			int file = client.open(p, "test.txt", 1);
 			System.out.println("Opened File: " + file);
@@ -57,11 +61,12 @@ public class TFSDemo {
 			p = new Path();
 			p.add("test");
 			
-			System.out.println("Disk Usage");
-			DiskUsage du = new DiskUsage(client);
+			//System.out.println("Disk Usage");
+			//DiskUsage du = new DiskUsage(client);
 			//du.diskUsage(p, true);
 			//client.stop_monitoring(monitor);
 			
+			// IOError expected:
 			client.mkdir(p);
 			
 		} catch (UnknownHostException e) {

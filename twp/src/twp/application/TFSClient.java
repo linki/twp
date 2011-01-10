@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import twp.application.DomainResolver.DomainBundle;
 import twp.core.GenericRegisteredExtension;
 import twp.generated.ListResult;
 import twp.generated.Path;
@@ -20,6 +21,16 @@ public class TFSClient {
 	
 	public TFSClient(String host, int port) throws UnknownHostException, IOException {
 		protocol = new RPCProtocol(host, port);
+	}
+	
+	public TFSClient(String host) throws UnknownHostException, IOException {
+		DomainResolver dr = new DomainResolver();
+		if (!host.endsWith("."))
+			host = host.concat(".");
+		DomainBundle db = dr.resolve(host);
+		if (db == null)
+			throw new UnknownHostException();
+		protocol = new RPCProtocol(db.host, db.port);
 	}
 	
 	/* path: root directory is an empty sequence */

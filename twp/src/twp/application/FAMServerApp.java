@@ -11,7 +11,6 @@ public class FAMServerApp {
 			FAMServer server = new FAMServer(12347);
 			server.listen(new FAMServerHandler());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -30,8 +30,7 @@ public class EchoServerApp implements EchoHandler {
 	
 	@Override
 	public void onEchoReply(EchoReply reply) {
-		// TODO Auto-generated method stub
-		
+		// do nothing
 	}
 
 	@Override
@@ -41,7 +40,6 @@ public class EchoServerApp implements EchoHandler {
 		try {
 			prot.sendReply(request.getText(), text.length());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
