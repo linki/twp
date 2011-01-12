@@ -45,6 +45,10 @@ public abstract class TWPProtocol {
 				GenericUnion un = new GenericUnion(((TWPContainer)param.getValue()).getId(), compose(param));
 				result = un;
 				break;
+			case APPLICATION_TYPE:
+				GenericApplicationType at = new GenericApplicationType(((TWPContainer)param.getValue()).getId(), ((TWPContainer) param.getValue()).getParameters().get(0).getValue());
+				result = at;
+				break;
 			case NO_VALUE:
 				result = null;
 				break;

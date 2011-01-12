@@ -1,7 +1,6 @@
 package twp.application;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import twp.generated.ListResult;

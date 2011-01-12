@@ -1,0 +1,107 @@
+package twp.generated;
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+
+import twp.core.GenericApplicationType;
+import twp.core.GenericSequence;
+import twp.core.Message;
+import twp.core.Parameter;
+import twp.core.TWPProtocol;
+
+public class CalculatorProtocol extends TWPProtocol {
+	public static final int ID = 5;
+	
+	private CalculatorHandler handler;
+	
+	public CalculatorProtocol(String host, int port, CalculatorHandler rh) throws UnknownHostException, IOException {
+		super(host, port);
+		handler = rh;
+		connection.listen();
+	}
+	
+	public CalculatorProtocol(String host, int port) throws UnknownHostException, IOException {
+		super(host, port);
+	}
+		
+	public CalculatorProtocol(Socket s, CalculatorHandler rh) throws IOException {
+		super(s);
+		handler = rh;
+	}
+	
+	public int getVersion() {
+		return ID;
+	}
+	
+	public void sendRequest(int  requestId , Parameters  arguments ) throws IOException {
+		Message message = new Message(0, ID);
+		message.addParameter(decompose(requestId));
+		message.addParameter(decompose(arguments));
+
+		connection.writeMessage(message);
+	}
+
+	public CalculatorRequest receiveRequest() throws IOException {
+		Message message = connection.readMessage();
+		if (message == null || message.getType() != 0) {
+			// throw exception
+		}
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		CalculatorRequest req = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
+		return req;
+	}
+		public void sendReply(int  requestId , Double  result ) throws IOException {
+		Message message = new Message(1, ID);
+		message.addParameter(decompose(requestId));
+		message.addParameter(decompose(result));
+
+		connection.writeMessage(message);
+	}
+
+	public CalculatorReply receiveReply() throws IOException {
+		Message message = connection.readMessage();
+		if (message == null || message.getType() != 1) {
+			// throw exception
+		}
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		CalculatorReply req = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
+		return req;
+	}
+		public void sendError(String  text ) throws IOException {
+		Message message = new Message(2, ID);
+		message.addParameter(decompose(text));
+
+		connection.writeMessage(message);
+	}
+
+	public CalculatorError receiveError() throws IOException {
+		Message message = connection.readMessage();
+		if (message == null || message.getType() != 2) {
+			// throw exception
+		}
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		CalculatorError req = new CalculatorError(this, (String) iter.next().getValue() );
+		return req;
+	}
+		
+	
+	public void onMessage(Message message) throws IOException {
+		Iterator<Parameter> iter = message.getParameters().iterator();
+		switch (message.getType()) {
+		case 0:
+				CalculatorRequest req0 = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
+				handler.onCalculatorRequest(req0);
+				break;
+		case 1:
+				CalculatorReply req1 = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
+				handler.onCalculatorReply(req1);
+				break;
+		case 2:
+				CalculatorError req2 = new CalculatorError(this, (String) iter.next().getValue() );
+				handler.onCalculatorError(req2);
+				break;
+
+		}
+	}
+}

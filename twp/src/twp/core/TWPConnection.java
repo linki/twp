@@ -113,6 +113,8 @@ public class TWPConnection {
 			case RESERVED:
 				break;
 			case APPLICATION_TYPE:
+				TWPContainer value4 = readApplicationType(tag);
+				p = new Parameter(type, value4);
 				break;
 		}
 		return p;
@@ -163,6 +165,26 @@ public class TWPConnection {
 		writer.write(0);
 	}
 	
+	private TWPContainer readApplicationType(int tag) throws IOException {
+		TWPContainer container = new TWPContainer();
+		container.setId(tag);
+		int length = reader.readInt();
+		byte[] content = new byte[length];
+		reader.readFully(content);
+		container.add(new Parameter(ParameterType.APPLICATION_TYPE, content));
+		return container;
+	}
+	
+	private void writeApplicationType(TWPContainer container) throws IOException {
+		writer.writeByte(container.getId());
+		if (container.getParameters().size() == 1) {
+			writer.writeInt(((byte[]) container.getParameters().get(0).getValue()).length);
+			writer.write((byte[]) container.getParameters().get(0).getValue());
+		} else {
+			writer.write(0);
+		}
+	}
+	
 	public Message readMessage(int messageId) throws IOException {
 		Message message = new Message(messageId, protocolVersion);
 		int tag = reader.readUnsignedByte();
@@ -204,6 +226,7 @@ public class TWPConnection {
 		case RESERVED:
 			break;
 		case APPLICATION_TYPE:
+			writeApplicationType((TWPContainer) p.getValue());
 			break;
 		}
 	}

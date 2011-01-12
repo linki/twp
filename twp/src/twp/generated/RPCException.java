@@ -44,6 +44,7 @@ public class RPCException implements Container {
 	@Override
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.REGISTERED_EXTENSION);
+		container.setId(id);
 		container.add(RPCProtocol.decompose(text));
 
 		return container;
