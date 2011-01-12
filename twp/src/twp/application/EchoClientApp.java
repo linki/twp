@@ -34,7 +34,7 @@ public class EchoClientApp implements EchoHandler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		EchoClientApp client = new EchoClientApp("localhost", 12347, false);
+		EchoClientApp client = new EchoClientApp("www.dcl.hpi.uni-potsdam.de", 80, false);
 		//EchoClientApp client = new EchoClientApp("localhost", 12347, true);
 		client.start();
 		

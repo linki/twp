@@ -1,0 +1,9 @@
+protocol Logging = ID 6 {
+  message LogEntry = 0 {
+    int seconds; /* seconds since the Unix Epoch */
+    int useconds; /* micro-seconds */
+    string source; /* Service creating the log message */
+    string thread_id; /* human-readable version of logical thread ID */
+    string text; /* Log data */
+  }
+}

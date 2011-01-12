@@ -2,15 +2,19 @@ package twp.application;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Calendar;
+import java.util.Date;
 
 import twp.generated.CalculatorProtocol;
 import twp.generated.CalculatorReply;
 import twp.generated.Double;
+import twp.generated.LoggingProtocol;
 import twp.generated.Parameters;
 import twp.generated.Term;
 
 public class CalculatorClient {
 	CalculatorProtocol protocol = null;
+	LoggingProtocol logger = null;
 	
 	private static int regId = 0;
 	
@@ -21,6 +25,7 @@ public class CalculatorClient {
 	public CalculatorClient() {
 		try {
 			protocol = new CalculatorProtocol("www.dcl.hpi.uni-potsdam.de", 80);
+			logger = new LoggingProtocol("www.dcl.hpi.uni-potsdam.de", 80);
 			System.out.println("Connection established");
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -38,7 +43,9 @@ public class CalculatorClient {
 			try {
 				protocol.sendRequest(getRegId(), params);
 				CalculatorReply response = protocol.receiveReply();
-				System.out.println(response.getResult().getValue());
+				Date date = new Date();
+				
+				logger.sendLogEntry(((int) date.getTime() / 1000), ((int) date.getTime() * 1000), "Calculator", String.valueOf(response.getRequestId()), "This is a test!");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
