@@ -59,13 +59,16 @@ public class CalculatorClient {
 	private Parameters buildDemo() {
 		// 1 + sin(1)
 		Parameters params = new Parameters();
-		params.add(new Term(new Double(1)));
+		//params.add(new Term(new Double(1)));
 		Parameters params2 = new Parameters();
 		params2.add(new Term(new Double(1)));
+		Parameters params3 = new Parameters();
+		params3.add(new Term(new Double(2)));
 		try {
 			InetAddress addr = InetAddress.getByName("www.dcl.hpi.uni-potsdam.de");
 			//byte[] ip = new byte[]{(byte) 141, (byte) 89, (byte) 224, (byte) 164};
 			params.add(new Term(new Expression(addr.getAddress(), 80, params2)));
+			params.add(new Term(new Expression(addr.getAddress(), 80, params3)));
 			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
