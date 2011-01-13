@@ -83,6 +83,10 @@ public class Term implements Container {
 		expr = newExpr;
 	}
 	
+	public Class getContentClass() {
+		return getClassForId(option);
+	}
+	
 	@Override
 	public ParameterType getParameterType() {
 		return ParameterType.UNION;
