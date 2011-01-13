@@ -42,7 +42,7 @@ public abstract class TWPProtocol {
 				result = gre;
 				break;
 			case UNION:
-				GenericUnion un = new GenericUnion(((TWPContainer)param.getValue()).getId(), compose(param));
+				GenericUnion un = new GenericUnion(((TWPContainer)param.getValue()).getId(), compose(((TWPContainer)param.getValue()).getParameters().get(0)));
 				result = un;
 				break;
 			case APPLICATION_TYPE:

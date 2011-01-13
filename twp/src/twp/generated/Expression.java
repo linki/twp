@@ -13,6 +13,11 @@ public class Expression implements Container {
 	private int  port ;
 	private Parameters  arguments ;
 
+	public Expression(byte[] host, int port, Parameters args) {
+		this.host = host;
+		this.port = port;
+		this.arguments = args;
+	}
 	
 	public Expression(List<Object> params) {
 		if (params.size() == 3) {
