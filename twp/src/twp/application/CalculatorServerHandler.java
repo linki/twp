@@ -22,6 +22,11 @@ import twp.generated.LoggingProtocol;
 import twp.generated.Parameters;
 import twp.generated.Term;
 import twp.generated.ThreadID;
+import twp.generated.ThreadID2;
+import twp.generated.ThreadID3;
+import twp.generated.ThreadID4;
+import twp.generated.ThreadID5;
+import twp.generated.ThreadID6;
 
 abstract public class CalculatorServerHandler implements CalculatorHandler {
 
@@ -68,7 +73,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		if (job != null) {
 			// all intermediate results were returned
 			// so finish the job
-			log(getThreadId(handleThreadID(job.request.getExtensions())), getOperationForLog(job.values));
+			log(handleThreadID(job.request.getExtensions()).toString(), getOperationForLog(job.values));
 			Double result = runCalculation(job.values);
 			try {
 				job.request.getProtocol().sendReply(job.request.getRequestId(), result);
@@ -112,7 +117,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			}
 			if (resolve.isEmpty()) {
 				// nothing to resolve, just calculate the result
-				log(getThreadId(threadId), getOperationForLog(job.values));
+				log(threadId.toString(), getOperationForLog(job.values));
 				Double result = runCalculation(job.values);
 				try {
 					message.getProtocol().sendReply(message.getRequestId(), result);
@@ -149,26 +154,34 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 	private Extension handleThreadID(List<GenericRegisteredExtension> extensions) {
 		Extension container = null;
 		for (GenericRegisteredExtension ext:extensions) {
-			if (ext.getId() == ThreadID.ID) {
+			switch(ext.getId()) { 
+			case ThreadID.ID:
 				container = new ThreadID(ext);
 				((ThreadID) container).incDepth();
+				break;
+			case ThreadID2.ID:
+				container = new ThreadID2(ext);
+				break;
+			case ThreadID3.ID:
+				container = new ThreadID3(ext);
+				break;
+			case ThreadID4.ID:
+				container = new ThreadID4(ext);
+				((ThreadID4) container).incDepth();
+				break;
+			case ThreadID5.ID:
+				container = new ThreadID5(ext);
+				((ThreadID5) container).incDepth();
+				break;
+			case ThreadID6.ID:
+				container = new ThreadID6(ext);
+				((ThreadID6) container).incDepth();
 				break;
 			}
 		}
 		return container;
 	}
 	
-	private String getThreadId(Extension threadId) {
-		String id = "";
-		if (threadId != null)
-			switch(threadId.getId()) {
-				case ThreadID.ID: 
-					id = ((ThreadID) threadId).getThreadId();
-					break;
-			}
-		return id;
-	}
-
 	private void sendRequest(byte[] host, int port, Parameters args, int reqId, Container threadId) {
 		try {
 			String ip = InetAddress.getByAddress(host).getHostAddress();

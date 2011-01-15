@@ -98,5 +98,9 @@ public class ThreadID implements Container, Extension {
 		container.add(new Parameter(ParameterType.LONG_INTEGER, depth));
 		return container;
 	}
+	
+	public String toString() {
+		return thread_id;
+	}
 
 }
