@@ -5,8 +5,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import twp.core.Container;
 import twp.generated.CalculatorProtocol;
 import twp.generated.CalculatorReply;
 import twp.generated.Double;
@@ -14,6 +17,7 @@ import twp.generated.Expression;
 import twp.generated.LoggingProtocol;
 import twp.generated.Parameters;
 import twp.generated.Term;
+import twp.generated.ThreadID;
 
 public class CalculatorClient {
 	CalculatorProtocol protocol = null;
@@ -28,7 +32,7 @@ public class CalculatorClient {
 	public CalculatorClient() {
 		try {
 			//protocol = new CalculatorProtocol("www.dcl.hpi.uni-potsdam.de", 80);
-			protocol = new CalculatorProtocol("localhost", 12349);
+			protocol = new CalculatorProtocol("localhost", 12348);
 			//logger = new LoggingProtocol("www.dcl.hpi.uni-potsdam.de", 80);
 			System.out.println("Connection established");
 		} catch (UnknownHostException e) {
@@ -45,7 +49,7 @@ public class CalculatorClient {
 			//params.add(new Term(new Double(1)));
 			//params.add(new Term(new Double(2)));
 			try {
-				protocol.sendRequest(getRegId(), params);
+				protocol.sendRequest(getRegId(), params, createThreadExtension());
 				CalculatorReply response = protocol.receiveReply();
 				System.out.println(response.getResult().getValue());
 			//	Date date = new Date();
@@ -56,24 +60,31 @@ public class CalculatorClient {
 		}
 	}
 	
+	private List<Container> createThreadExtension() {
+		ArrayList<Container> exts = new ArrayList<Container>();
+		exts.add(new ThreadID(protocol.getLocalAddress(), protocol.getLocalPort()));
+		return exts;
+	}
+	
 	private Parameters buildDemo() {
-		// 1 + sin(1)
-		Parameters params = new Parameters();
-		//params.add(new Term(new Double(1)));
-		Parameters params2 = new Parameters();
-		params2.add(new Term(new Double(1)));
-		Parameters params3 = new Parameters();
-		params3.add(new Term(new Double(2)));
+		// (6!+3)*4
+		Parameters paramsMulti = new Parameters();
+		Parameters paramsAdd = new Parameters();
+		Parameters paramsFac = new Parameters();
+
+		paramsFac.add(new Term(new Double(6)));
 		try {
-			InetAddress addr = InetAddress.getByName("www.dcl.hpi.uni-potsdam.de");
-			//byte[] ip = new byte[]{(byte) 141, (byte) 89, (byte) 224, (byte) 164};
-			params.add(new Term(new Expression(addr.getAddress(), 80, params2)));
-			params.add(new Term(new Expression(addr.getAddress(), 80, params3)));
+			InetAddress addr = InetAddress.getByName("localhost");
+			paramsAdd.add(new Term(new Expression(addr.getAddress(), 12350, paramsFac)));
+			paramsAdd.add(new Term(new Double(3)));
+			paramsMulti.add(new Term(new Expression(addr.getAddress(), 12347, paramsAdd)));
 			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}	
-		return params;
+		paramsMulti.add(new Term(new Double(4)));
+		
+		return paramsMulti;
 	}
 	
 	public static void main(String[] args) {

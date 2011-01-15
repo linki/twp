@@ -1,0 +1,7 @@
+struct ThreadID {
+	string thread_id; /* unique id */
+	binary host; /* client address */
+	int port; /* client port */
+	int time; /* Unix timestamp in seconds */
+	int depth; /* recursion depth */
+}

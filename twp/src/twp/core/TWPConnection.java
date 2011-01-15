@@ -61,6 +61,14 @@ public class TWPConnection {
 		listen();
 	}
 	
+	public byte[] getLocalAddress() {
+		return socket.getLocalAddress().getAddress();
+	}
+	
+	public int getLocalPort() {
+		return socket.getLocalPort();
+	}
+	
 	private void startClient() throws IOException {
 		writeMagicBytes();
 		writeProtocol(this.protocolVersion);

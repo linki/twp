@@ -3,12 +3,13 @@ package twp.generated;
 import java.util.List;
 
 import twp.core.Container;
+import twp.core.Extension;
 import twp.core.GenericRegisteredExtension;
 import twp.core.ParameterType;
 import twp.core.TWPContainer;
 
-public class RPCException implements Container {
-	private int id = 0;
+public class RPCException implements Container, Extension {
+	public final int ID = 3;
 	private String  text ;
 
 	
@@ -19,18 +20,18 @@ public class RPCException implements Container {
 	}
 	
 	public RPCException(GenericRegisteredExtension regex) {
-		id = regex.getId();
+		//id = regex.getId();
 		text = (String) regex.getElements().get(0);
 	}
 	
 
 	public int getId() {
-		return id;
+		return ID;
 	}
 	
-	public void setId(int id) {
+	/*public void setId(int id) {
 		this.id = id;
-	}
+	}*/
 	
 	public String  getText() {
 			return text;
@@ -44,7 +45,7 @@ public class RPCException implements Container {
 	@Override
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.REGISTERED_EXTENSION);
-		container.setId(id);
+		container.setId(ID);
 		container.add(RPCProtocol.decompose(text));
 
 		return container;

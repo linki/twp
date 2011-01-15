@@ -3,8 +3,14 @@ package twp.application;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
+import twp.core.Container;
+import twp.core.Extension;
+import twp.core.GenericRegisteredExtension;
 import twp.generated.CalculatorError;
 import twp.generated.CalculatorHandler;
 import twp.generated.CalculatorProtocol;
@@ -12,8 +18,10 @@ import twp.generated.CalculatorReply;
 import twp.generated.CalculatorRequest;
 import twp.generated.Double;
 import twp.generated.Expression;
+import twp.generated.LoggingProtocol;
 import twp.generated.Parameters;
 import twp.generated.Term;
+import twp.generated.ThreadID;
 
 abstract public class CalculatorServerHandler implements CalculatorHandler {
 
@@ -32,6 +40,20 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 	// our job center, requests are stored here until all intermediate results are resolved 
 	private HashMap<Integer, Job> jobs = new HashMap<Integer, Job>(); 
 	
+	private LoggingProtocol logger;
+	
+	public CalculatorServerHandler(String host, int port) {
+		try {
+			logger = new LoggingProtocol(host, port);
+		} catch (UnknownHostException e) {
+			logger = null;
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger = null;
+			e.printStackTrace();
+		}
+	}
+	
 	abstract protected int getParamCount();
 	
 	@Override
@@ -46,6 +68,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		if (job != null) {
 			// all intermediate results were returned
 			// so finish the job
+			log(getThreadId(handleThreadID(job.request.getExtensions())), getOperationForLog(job.values));
 			Double result = runCalculation(job.values);
 			try {
 				job.request.getProtocol().sendReply(job.request.getRequestId(), result);
@@ -58,6 +81,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 
 	@Override
 	public void onCalculatorRequest(CalculatorRequest message) {
+		Extension threadId = handleThreadID(message.getExtensions());
 		if (getParamCount() == 0) {
 			// in case we implement a constant
 			Double result = runCalculation(new Double[0]);
@@ -88,6 +112,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			}
 			if (resolve.isEmpty()) {
 				// nothing to resolve, just calculate the result
+				log(getThreadId(threadId), getOperationForLog(job.values));
 				Double result = runCalculation(job.values);
 				try {
 					message.getProtocol().sendReply(message.getRequestId(), result);
@@ -99,18 +124,61 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 				int id = addJob(job);
 				for (int key:resolve.keySet()) {
 					Expression expr = resolve.get(key);
-					sendRequest(expr.getHost(), expr.getPort(), expr.getArguments(), composeId(id, key));
+					sendRequest(expr.getHost(), expr.getPort(), expr.getArguments(), composeId(id, key), threadId);
 				}
 			}
 				
 		}
 	}
 
-	private void sendRequest(byte[] host, int port, Parameters args, int reqId) {
+	protected void log(String threadId, String message) {
+		if (logger != null) {
+			Date date = new Date();
+			try {
+				logger.sendLogEntry((int) (date.getTime() / 1000), (int) (date.getTime() * 1000), getOperationName(), threadId, message);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	abstract protected String getOperationName();
+	
+	abstract protected String getOperationForLog(Double...values);
+	
+	private Extension handleThreadID(List<GenericRegisteredExtension> extensions) {
+		Extension container = null;
+		for (GenericRegisteredExtension ext:extensions) {
+			if (ext.getId() == ThreadID.ID) {
+				container = new ThreadID(ext);
+				((ThreadID) container).incDepth();
+				break;
+			}
+		}
+		return container;
+	}
+	
+	private String getThreadId(Extension threadId) {
+		String id = "";
+		if (threadId != null)
+			switch(threadId.getId()) {
+				case ThreadID.ID: 
+					id = ((ThreadID) threadId).getThreadId();
+					break;
+			}
+		return id;
+	}
+
+	private void sendRequest(byte[] host, int port, Parameters args, int reqId, Container threadId) {
 		try {
 			String ip = InetAddress.getByAddress(host).getHostAddress();
 			CalculatorProtocol prot = new CalculatorProtocol(ip, port, this);
-			prot.sendRequest(reqId, args);
+			if (threadId != null) {
+				ArrayList<Container> list = new ArrayList<Container>();
+				list.add(threadId);
+				prot.sendRequest(reqId, args, list);
+			} else 
+				prot.sendRequest(reqId, args);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

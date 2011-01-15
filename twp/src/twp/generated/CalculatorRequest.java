@@ -1,7 +1,9 @@
 package twp.generated;
 
+import twp.core.AbstractRequest;
 
-public class CalculatorRequest {
+
+public class CalculatorRequest extends AbstractRequest {
 	
 	private CalculatorProtocol protocol;
 	private int  requestId ;

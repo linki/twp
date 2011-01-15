@@ -88,6 +88,15 @@ public abstract class TWPProtocol {
 		return param;
 	}
 	
+	protected void addExtensions(Message message, List<Container> extensions) {
+		if (extensions != null) {
+			for (Container container:extensions) {
+				if (container.getParameterType() == ParameterType.REGISTERED_EXTENSION)
+					message.addParameter(decompose(container));
+			}
+		}
+	}
+	
 	public TWPProtocol(String host, int port) throws UnknownHostException, IOException {
 		connection = new TWPConnection(host, port, this);
 	}
@@ -98,6 +107,14 @@ public abstract class TWPProtocol {
 	
 	public void stop() throws IOException {
 		connection.disconnect();
+	}
+	
+	public byte[] getLocalAddress() {
+		return connection.getLocalAddress();
+	}
+	
+	public int getLocalPort() {
+		return connection.getLocalPort();
 	}
 	
 	public abstract void onMessage(Message message) throws IOException;

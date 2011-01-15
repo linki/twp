@@ -17,7 +17,7 @@ import twp.core.TWPContainer;
 public class Double implements Container {
 	private double value;
 	private byte[] content;
-	private int id = 160;
+	public final int ID = 160;
 	
 	public Double() {};
 	
@@ -48,13 +48,9 @@ public class Double implements Container {
 	}
 	
 	public int getId() {
-		return id;
+		return ID;
 	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
+		
 	public double getValue() {
 		return value;
 	}
@@ -79,7 +75,7 @@ public class Double implements Container {
 	@Override
 	public TWPContainer toContainer() {
 		TWPContainer container = new TWPContainer(ParameterType.APPLICATION_TYPE);
-		container.setId(160);
+		container.setId(ID);
 		container.add(new Parameter(ParameterType.APPLICATION_TYPE, content));
 		return container;
 	}

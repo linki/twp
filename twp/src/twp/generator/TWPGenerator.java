@@ -171,6 +171,7 @@ public class TWPGenerator {
 					writeToFile(dir + seq.bigName + ".java", st.toString());
 				}
 			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

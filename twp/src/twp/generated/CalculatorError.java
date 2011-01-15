@@ -1,7 +1,9 @@
 package twp.generated;
 
+import twp.core.AbstractRequest;
 
-public class CalculatorError {
+
+public class CalculatorError extends AbstractRequest {
 	
 	private CalculatorProtocol protocol;
 	private String  text ;
