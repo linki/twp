@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import twp.core.Container;
@@ -30,34 +27,22 @@ public class CalculatorClient {
 	}
 	
 	public CalculatorClient() {
-		try {
-			//protocol = new CalculatorProtocol("www.dcl.hpi.uni-potsdam.de", 80);
-			protocol = new CalculatorProtocol("localhost", 12348);
-			//logger = new LoggingProtocol("www.dcl.hpi.uni-potsdam.de", 80);
-			System.out.println("Connection established");
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 	}
 	
 	public void run() {
 		System.out.println("Starting calculator...");
-		if (protocol != null) {
-			Parameters params = buildDemo();// new Parameters();
-			//params.add(new Term(new Double(1)));
-			//params.add(new Term(new Double(2)));
+		/*if (protocol != null) {
+			Parameters params = buildDemo();
 			try {
 				protocol.sendRequest(getRegId(), params, createThreadExtension());
 				CalculatorReply response = protocol.receiveReply();
 				System.out.println(response.getResult().getValue());
-			//	Date date = new Date();
-			//	logger.sendLogEntry(((int) date.getTime() / 1000), ((int) date.getTime() * 1000), "Calculator", String.valueOf(response.getRequestId()), "This is a test!");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
+		
 	}
 	
 	private List<Container> createThreadExtension() {
