@@ -1,79 +1,152 @@
 package twp.application;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import twp.core.Container;
+import twp.generated.CalculatorError;
+import twp.generated.CalculatorHandler;
 import twp.generated.CalculatorProtocol;
 import twp.generated.CalculatorReply;
-import twp.generated.Double;
+import twp.generated.CalculatorRequest;
 import twp.generated.Expression;
 import twp.generated.LoggingProtocol;
-import twp.generated.Parameters;
-import twp.generated.Term;
 import twp.generated.ThreadID;
 
-public class CalculatorClient {
-	CalculatorProtocol protocol = null;
-	LoggingProtocol logger = null;
+public class CalculatorClient extends JFrame implements CalculatorHandler {
+	
+	private static final long serialVersionUID = 1L;
+
+	private class CalculatorListener implements ActionListener {
+		private CalculatorClient client;
+		
+		public CalculatorListener(CalculatorClient client) {
+			this.client = client;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			client.run();	
+		}
+	}
+	
+	CalculatorFormulaGenerator generator;
 	
 	private static int regId = 0;
+	
+	private JPanel panel;
+	private JTextField input;
+	private JButton submit;
+	private JTextArea out;
 	
 	public static synchronized int getRegId() {
 		return regId++;
 	}
 	
 	public CalculatorClient() {
-		
+		buildInterface();
+		registerOperations();
 	}
 	
-	public void run() {
-		System.out.println("Starting calculator...");
-		/*if (protocol != null) {
-			Parameters params = buildDemo();
+	private void buildInterface() {
+		setTitle("Calculator");
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(200, 156);
+		panel = new JPanel();
+		panel.setLayout(null);
+		getContentPane().add(panel);
+		input = new JTextField();
+		input.setBounds(10, 10, 180, 24);
+		panel.add(input);
+		submit = new JButton("Calculate!");
+		submit.setBounds(10, 44, 180, 24);
+		submit.addActionListener(new CalculatorListener(this));
+		panel.add(submit);
+		out = new JTextArea();
+		out.setBounds(10, 78, 180, 48);
+		out.setEditable(false);
+		out.setLineWrap(true);
+		out.setWrapStyleWord(true);
+		panel.add(out);
+		setVisible(true);
+	}
+	
+	private void run() {
+		run(input.getText());
+	}
+	
+	public void run(String formula) {
+		Expression expr = null;
+		try {
+			expr = generator.generate(formula);
+		} catch (Exception e) {
+			out.setText("Formula is not correct.\n" + e.getMessage());
+			e.printStackTrace();
+		}
+		if (expr != null) {
 			try {
-				protocol.sendRequest(getRegId(), params, createThreadExtension());
-				CalculatorReply response = protocol.receiveReply();
-				System.out.println(response.getResult().getValue());
+				InetAddress addr = InetAddress.getByAddress(expr.getHost());
+				CalculatorProtocol prot = new CalculatorProtocol(addr.getHostAddress(), expr.getPort(), this);
+				prot.sendRequest(getRegId(), expr.getArguments(), createThreadExtension(prot));
+				submit.setEnabled(false);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}*/
-		
+		}
 	}
 	
-	private List<Container> createThreadExtension() {
+	private List<Container> createThreadExtension(CalculatorProtocol prot) {
 		ArrayList<Container> exts = new ArrayList<Container>();
-		exts.add(new ThreadID(protocol.getLocalAddress(), protocol.getLocalPort()));
+		exts.add(new ThreadID(prot.getLocalAddress(), prot.getLocalPort()));
 		return exts;
 	}
 	
-	private Parameters buildDemo() {
-		// (6!+3)*4
-		Parameters paramsMulti = new Parameters();
-		Parameters paramsAdd = new Parameters();
-		Parameters paramsFac = new Parameters();
-
-		paramsFac.add(new Term(new Double(6)));
+	private void registerOperations() {
+		generator = new CalculatorFormulaGenerator();
 		try {
-			InetAddress addr = InetAddress.getByName("localhost");
-			paramsAdd.add(new Term(new Expression(addr.getAddress(), 12350, paramsFac)));
-			paramsAdd.add(new Term(new Double(3)));
-			paramsMulti.add(new Term(new Expression(addr.getAddress(), 12347, paramsAdd)));
-			
-		} catch (UnknownHostException e) {
+			generator.register(new CalculatorOperation("localhost", 12347, "+", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			generator.register(new CalculatorOperation("localhost", 12348, "*", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			generator.register(new CalculatorOperation("localhost", 12349, "!", CalculatorOperation.UNARY_OP, CalculatorOperation.POSTFIX));
+			generator.register(new CalculatorOperation("localhost", 12350, "sin", CalculatorOperation.UNARY_OP, CalculatorOperation.PREFIX));
+			generator.register(new CalculatorOperation("localhost", 12351, "PI", CalculatorOperation.CONSTANT, CalculatorOperation.PREFIX));
+		} catch (Exception e) {
 			e.printStackTrace();
-		}	
-		paramsMulti.add(new Term(new Double(4)));
-		
-		return paramsMulti;
+		}
 	}
 	
 	public static void main(String[] args) {
-		CalculatorClient client = new CalculatorClient();
-		client.run();
+		new CalculatorClient();
+	}
+
+	@Override
+	public void onCalculatorError(CalculatorError message) {
+		out.setText("Error: " + message.getText());
+		submit.setEnabled(true);
+	}
+
+	@Override
+	public void onCalculatorReply(CalculatorReply message) {
+		out.setText("Result: " + message.getResult().getValue());
+		submit.setEnabled(true);
+	}
+
+	@Override
+	public void onCalculatorRequest(CalculatorRequest message) {
+		// do nothing	
 	}
 }

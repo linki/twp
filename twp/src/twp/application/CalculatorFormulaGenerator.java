@@ -25,6 +25,7 @@ public class CalculatorFormulaGenerator {
 		List<Object> groups = removeParenthesis(tokens);
 		System.out.println(groups);
 		groups = prioritize(groups);
+		groups = removeUnneccessaryHierarchy(groups);
 		System.out.println(groups);
 		groups = finalSort(groups);
 		System.out.println(groups);
@@ -32,6 +33,21 @@ public class CalculatorFormulaGenerator {
 		return expr;
 	}
 	
+	private List<Object> removeUnneccessaryHierarchy(List<Object> groups) {
+		if (groups.size() == 1 && groups.get(0) instanceof List) {
+			return (List<Object>) groups.get(0);
+		} else {
+			List<Object> list = new ArrayList<Object>();
+			for (Object obj:groups) {
+				if (obj instanceof List)
+					list.add(removeUnneccessaryHierarchy((List<Object>) obj));
+				else 
+					list.add(obj);
+			}
+			return list;
+		}
+	}
+
 	/**
 	 * Creates an Expression for the given operator based on the registered operations.
 	 * @param operator

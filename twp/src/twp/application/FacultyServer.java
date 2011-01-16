@@ -12,7 +12,7 @@ public class FacultyServer extends CalculatorServerHandler {
 	}
 
 	public static void main(String[] args) {
-		int port = 12350;
+		int port = 12349;
 		if (args.length > 0)
 			port = Integer.parseInt(args[0]);
 		try {
