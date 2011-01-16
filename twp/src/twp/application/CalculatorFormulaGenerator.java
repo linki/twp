@@ -14,25 +14,56 @@ public class CalculatorFormulaGenerator {
 
 	private HashMap<String, CalculatorOperation> ops = new HashMap<String, CalculatorOperation>();
 	
+	/**
+	 * used for removeParenthesis() to keep track of the current position
+	 */
 	private int index;
 	
+	/**
+	 * Generates an Expression which can be used by the CalculatorClient to
+	 * calculate the result of the given formula.
+	 * @param String formula
+	 * @return Expression representing the formula
+	 * @throws Exception
+	 */
 	public Expression generate(String formula) throws Exception {
+		if (formula.length() == 0)
+			return null;
 		checkIfAllOperationsAreRegistered(formula);
 		formula = formula.replace(" ", "");
 		List<String> tokens = tokenize(formula);
-		System.out.println(tokens);
 		index = 0;
 		List<Object> groups = removeParenthesis(tokens);
-		System.out.println(groups);
 		groups = prioritize(groups);
 		groups = removeUnneccessaryHierarchy(groups);
-		System.out.println(groups);
 		groups = finalSort(groups);
-		System.out.println(groups);
-		Expression expr = convert(groups);
+		Expression expr = checkIfSingleDouble(groups);
+		if (expr == null)
+			expr = convert(groups);
 		return expr;
 	}
 	
+	/**
+	 * Check if the whole formula contains just a single double value
+	 * without any operator.
+	 * @param list of string (operators), doubles and further lists
+	 * @return null if the check fails, else an Expression
+	 */
+	private Expression checkIfSingleDouble(List<Object> groups) {
+		if (groups.size() == 1 && groups.get(0) instanceof Double) {
+			Parameters params = new Parameters();
+			params.add(new Term(new twp.generated.Double((Double) groups.get(0))));
+			return new Expression(null, 0, params);
+		}
+		return null;
+	}
+
+	/**
+	 * Sometimes there are more hierarchical layers then neccessary for unary operators.
+	 * So remove them!
+	 * @param list of string (operators), doubles and further lists
+	 * @return a ready to convert list with all elements of the original formula
+	 */
 	private List<Object> removeUnneccessaryHierarchy(List<Object> groups) {
 		if (groups.size() == 1 && groups.get(0) instanceof List) {
 			return (List<Object>) groups.get(0);

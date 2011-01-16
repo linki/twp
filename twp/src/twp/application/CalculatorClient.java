@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -22,7 +21,6 @@ import twp.generated.CalculatorProtocol;
 import twp.generated.CalculatorReply;
 import twp.generated.CalculatorRequest;
 import twp.generated.Expression;
-import twp.generated.LoggingProtocol;
 import twp.generated.ThreadID;
 
 public class CalculatorClient extends JFrame implements CalculatorHandler {
@@ -97,16 +95,20 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 			e.printStackTrace();
 		}
 		if (expr != null) {
-			try {
-				InetAddress addr = InetAddress.getByAddress(expr.getHost());
-				CalculatorProtocol prot = new CalculatorProtocol(addr.getHostAddress(), expr.getPort(), this);
-				prot.sendRequest(getRegId(), expr.getArguments(), createThreadExtension(prot));
-				submit.setEnabled(false);
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			if (expr.getHost() != null)
+				try {
+					InetAddress addr = InetAddress.getByAddress(expr.getHost());
+					CalculatorProtocol prot = new CalculatorProtocol(addr.getHostAddress(), expr.getPort(), this);
+					prot.sendRequest(getRegId(), expr.getArguments(), createThreadExtension(prot));
+					submit.setEnabled(false);
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			else
+				// shortcut in case the user entered just a number
+				out.setText("Result:\n" + expr.getArguments().getElements().get(0).getValue().getValue());
 		}
 	}
 	
@@ -124,6 +126,8 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 			generator.register(new CalculatorOperation("localhost", 12349, "!", CalculatorOperation.UNARY_OP, CalculatorOperation.POSTFIX));
 			generator.register(new CalculatorOperation("localhost", 12350, "sin", CalculatorOperation.UNARY_OP, CalculatorOperation.PREFIX));
 			generator.register(new CalculatorOperation("localhost", 12351, "PI", CalculatorOperation.CONSTANT, CalculatorOperation.PREFIX));
+			generator.register(new CalculatorOperation("localhost", 12352, "/", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			generator.register(new CalculatorOperation("localhost", 12353, "-", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -135,13 +139,13 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 
 	@Override
 	public void onCalculatorError(CalculatorError message) {
-		out.setText("Error: " + message.getText());
+		out.setText("Error:\n" + message.getText());
 		submit.setEnabled(true);
 	}
 
 	@Override
 	public void onCalculatorReply(CalculatorReply message) {
-		out.setText("Result: " + message.getResult().getValue());
+		out.setText("Result:\n" + message.getResult().getValue());
 		submit.setEnabled(true);
 	}
 

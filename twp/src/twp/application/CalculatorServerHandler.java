@@ -27,6 +27,7 @@ import twp.generated.ThreadID3;
 import twp.generated.ThreadID4;
 import twp.generated.ThreadID5;
 import twp.generated.ThreadID6;
+import twp.generated.ThreadID7;
 
 abstract public class CalculatorServerHandler implements CalculatorHandler {
 
@@ -74,12 +75,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			// all intermediate results were returned
 			// so finish the job
 			log(handleThreadID(job.request.getExtensions()).toString(), getOperationForLog(job.values));
-			Double result = runCalculation(job.values);
-			try {
-				job.request.getProtocol().sendReply(job.request.getRequestId(), result);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			finish(job.request.getProtocol(), job.request.getRequestId(), job.values);
 		}
 		
 	}
@@ -89,12 +85,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		Extension threadId = handleThreadID(message.getExtensions());
 		if (getParamCount() == 0) {
 			// in case we implement a constant
-			Double result = runCalculation(new Double[0]);
-			try {
-				message.getProtocol().sendReply(message.getRequestId(), result);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			finish(message.getProtocol(), message.getRequestId(), new Double[0]);
 		} else if (message.getArguments().getElements().size() != getParamCount())
 			try {
 				message.getProtocol().sendError("Wrong number of parameters (" + getParamCount() + " were expected).");
@@ -118,24 +109,21 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			if (resolve.isEmpty()) {
 				// nothing to resolve, just calculate the result
 				log(threadId.toString(), getOperationForLog(job.values));
-				Double result = runCalculation(job.values);
-				try {
-					message.getProtocol().sendReply(message.getRequestId(), result);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				finish(message.getProtocol(), message.getRequestId(), job.values);
 			} else {
 				// store the job and send the requests to the other services
 				int id = addJob(job);
 				for (int key:resolve.keySet()) {
 					Expression expr = resolve.get(key);
 					sendRequest(expr.getHost(), expr.getPort(), expr.getArguments(), composeId(id, key), threadId);
+					if (threadId instanceof ThreadID7)
+						((ThreadID7) threadId).incPath();
 				}
 			}
 				
 		}
 	}
-
+	
 	protected void log(String threadId, String message) {
 		if (logger != null) {
 			Date date = new Date();
@@ -144,6 +132,25 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private void finish(CalculatorProtocol protocol, int requestId, Double...values) {
+		Double result = null;
+		String error = null;
+		try {
+			result = runCalculation(values);
+		} catch(Exception e) {
+			// an error occured during calculation
+			error = e.getMessage();
+		}
+		try {
+			if (error == null)
+				protocol.sendReply(requestId, result);
+			else
+				protocol.sendError(error);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -176,6 +183,9 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			case ThreadID6.ID:
 				container = new ThreadID6(ext);
 				((ThreadID6) container).incDepth();
+				break;
+			case ThreadID7.ID:
+				container = new ThreadID7(ext);
 				break;
 			}
 		}
@@ -210,7 +220,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		return result;
 	}
 	
-	abstract protected Double runCalculation(Double...values);
+	abstract protected Double runCalculation(Double...values) throws Exception;
 	
 	private synchronized Job updateJob(int reqId, int index, Double value) {
 		if (jobs.containsKey(reqId)) {
