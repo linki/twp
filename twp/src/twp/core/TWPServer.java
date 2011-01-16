@@ -53,14 +53,13 @@ public abstract class TWPServer {
 		this.handler = handler;
 		if (listener != null && listener.isAlive())
 			listener.disconnect();
-		System.out.println("Starting server thread");
-		Listener listener = new Listener(this, serverSocket);
+		listener = new Listener(this, serverSocket);
 		listener.start();
-		System.out.println("going on");
 	}
 	
 	public void stop() {
-		listener.disconnect();
+		if (listener != null)
+			listener.disconnect();
 	}
 	
 	public abstract void openConnection(Socket socket);
