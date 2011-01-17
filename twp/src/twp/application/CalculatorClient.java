@@ -99,7 +99,7 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 				try {
 					InetAddress addr = InetAddress.getByAddress(expr.getHost());
 					CalculatorProtocol prot = new CalculatorProtocol(addr.getHostAddress(), expr.getPort(), this);
-					prot.sendRequest(getRegId(), expr.getArguments());//, createThreadExtension(prot));
+					prot.sendRequest(getRegId(), expr.getArguments(), createThreadExtension(prot));
 					submit.setEnabled(false);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();

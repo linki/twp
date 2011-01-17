@@ -75,7 +75,8 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		if (job != null) {
 			// all intermediate results were returned
 			// so finish the job
-			log(handleThreadID(job.request.getExtensions()).toString(), getOperationForLog(job.values));
+			if (handleThreadID(job.request.getExtensions()) != null)
+				log(handleThreadID(job.request.getExtensions()).toString(), getOperationForLog(job.values));
 			finish(job.request.getProtocol(), job.request.getRequestId(), job.values);
 		}
 		
@@ -109,7 +110,8 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 			}
 			if (resolve.isEmpty()) {
 				// nothing to resolve, just calculate the result
-				log(threadId.toString(), getOperationForLog(job.values));
+				if (threadId != null)
+					log(threadId.toString(), getOperationForLog(job.values));
 				finish(message.getProtocol(), message.getRequestId(), job.values);
 			} else {
 				// store the job and send the requests to the other services
