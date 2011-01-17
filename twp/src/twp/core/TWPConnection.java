@@ -143,7 +143,10 @@ public class TWPConnection {
 			if (p != null) {
 				container.add(p);
 			}
-			tag = reader.readUnsignedByte();
+			if (type == ParameterType.UNION)
+				tag = 0;
+			else
+				tag = reader.readUnsignedByte();
 			type = getParameterType(tag);
 		}
 		return container;
@@ -170,7 +173,8 @@ public class TWPConnection {
 			Parameter param = iterator.next();
 			writeParameter(param);	
 		}
-		writer.write(0);
+		if (container.getType() != ParameterType.UNION)
+			writer.write(0);
 	}
 	
 	private TWPContainer readApplicationType(int tag) throws IOException {

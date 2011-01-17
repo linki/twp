@@ -99,7 +99,7 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 				try {
 					InetAddress addr = InetAddress.getByAddress(expr.getHost());
 					CalculatorProtocol prot = new CalculatorProtocol(addr.getHostAddress(), expr.getPort(), this);
-					prot.sendRequest(getRegId(), expr.getArguments(), createThreadExtension(prot));
+					prot.sendRequest(getRegId(), expr.getArguments());//, createThreadExtension(prot));
 					submit.setEnabled(false);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -121,13 +121,15 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 	private void registerOperations() {
 		generator = new CalculatorFormulaGenerator();
 		try {
-			generator.register(new CalculatorOperation("localhost", 12347, "+", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			/*generator.register(new CalculatorOperation("localhost", 12347, "+", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
 			generator.register(new CalculatorOperation("localhost", 12348, "*", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
 			generator.register(new CalculatorOperation("localhost", 12349, "!", CalculatorOperation.UNARY_OP, CalculatorOperation.POSTFIX));
 			generator.register(new CalculatorOperation("localhost", 12350, "sin", CalculatorOperation.UNARY_OP, CalculatorOperation.PREFIX));
 			generator.register(new CalculatorOperation("localhost", 12351, "PI", CalculatorOperation.CONSTANT, CalculatorOperation.PREFIX));
 			generator.register(new CalculatorOperation("localhost", 12352, "/", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
-			generator.register(new CalculatorOperation("localhost", 12353, "-", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			generator.register(new CalculatorOperation("localhost", 12353, "-", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));*/
+			generator.register(new CalculatorOperation("172.16.57.117", 7001, "+", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
+			generator.register(new CalculatorOperation("172.16.57.117", 7002, "*", CalculatorOperation.BINARY_OP, CalculatorOperation.INFIX));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -139,7 +141,7 @@ public class CalculatorClient extends JFrame implements CalculatorHandler {
 
 	@Override
 	public void onCalculatorError(CalculatorError message) {
-		out.setText("Error:\n" + message.getText());
+		out.setText("Error from Server:\n" + message.getText());
 		submit.setEnabled(true);
 	}
 
