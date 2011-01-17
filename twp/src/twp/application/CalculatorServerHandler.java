@@ -28,6 +28,7 @@ import twp.generated.ThreadID4;
 import twp.generated.ThreadID5;
 import twp.generated.ThreadID6;
 import twp.generated.ThreadID7;
+import twp.generated.ThreadID8;
 
 abstract public class CalculatorServerHandler implements CalculatorHandler {
 
@@ -162,31 +163,35 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		Extension container = null;
 		for (GenericRegisteredExtension ext:extensions) {
 			switch(ext.getId()) { 
-			case ThreadID.ID:
-				container = new ThreadID(ext);
-				((ThreadID) container).incDepth();
-				break;
-			case ThreadID2.ID:
-				container = new ThreadID2(ext);
-				break;
-			case ThreadID3.ID:
-				container = new ThreadID3(ext);
-				break;
-			case ThreadID4.ID:
-				container = new ThreadID4(ext);
-				((ThreadID4) container).incDepth();
-				break;
-			case ThreadID5.ID:
-				container = new ThreadID5(ext);
-				((ThreadID5) container).incDepth();
-				break;
-			case ThreadID6.ID:
-				container = new ThreadID6(ext);
-				((ThreadID6) container).incDepth();
-				break;
-			case ThreadID7.ID:
-				container = new ThreadID7(ext);
-				break;
+				case ThreadID.ID:
+					container = new ThreadID(ext);
+					((ThreadID) container).incDepth();
+					break;
+				case ThreadID2.ID:
+					container = new ThreadID2(ext);
+					break;
+				case ThreadID3.ID:
+					container = new ThreadID3(ext);
+					((ThreadID3) container).incDepth();
+					break;
+				case ThreadID4.ID:
+					container = new ThreadID4(ext);
+					((ThreadID4) container).incDepth();
+					break;
+				case ThreadID5.ID:
+					container = new ThreadID5(ext);
+					((ThreadID5) container).incDepth();
+					break;
+				case ThreadID6.ID:
+					container = new ThreadID6(ext);
+					((ThreadID6) container).incDepth();
+					break;
+				case ThreadID7.ID:
+					container = new ThreadID7(ext);
+					break;
+				case ThreadID8.ID:
+					container = new ThreadID8(ext);
+					break;
 			}
 		}
 		return container;

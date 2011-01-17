@@ -14,11 +14,13 @@ public class ThreadID3 implements Container, Extension {
 	private String address; /* ip address */
 	private int port; /* port */
 	private int timestamp; /* time of request */
+	private int depth; /* recursion depth */
 
 	public ThreadID3(GenericRegisteredExtension regex) {
 		address = (String) regex.getElements().get(0);
 		port = (Integer) regex.getElements().get(1);
 		timestamp = (Integer) regex.getElements().get(2);
+		depth = (Integer) regex.getElements().get(3);
 	}
 	
 	public String getAddress() {
@@ -45,6 +47,18 @@ public class ThreadID3 implements Container, Extension {
 		this.timestamp = timestamp;
 	}
 
+	public int getDepth() {
+		return depth;
+	}
+
+	public void setDepth(int depth) {
+		this.depth = depth;
+	}
+
+	public void incDepth() {
+		depth++;
+	}
+	
 	@Override
 	public ParameterType getParameterType() {
 		return ParameterType.REGISTERED_EXTENSION;
