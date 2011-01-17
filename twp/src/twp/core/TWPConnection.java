@@ -143,7 +143,7 @@ public class TWPConnection {
 			if (p != null) {
 				container.add(p);
 			}
-			if (type == ParameterType.UNION)
+			if (container.getType() == ParameterType.UNION)
 				tag = 0;
 			else
 				tag = reader.readUnsignedByte();
