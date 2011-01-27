@@ -12,7 +12,6 @@ import twp.core.GenericRegisteredExtension;
 import twp.core.GenericSequence;
 import twp.core.Message;
 import twp.core.Parameter;
-import twp.core.ParameterType;
 import twp.core.TWPProtocol;
 
 public class CalculatorProtocol extends TWPProtocol {
