@@ -5,10 +5,8 @@ import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.List;
 
-import twp.core.AbstractRequest;
 import twp.core.Container;
 import twp.core.GenericApplicationType;
-import twp.core.GenericRegisteredExtension;
 import twp.core.GenericSequence;
 import twp.core.Message;
 import twp.core.Parameter;
@@ -38,12 +36,6 @@ public class CalculatorProtocol extends TWPProtocol {
 		return ID;
 	}
 	
-	private void addExtensions(AbstractRequest request, Iterator<Parameter> iter) {
-		while (iter.hasNext()) {
-			request.addExtension((GenericRegisteredExtension) compose(iter.next()));
-		}
-	}
-	
 	public void sendRequest(int  requestId , Parameters  arguments ) throws IOException {
 		sendRequest(requestId, arguments, null);
 	}
@@ -53,6 +45,7 @@ public class CalculatorProtocol extends TWPProtocol {
 		message.addParameter(decompose(requestId));
 		message.addParameter(decompose(arguments));
 		addExtensions(message, extensions);
+		message = sign(message);
 		connection.writeMessage(message);
 	}
 	
@@ -77,6 +70,7 @@ public class CalculatorProtocol extends TWPProtocol {
 		message.addParameter(decompose(requestId));
 		message.addParameter(decompose(result));
 		addExtensions(message, extensions);
+		message = sign(message);
 		connection.writeMessage(message);
 	}
 
@@ -100,6 +94,7 @@ public class CalculatorProtocol extends TWPProtocol {
 		Message message = new Message(2, ID);
 		message.addParameter(decompose(text));
 		addExtensions(message, extensions);
+		message = sign(message);
 		connection.writeMessage(message);
 	}
 

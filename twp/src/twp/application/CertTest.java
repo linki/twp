@@ -30,10 +30,10 @@ public class CertTest {
 			inStream.close();
 			//System.out.println(cert);*/
 			Signature signature = Signature.getInstance("SHA1withRSA");
-			byte[] blank = readFile("/security/data.bin");
+			byte[] blank = readFile("security/data.bin");
 			System.out.println(new String(blank));
 			KeyStore ks = KeyStore.getInstance("JKS");
-			inStream = new FileInputStream("/security/keystore.jks");
+			inStream = new FileInputStream("security/keystore.jks");
 			ks.load(inStream, new String("foobar").toCharArray());
 			
 			Certificate cert = ks.getCertificate("1");
@@ -43,7 +43,7 @@ public class CertTest {
 			signature.initSign((PrivateKey) key);
 			signature.update(blank);
 			byte[] signed = signature.sign();
-			byte[] test = readFile("/security/signature.bin");
+			byte[] test = readFile("security/signature.bin");
 			Signature verifier = Signature.getInstance("SHA1withRSA");
 			verifier.initVerify(cert);
 			verifier.update(blank);

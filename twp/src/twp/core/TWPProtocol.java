@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public abstract class TWPProtocol {
 	protected TWPConnection connection;
+	private SignatureHandler signatureHandler;
+	protected boolean doSign = false;
+	protected boolean isServer = false;
 	
 	protected List<Object> getAnyDefinedBy(Parameter param) {
 		List<Object> list = new ArrayList<Object>();
@@ -97,12 +101,19 @@ public abstract class TWPProtocol {
 		}
 	}
 	
+	protected void addExtensions(AbstractRequest request, Iterator<Parameter> iter) {
+		while (iter.hasNext()) {
+			request.addExtension((GenericRegisteredExtension) compose(iter.next()));
+		}
+	}
+	
 	public TWPProtocol(String host, int port) throws UnknownHostException, IOException {
 		connection = new TWPConnection(host, port, this);
 	}
 	
 	public TWPProtocol(Socket s) throws IOException {
 		connection = new TWPConnection(s, this);
+		isServer = true;
 	}
 	
 	public void stop() throws IOException {
@@ -120,4 +131,32 @@ public abstract class TWPProtocol {
 	public abstract void onMessage(Message message) throws IOException;
 	
 	public abstract int getVersion();
+	
+	public void setSignatureHandler(SignatureHandler handler) throws IOException {
+		signatureHandler = handler;
+		doSign = true;
+		if (!isServer) {
+			connection.writeMessage(signatureHandler.getCertificateMessage());
+		}
+	}
+	
+	protected void checkSecurity(Message message) throws Exception {
+		if (message.getType() == SignatureHandler.CERTIFICATE) {
+			signatureHandler.storeCertificate(message);
+			if (isServer) {
+				connection.writeMessage(signatureHandler.getCertificateMessage());
+			}	
+		} else if (message.getType() == SignatureHandler.ERROR) {
+			signatureHandler.handleErrorMessage(message);
+		} else {
+			
+		}
+	}
+	
+	protected Message sign(Message message) {
+		if (doSign) {
+			return signatureHandler.sign(message);
+		}
+		return message;
+	}
 }
