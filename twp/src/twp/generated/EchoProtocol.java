@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
+import java.util.List;
 
+import twp.core.Container;
 import twp.core.Message;
 import twp.core.Parameter;
 import twp.core.ParameterType;
@@ -34,52 +36,72 @@ public class EchoProtocol extends TWPProtocol {
 	}
 	
 	public void sendRequest(String  text ) throws IOException {
+		sendRequest(text, null);
+	}
+
+	public void sendRequest(String text, List<Container> extensions) throws IOException {
 		Message message = new Message(0, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
-
+		addExtensions(message, extensions);
+		message = sign(message);
 		connection.writeMessage(message);
 	}
-
-	public EchoRequest receiveRequest() throws IOException {
+	
+	public EchoRequest receiveRequest() throws Exception {
 		Message message = connection.readMessage();
-		if (message == null || message.getType() != 0) {
-			// throw exception
+		if (checkSecurity(message)) {
+			if (message == null || message.getType() != 0) {
+				// throw exception
+			}
+			Iterator<Parameter> iter = message.getParameters().iterator();
+			EchoRequest req = new EchoRequest(this, (String) iter.next().getValue());
+			return req;
+		} else {
+			return receiveRequest();
 		}
-		Iterator<Parameter> iter = message.getParameters().iterator();
-		EchoRequest req = new EchoRequest(this, (String) iter.next().getValue());
-		return req;
 	}
-		public void sendReply(String  text , int  numberOfLetters ) throws IOException {
+	
+	public void sendReply(String  text , int  numberOfLetters ) throws IOException {
+		sendReply(text, numberOfLetters, null);
+	}
+
+	public void sendReply(String text, int numberOfLetters, List<Container> extensions) throws IOException {
 		Message message = new Message(1, ID);
 		message.addParameter(new Parameter(ParameterType.LONG_STRING, text));
 		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, numberOfLetters));
-
+		addExtensions(message, extensions);
+		message = sign(message);
 		connection.writeMessage(message);
 	}
-
-	public EchoReply receiveReply() throws IOException {
+	
+	public EchoReply receiveReply() throws Exception {
 		Message message = connection.readMessage();
-		if (message == null || message.getType() != 1) {
-			// throw exception
+		if (checkSecurity(message)) {
+			if (message == null || message.getType() != 1) {
+				// throw exception
+			}
+			Iterator<Parameter> iter = message.getParameters().iterator();
+			EchoReply req = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
+			return req;
+		} else {
+			return receiveReply();
 		}
-		Iterator<Parameter> iter = message.getParameters().iterator();
-		EchoReply req = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
-		return req;
 	}
 		
 	
-	public void onMessage(Message message) throws IOException {
+	public void onMessage(Message message) throws Exception {
 		Iterator<Parameter> iter = message.getParameters().iterator();
-		switch (message.getType()) {
-		case 0:
-				EchoRequest req0 = new EchoRequest(this, (String) iter.next().getValue());
-				handler.onEchoRequest(req0);
-				break;
-		case 1:
-				EchoReply req1 = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
-				handler.onEchoReply(req1);
-				break;
-
+		if (checkSecurity(message)) {
+			switch (message.getType()) {
+				case 0:
+					EchoRequest req0 = new EchoRequest(this, (String) iter.next().getValue());
+					handler.onEchoRequest(req0);
+					break;
+				case 1:
+					EchoReply req1 = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
+					handler.onEchoReply(req1);
+					break;
+			}
 		}
 	}
 }

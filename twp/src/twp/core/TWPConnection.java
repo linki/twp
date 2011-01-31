@@ -25,7 +25,7 @@ public class TWPConnection {
 					protocol.onMessage(message);
 				}
 			} catch (EOFException e) {}
-			catch (IOException e) {}
+			catch (Exception e) {}
 		}
 		
 		public void disconnect() {

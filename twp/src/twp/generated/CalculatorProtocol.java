@@ -49,15 +49,19 @@ public class CalculatorProtocol extends TWPProtocol {
 		connection.writeMessage(message);
 	}
 	
-	public CalculatorRequest receiveRequest() throws IOException {
+	public CalculatorRequest receiveRequest() throws Exception {
 		Message message = connection.readMessage();
-		if (message == null || message.getType() != 0) {
-			// throw exception
+		if (checkSecurity(message)) {
+			if (message == null || message.getType() != 0) {
+				// throw exception
+			}
+			Iterator<Parameter> iter = message.getParameters().iterator();
+			CalculatorRequest req = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
+			addExtensions(req, iter);
+			return req;
+		} else {
+			return receiveRequest();
 		}
-		Iterator<Parameter> iter = message.getParameters().iterator();
-		CalculatorRequest req = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
-		addExtensions(req, iter);
-		return req;
 	}
 
 	public void sendReply(int  requestId , Double  result ) throws IOException {
@@ -74,15 +78,19 @@ public class CalculatorProtocol extends TWPProtocol {
 		connection.writeMessage(message);
 	}
 
-	public CalculatorReply receiveReply() throws IOException {
+	public CalculatorReply receiveReply() throws Exception {
 		Message message = connection.readMessage();
-		if (message == null || message.getType() != 1) {
-			// throw exception
+		if (checkSecurity(message)) {
+			if (message == null || message.getType() != 1) {
+				// throw exception
+			}
+			Iterator<Parameter> iter = message.getParameters().iterator();
+			CalculatorReply req = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
+			addExtensions(req, iter);
+			return req;
+		} else {
+			return receiveReply();
 		}
-		Iterator<Parameter> iter = message.getParameters().iterator();
-		CalculatorReply req = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
-		addExtensions(req, iter);
-		return req;
 	}
 	
 	public void sendError(String  text ) throws IOException {
@@ -98,37 +106,42 @@ public class CalculatorProtocol extends TWPProtocol {
 		connection.writeMessage(message);
 	}
 
-	public CalculatorError receiveError() throws IOException {
+	public CalculatorError receiveError() throws Exception {
 		Message message = connection.readMessage();
-		if (message == null || message.getType() != 2) {
-			// throw exception
+		if (checkSecurity(message)) {
+			if (message == null || message.getType() != 2) {
+				// throw exception
+			}
+			Iterator<Parameter> iter = message.getParameters().iterator();
+			CalculatorError req = new CalculatorError(this, (String) iter.next().getValue() );
+			addExtensions(req, iter);
+			return req;
+		} else {
+			return receiveError();
 		}
-		Iterator<Parameter> iter = message.getParameters().iterator();
-		CalculatorError req = new CalculatorError(this, (String) iter.next().getValue() );
-		addExtensions(req, iter);
-		return req;
 	}
 		
 	
-	public void onMessage(Message message) throws IOException {
+	public void onMessage(Message message) throws Exception {
 		Iterator<Parameter> iter = message.getParameters().iterator();
-		switch (message.getType()) {
-		case 0:
-				CalculatorRequest req0 = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
-				addExtensions(req0, iter);
-				handler.onCalculatorRequest(req0);
-				break;
-		case 1:
-				CalculatorReply req1 = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
-				addExtensions(req1, iter);
-				handler.onCalculatorReply(req1);
-				break;
-		case 2:
-				CalculatorError req2 = new CalculatorError(this, (String) iter.next().getValue() );
-				addExtensions(req2, iter);
-				handler.onCalculatorError(req2);
-				break;
-
+		if (checkSecurity(message)) {
+			switch (message.getType()) {
+				case 0:
+					CalculatorRequest req0 = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );
+					addExtensions(req0, iter);
+					handler.onCalculatorRequest(req0);
+					break;
+				case 1:
+					CalculatorReply req1 = new CalculatorReply(this, (Integer) iter.next().getValue() , new Double((GenericApplicationType ) compose(iter.next())) );
+					addExtensions(req1, iter);
+					handler.onCalculatorReply(req1);
+					break;
+				case 2:
+					CalculatorError req2 = new CalculatorError(this, (String) iter.next().getValue() );
+					addExtensions(req2, iter);
+					handler.onCalculatorError(req2);
+					break;
+			}
 		}
 	}
 }

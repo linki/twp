@@ -115,10 +115,13 @@ public class TWPInputStream extends DataInputStream {
 		return protocolVersion;
 	}
 	
-	// TODO: registered extensions
 	public int readMessageId() throws IOException {
 		int message = readUnsignedByte();
-		return message - 4;
+		if (message == 12) {
+			message = readInt();
+			return message;
+		} else
+			return message - 4;
 	}
 	
 	public byte[] readTWPByte() throws IOException {

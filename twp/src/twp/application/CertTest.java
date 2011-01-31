@@ -33,12 +33,12 @@ public class CertTest {
 			byte[] blank = readFile("security/data.bin");
 			System.out.println(new String(blank));
 			KeyStore ks = KeyStore.getInstance("JKS");
-			inStream = new FileInputStream("security/keystore.jks");
+			inStream = new FileInputStream("security/private_keystore.jks");
 			ks.load(inStream, new String("foobar").toCharArray());
 			
-			Certificate cert = ks.getCertificate("1");
+			Certificate cert = ks.getCertificate("hasso-plattner-institut id von christian wiggert");
 			System.out.println(cert);
-			Key key = ks.getKey("1", new String("foobar").toCharArray());
+			Key key = ks.getKey("hasso-plattner-institut id von christian wiggert", new String("foobar").toCharArray());
 			System.out.println(key);
 			signature.initSign((PrivateKey) key);
 			signature.update(blank);

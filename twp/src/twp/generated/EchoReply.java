@@ -1,5 +1,8 @@
 package twp.generated;
-public class EchoReply {
+
+import twp.core.AbstractRequest;
+
+public class EchoReply extends AbstractRequest {
 	
 	private EchoProtocol protocol;
 	private String  text ;

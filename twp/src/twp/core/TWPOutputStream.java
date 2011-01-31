@@ -94,13 +94,16 @@ public class TWPOutputStream extends DataOutputStream {
 		writeInteger(protocol);
 	}
 	
-	// TODO: registered extensions
 	public void writeMessageId(int i) throws IOException {
-		write(i + 4);
+		if (i > 7) {
+			write(12);
+			writeInt(i);
+		} else
+			write(i + 4);
 	}
 	
 	public void writeTWPByte(byte[] value) throws IOException {
-		if (value.length > 255) {
+		if (value.length <= 255) {
 			write(15);
 			writeByte(value.length);
 		} else {

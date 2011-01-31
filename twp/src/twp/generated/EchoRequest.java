@@ -1,5 +1,8 @@
 package twp.generated;
-public class EchoRequest {
+
+import twp.core.AbstractRequest;
+
+public class EchoRequest extends AbstractRequest {
 	
 	private EchoProtocol protocol;
 	private String  text ;

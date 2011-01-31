@@ -128,7 +128,7 @@ public abstract class TWPProtocol {
 		return connection.getLocalPort();
 	}
 	
-	public abstract void onMessage(Message message) throws IOException;
+	public abstract void onMessage(Message message) throws Exception;
 	
 	public abstract int getVersion();
 	
@@ -140,17 +140,21 @@ public abstract class TWPProtocol {
 		}
 	}
 	
-	protected void checkSecurity(Message message) throws Exception {
+	protected boolean checkSecurity(Message message) throws Exception {
 		if (message.getType() == SignatureHandler.CERTIFICATE) {
 			signatureHandler.storeCertificate(message);
 			if (isServer) {
 				connection.writeMessage(signatureHandler.getCertificateMessage());
 			}	
+			return false;
 		} else if (message.getType() == SignatureHandler.ERROR) {
 			signatureHandler.handleErrorMessage(message);
+			return false;
 		} else {
-			
+			if (doSign)
+				return signatureHandler.checkSignature(message);
 		}
+		return true;
 	}
 	
 	protected Message sign(Message message) {
