@@ -15,7 +15,9 @@ public class EchoServer extends TWPServer {
 	public void openConnection(Socket socket) {
 		if (handler != null)
 			try {
-				new EchoProtocol(socket, (EchoHandler) handler);
+				EchoProtocol protocol = new EchoProtocol(socket, (EchoHandler) handler);
+				if (getSignatureHandler() != null)
+					protocol.setSignatureHandler(getSignatureHandler().clone());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

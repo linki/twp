@@ -15,7 +15,9 @@ public class CalculatorServer extends TWPServer {
 	public void openConnection(Socket socket) {
 		if (handler != null)
 			try {
-				new CalculatorProtocol(socket, (CalculatorHandler) handler);
+				CalculatorProtocol protocol = new CalculatorProtocol(socket, (CalculatorHandler) handler);
+				if (getSignatureHandler() != null) 
+					protocol.setSignatureHandler(getSignatureHandler().clone());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

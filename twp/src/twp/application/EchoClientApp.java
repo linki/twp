@@ -33,7 +33,7 @@ public class EchoClientApp implements EchoHandler {
 		Certificate cert = null;
 		try {
 			ks = KeyStore.getInstance("JKS");
-			InputStream inStream = new FileInputStream("security/private_keystore.jks");
+			InputStream inStream = new FileInputStream("../security/private_keystore.jks");
 			ks.load(inStream, new String("foobar").toCharArray());
 			cert = ks.getCertificate("hasso-plattner-institut id von christian wiggert");
 			key = (PrivateKey) ks.getKey("hasso-plattner-institut id von christian wiggert", new String("foobar").toCharArray());
@@ -70,8 +70,8 @@ public class EchoClientApp implements EchoHandler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		EchoClientApp client = new EchoClientApp("www.dcl.hpi.uni-potsdam.de", 80, false);
-		//EchoClientApp client = new EchoClientApp("localhost", 12347, true);
+		//EchoClientApp client = new EchoClientApp("www.dcl.hpi.uni-potsdam.de", 80, false);
+		EchoClientApp client = new EchoClientApp("localhost", 12347, false);
 		client.start();
 		
 	}
@@ -87,7 +87,7 @@ public class EchoClientApp implements EchoHandler {
 					protocol.sendRequest(input);
 					if (!autoHandler) {
 						EchoReply rep = protocol.receiveReply();
-						System.out.println(">> " + rep.getText() + " has " + rep.getNumberOfLetters() + " letters");
+						System.out.println(">> " + rep.getText() + " has " + rep.getNumberOfLetters() + " different letters");
 					}
 				} else 
 					break;

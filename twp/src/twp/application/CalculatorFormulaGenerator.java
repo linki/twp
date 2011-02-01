@@ -32,12 +32,18 @@ public class CalculatorFormulaGenerator {
 		checkIfAllOperationsAreRegistered(formula);
 		formula = formula.replace(" ", "");
 		List<String> tokens = tokenize(formula);
+		System.out.println(tokens);
 		index = 0;
 		List<Object> groups = removeParenthesis(tokens);
+		System.out.println(groups);
 		groups = prioritize(groups);
+		System.out.println(groups);
 		groups = removeUnneccessaryHierarchy(groups);
+		System.out.println(groups);
 		groups = finalSort(groups);
+		System.out.println(groups);
 		Expression expr = checkIfSingleDouble(groups);
+		System.out.println(groups);
 		if (expr == null)
 			expr = convert(groups);
 		return expr;
@@ -66,13 +72,17 @@ public class CalculatorFormulaGenerator {
 	 */
 	private List<Object> removeUnneccessaryHierarchy(List<Object> groups) {
 		if (groups.size() == 1 && groups.get(0) instanceof List) {
-			return (List<Object>) groups.get(0);
+			return removeUnneccessaryHierarchy((List<Object>) groups.get(0));
 		} else {
 			List<Object> list = new ArrayList<Object>();
 			for (Object obj:groups) {
-				if (obj instanceof List)
-					list.add(removeUnneccessaryHierarchy((List<Object>) obj));
-				else 
+				if (obj instanceof List) {
+					List<Object> child = removeUnneccessaryHierarchy((List<Object>) obj);
+					if (child.size() == 1 && !(child.get(0) instanceof String))
+						list.add(child.get(0));
+					else 
+						list.add(child);
+				} else 
 					list.add(obj);
 			}
 			return list;

@@ -13,6 +13,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 
 public class SignatureHandler {
 
@@ -20,9 +21,21 @@ public class SignatureHandler {
 	public static final int CERTIFICATE = 27;
 	public static final int ERROR = 29;
 	
+	public static final int OTHER_ERROR = 0;
+	public static final int BAD_CERTIFICATE = 1;
+	public static final int UNSUPPORTED_CERTIFICATE = 2;
+	public static final int CERTIFICATE_REVOKED = 3;
+	public static final int CERTIFICATE_EXPIRED = 4;
+	public static final int CERTIFICATE_UNKNOWN = 5;
+	public static final int ILLEGAL_PARAMETER = 6;
+	public static final int UNKNOWN_CA = 7;
+	public static final int ACCESS_DENIED = 8;
+	public static final int BAD_MAC = 9;
+	public static final int CERTIFICATE_NOT_YET_VALID = 10;
+	
 	private Certificate cert;
 	private PrivateKey key;
-	private Certificate external;
+	private X509Certificate external;
 	
 	public SignatureHandler(Certificate cert, PrivateKey key) {
 		this.cert = cert;
@@ -78,16 +91,23 @@ public class SignatureHandler {
 		return message;
 	}
 	
-	public void storeCertificate(Message message) {
+	public Message getErrorMessage(int id, String details) {
+		Message message = new Message(ERROR, -1);
+		message.addParameter(new Parameter(ParameterType.LONG_INTEGER, id));
+		message.addParameter(new Parameter(ParameterType.LONG_STRING, details));
+		return message;
+	}
+	
+	public boolean storeCertificate(Message message) throws CertificateException  {
 		if (message.getType() == CERTIFICATE) {
 			byte[] der = (byte[]) message.getParameters().get(0).getValue();
-			try {
-				CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				external = cf.generateCertificate(new ByteArrayInputStream(der));
-			} catch (CertificateException e) {
-				e.printStackTrace();
-			}
+			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			external = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(der));
+			external.checkValidity();
+			//external.
+			return true;
 		}
+		return false;
 	}
 	
 	public boolean checkSignature(Message message) {
@@ -97,10 +117,10 @@ public class SignatureHandler {
 		byte[] signature = null;
 		for (Parameter param:message.getParameters()) {
 			if (param.getType() == ParameterType.REGISTERED_EXTENSION &&
-				((TWPContainer) param.getValue()).getId() == 28) {
+				((TWPContainer) param.getValue()).getId() == SIGNATURE) {
 				signP = param;
 				signature = (byte[]) ((TWPContainer) param.getValue()).getParameters().get(0).getValue();
-			
+				break; // just use all fields until the signature is found 
 			} else {
 				try {
 					twp.writeParameter(param);
@@ -134,37 +154,37 @@ public class SignatureHandler {
 			StringBuffer buffer = new StringBuffer();
 			int code = (Integer) message.getParameters().get(0).getValue();
 			switch(code) {
-				case 0: 
+				case OTHER_ERROR: 
 					buffer.append("other error");
 					break;
-				case 1: 
+				case BAD_CERTIFICATE: 
 					buffer.append("bad certificate");
 					break;
-				case 2:
+				case UNSUPPORTED_CERTIFICATE:
 					buffer.append("unsupported certificate");
 					break;
-				case 3:
+				case CERTIFICATE_REVOKED:
 					buffer.append("certificate revoked");
 					break;
-				case 4:
+				case CERTIFICATE_EXPIRED:
 					buffer.append("certificate expired");
 					break;
-				case 5:
+				case CERTIFICATE_UNKNOWN:
 					buffer.append("certificate unknown");
 					break;
-				case 6:
+				case ILLEGAL_PARAMETER:
 					buffer.append("illegal parameter");
 					break;
-				case 7: 
+				case UNKNOWN_CA: 
 					buffer.append("unknown ca");
 					break;
-				case 8: 
+				case ACCESS_DENIED: 
 					buffer.append("access denied");
 					break;
-				case 9: 
+				case BAD_MAC: 
 					buffer.append("bad MAC");
 					break;
-				case 10: 
+				case CERTIFICATE_NOT_YET_VALID: 
 					buffer.append("certificate not yet valid");
 					break;
 			}
@@ -172,5 +192,9 @@ public class SignatureHandler {
 			buffer.append((String) message.getParameters().get(1).getValue());
 			throw new Exception(buffer.toString());
 		}
+	}
+	
+	public SignatureHandler clone() {
+		return new SignatureHandler(cert, key);
 	}
 }

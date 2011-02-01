@@ -123,8 +123,8 @@ public class CalculatorProtocol extends TWPProtocol {
 		
 	
 	public void onMessage(Message message) throws Exception {
-		Iterator<Parameter> iter = message.getParameters().iterator();
 		if (checkSecurity(message)) {
+			Iterator<Parameter> iter = message.getParameters().iterator();
 			switch (message.getType()) {
 				case 0:
 					CalculatorRequest req0 = new CalculatorRequest(this, (Integer) iter.next().getValue() , new Parameters((GenericSequence ) compose(iter.next())) );

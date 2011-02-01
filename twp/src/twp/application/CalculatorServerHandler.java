@@ -11,6 +11,7 @@ import java.util.List;
 import twp.core.Container;
 import twp.core.Extension;
 import twp.core.GenericRegisteredExtension;
+import twp.core.SignatureHandler;
 import twp.generated.CalculatorError;
 import twp.generated.CalculatorHandler;
 import twp.generated.CalculatorProtocol;
@@ -118,7 +119,7 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 				int id = addJob(job);
 				for (int key:resolve.keySet()) {
 					Expression expr = resolve.get(key);
-					sendRequest(expr.getHost(), expr.getPort(), expr.getArguments(), composeId(id, key), threadId);
+					sendRequest(expr.getHost(), expr.getPort(), expr.getArguments(), composeId(id, key), threadId, message.getProtocol().getSignatureHandler());
 					if (threadId instanceof ThreadID7)
 						((ThreadID7) threadId).incPath();
 				}
@@ -199,13 +200,15 @@ abstract public class CalculatorServerHandler implements CalculatorHandler {
 		return container;
 	}
 	
-	private void sendRequest(byte[] host, int port, Parameters args, int reqId, Container threadId) {
+	private void sendRequest(byte[] host, int port, Parameters args, int reqId, Container threadId, SignatureHandler signHandler) {
 		try {
 			String ip = InetAddress.getByAddress(host).getHostAddress();
 			CalculatorProtocol prot = new CalculatorProtocol(ip, port, this);
 			if (threadId != null) {
 				ArrayList<Container> list = new ArrayList<Container>();
 				list.add(threadId);
+				if (signHandler != null)
+					prot.setSignatureHandler(signHandler.clone());
 				prot.sendRequest(reqId, args, list);
 			} else 
 				prot.sendRequest(reqId, args);

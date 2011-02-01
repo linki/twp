@@ -13,6 +13,7 @@ public abstract class TWPServer {
 		private ServerSocket socket;
 		private boolean isActive;
 		
+		
 		public Listener(TWPServer server, ServerSocket socket) {
 			this.server = server;	
 			this.socket = socket;
@@ -43,9 +44,11 @@ public abstract class TWPServer {
 	private ServerSocket serverSocket;
 	private Listener listener;
 	protected TWPHandler handler;
+	private SignatureHandler signatureHandler;
 	
 	public TWPServer(int port) throws IOException {
 		serverSocket = new ServerSocket(port);
+		this.signatureHandler = null;
 		
 	}
 	
@@ -55,6 +58,14 @@ public abstract class TWPServer {
 			listener.disconnect();
 		listener = new Listener(this, serverSocket);
 		listener.start();
+	}
+	
+	public SignatureHandler getSignatureHandler() {
+		return signatureHandler;
+	}
+	
+	public void setSignatureHandler(SignatureHandler signHandler) {
+		signatureHandler = signHandler;
 	}
 	
 	public void stop() {

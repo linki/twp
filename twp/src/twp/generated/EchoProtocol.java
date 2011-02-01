@@ -90,15 +90,17 @@ public class EchoProtocol extends TWPProtocol {
 		
 	
 	public void onMessage(Message message) throws Exception {
-		Iterator<Parameter> iter = message.getParameters().iterator();
 		if (checkSecurity(message)) {
+			Iterator<Parameter> iter = message.getParameters().iterator();
 			switch (message.getType()) {
 				case 0:
 					EchoRequest req0 = new EchoRequest(this, (String) iter.next().getValue());
+					addExtensions(req0, iter);
 					handler.onEchoRequest(req0);
 					break;
 				case 1:
 					EchoReply req1 = new EchoReply(this, (String) iter.next().getValue(), (Integer) iter.next().getValue());
+					addExtensions(req1, iter);
 					handler.onEchoReply(req1);
 					break;
 			}

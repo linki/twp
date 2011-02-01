@@ -3,6 +3,9 @@ package twp.core;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,7 +13,14 @@ import java.util.List;
 public abstract class TWPProtocol {
 	protected TWPConnection connection;
 	private SignatureHandler signatureHandler;
-	protected boolean doSign = false;
+	/**
+	 * indicates whether the communication partner has sent a valid certificate 
+	 */
+	protected boolean partnerSignEnabled = false;
+	/**
+	 * indicates whether the local protocol shall sign messages
+	 */
+	protected boolean signEnabled = false;
 	protected boolean isServer = false;
 	
 	protected List<Object> getAnyDefinedBy(Parameter param) {
@@ -132,33 +142,63 @@ public abstract class TWPProtocol {
 	
 	public abstract int getVersion();
 	
+	public SignatureHandler getSignatureHandler() {
+		return signatureHandler;
+	}
+	
 	public void setSignatureHandler(SignatureHandler handler) throws IOException {
-		signatureHandler = handler;
-		doSign = true;
-		if (!isServer) {
-			connection.writeMessage(signatureHandler.getCertificateMessage());
+		if (handler != null) {
+			signatureHandler = handler;
+			signEnabled = true;
+			if (!isServer) {
+				connection.writeMessage(signatureHandler.getCertificateMessage());
+			}
 		}
 	}
 	
+	/**
+	 * Checks whether the current message contains a certificate or an
+	 * AuthenticationError or needs to be verified.
+	 * @param message to be checked
+	 * @return true if the message should be processed further
+	 * @throws Exception
+	 */
 	protected boolean checkSecurity(Message message) throws Exception {
+		if (!signEnabled)
+			return true;
 		if (message.getType() == SignatureHandler.CERTIFICATE) {
-			signatureHandler.storeCertificate(message);
-			if (isServer) {
-				connection.writeMessage(signatureHandler.getCertificateMessage());
-			}	
+			try {
+				partnerSignEnabled = signatureHandler.storeCertificate(message);
+				if (isServer) {
+					connection.writeMessage(signatureHandler.getCertificateMessage());
+				}
+			} catch (CertificateNotYetValidException e) {
+				connection.writeMessage(
+						signatureHandler.getErrorMessage(SignatureHandler.CERTIFICATE_NOT_YET_VALID, e.getLocalizedMessage()));
+			} catch (CertificateExpiredException e) {
+				connection.writeMessage(
+						signatureHandler.getErrorMessage(SignatureHandler.CERTIFICATE_EXPIRED, e.getLocalizedMessage()));
+			} catch (CertificateException e) {
+				connection.writeMessage(
+						signatureHandler.getErrorMessage(SignatureHandler.BAD_CERTIFICATE, e.getLocalizedMessage()));
+			}
 			return false;
 		} else if (message.getType() == SignatureHandler.ERROR) {
 			signatureHandler.handleErrorMessage(message);
 			return false;
 		} else {
-			if (doSign)
-				return signatureHandler.checkSignature(message);
+			if (signEnabled && partnerSignEnabled)
+				if (!signatureHandler.checkSignature(message)) {
+					connection.writeMessage(
+							signatureHandler.getErrorMessage(SignatureHandler.ACCESS_DENIED, "Signature couldn't be verified."));
+					return false;
+				}
 		}
 		return true;
 	}
 	
 	protected Message sign(Message message) {
-		if (doSign) {
+		if (signEnabled) {
 			return signatureHandler.sign(message);
 		}
 		return message;
